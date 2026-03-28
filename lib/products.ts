@@ -13,6 +13,7 @@ export interface Product {
   subtitleIt?: string;
   subtitleEn?: string;
   type?: string;
+  compatibleHeaters?: string[];
 }
 
 export interface Heater {
