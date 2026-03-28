@@ -2,18 +2,28 @@ export interface Product {
   id: string;
   nameIt: string;
   nameEn: string;
+  name?: string;
+  description?: string;
   persons?: number;
+  capacity?: number;
   dims?: string;
+  dimensions?: {
+    width?: number;
+    depth?: number;
+    height?: number;
+  };
   category?: string;
   price?: number;
   flatpack?: number;
   assembled?: number;
+  assembledPrice?: number;
   image?: string;
   images?: string[];
   subtitleIt?: string;
   subtitleEn?: string;
   type?: string;
   compatibleHeaters?: string[];
+  compatibleAccessories?: string[];
 }
 
 export interface Heater {
