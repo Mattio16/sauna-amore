@@ -8,7 +8,7 @@ import ScrollReveal from '@/components/ScrollReveal';
 import { motion } from 'framer-motion';
 
 export default function SaunasPage() {
-  const { t } = useLang();
+  const lang = useLang();
   const [activeFilter, setActiveFilter] = useState('Tutti');
 
   const sizeFilters = ['Tutti', '2m', '2.4m', '3m', '4m', '5m+'];

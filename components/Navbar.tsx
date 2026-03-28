@@ -15,7 +15,7 @@ const Navbar = ({ onToggleLang }: NavbarProps) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const pathname = usePathname();
-  const { lang } = useLang();
+  const lang = useLang();
 
   const navItems = [
     { href: '/saunas', labelIt: 'Saune', labelEn: 'Saunas' },

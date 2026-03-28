@@ -7,7 +7,7 @@ import ScrollReveal from '@/components/ScrollReveal';
 import { motion } from 'framer-motion';
 
 export default function IceBathsPage() {
-  const { t } = useLang();
+  const lang = useLang();
 
   const heroImage = icebaths[0]?.image || '/images/icebath-hero.jpg';
 

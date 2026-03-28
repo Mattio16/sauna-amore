@@ -18,7 +18,7 @@ interface InfoModalContent {
 
 function ConfiguratorContent() {
   const searchParams = useSearchParams();
-  const { t, lang } = useLang();
+  const lang = useLang();
 
   const productId = searchParams.get('product') || 'S16E';
   const productType = (searchParams.get('type') || 'sauna') as 'sauna' | 'hottub' | 'icebath';

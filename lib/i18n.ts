@@ -112,7 +112,7 @@ export const translations = {
     },
     contact: {
       title: 'Get in Touch',
-      subtitle: 'We're here to help you find the perfect wellness solution',
+      subtitle: "We're here to help you find the perfect wellness solution",
       name: 'Name',
       email: 'Email',
       phone: 'Phone',

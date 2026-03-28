@@ -1,24 +1,11 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
 import Link from 'next/link';
-import ScrollReveal from '@/utils/scrollReveal';
-import useLang from '@/hooks/useLang';
+import { useLang } from '@/lib/i18n';
 import { Heart, Shield, Star } from 'lucide-react';
 
 export default function AboutPage() {
-  const { lang } = useLang();
-  const valuesRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (valuesRef.current) {
-      ScrollReveal.reveal(valuesRef.current, {
-        distance: '50px',
-        origin: 'bottom',
-        interval: 200,
-      });
-    }
-  }, []);
+  const lang = useLang();
 
   const content = {
     en: {
@@ -113,7 +100,7 @@ export default function AboutPage() {
       <section className="py-20 px-6 md:px-12 bg-gradient-to-br from-cream/50 to-sage-50">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-4xl font-serif font-bold text-gray-900 mb-16 text-center">{t.valuesTitle}</h2>
-          <div ref={valuesRef} className="grid md:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-3 gap-8">
             {values.map((value, index) => {
               const Icon = value.icon;
               return (

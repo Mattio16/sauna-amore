@@ -8,7 +8,7 @@ import ScrollReveal from '@/components/ScrollReveal';
 import { motion } from 'framer-motion';
 
 export default function HotTubsPage() {
-  const { t } = useLang();
+  const lang = useLang();
   const [activeFilter, setActiveFilter] = useState('Tutti');
 
   const materialFilters = ['Tutti', 'Fiberglass', 'Legno'];
