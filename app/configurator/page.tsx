@@ -1,7 +1,7 @@
 'use client';
 import { useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { useLang } from '@/lib/i18n';
+import { useLang, useTranslation } from '@/lib/i18n';
 import { saunas, hottubs, icebaths, saunaHeaters, hottubHeaters, saunaAccessories, hottubAccessories, icebathAccessories, Product, Heater, Accessory } from '@/lib/products';
 import ScrollReveal from '@/components/ScrollReveal';
 import Link from 'next/link';
@@ -16,14 +16,15 @@ interface InfoModalContent {
   specs?: string;
 }
 
-// Helper to pick correct language string
+// Helper to pick correct language string — IT gets Italian, everyone else gets English
 function n(item: { nameIt: string; nameEn: string }, lang: string): string {
-  return lang === 'en' ? item.nameEn : item.nameIt;
+  return lang === 'it' ? item.nameIt : item.nameEn;
 }
 
 function ConfiguratorContent() {
   const searchParams = useSearchParams();
   const lang = useLang();
+  const t = useTranslation();
 
   const productId = searchParams.get('product') || 'S16E';
   const productType = (searchParams.get('type') || 'sauna') as 'sauna' | 'hottub' | 'icebath';
@@ -51,7 +52,7 @@ function ConfiguratorContent() {
   };
 
   const product = getProduct();
-  if (!product) return <div className="p-8 text-center">{lang === 'en' ? 'Product not found' : 'Prodotto non trovato'}</div>;
+  if (!product) return <div className="p-8 text-center">{t('configurator.productNotFound')}</div>;
 
   const productName = n(product, lang);
 
@@ -109,8 +110,8 @@ function ConfiguratorContent() {
     name: n(acc, lang),
     price: acc.price,
     image: acc.image,
-    desc: lang === 'en' ? acc.descEn : acc.descIt,
-    specs: lang === 'en' ? acc.specsEn : acc.specsIt,
+    desc: lang === 'it' ? acc.descIt : acc.descEn,
+    specs: lang === 'it' ? acc.specsIt : acc.specsEn,
   });
 
   // Calculate price
@@ -156,7 +157,7 @@ function ConfiguratorContent() {
         <div className="max-w-6xl mx-auto px-4 py-4">
           <Link href="/" className="inline-flex items-center gap-2 text-[#2D5A4A] hover:text-[#1A3A2A] transition-colors">
             <ArrowLeft size={20} />
-            <span>{lang === 'en' ? 'Back' : 'Torna Indietro'}</span>
+            <span>{t('configurator.back')}</span>
           </Link>
         </div>
       </div>
@@ -224,19 +225,19 @@ function ConfiguratorContent() {
             <div className="mb-12">
               <h1 className="text-4xl font-bold text-[#2D5A4A] mb-2">{productName}</h1>
               {product.subtitleIt && (
-                <p className="text-[#6B6B6B] text-lg mb-4">{lang === 'en' ? product.subtitleEn : product.subtitleIt}</p>
+                <p className="text-[#6B6B6B] text-lg mb-4">{lang === 'it' ? product.subtitleIt : product.subtitleEn}</p>
               )}
 
               {product.dims && (
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 py-6 border-t border-b border-[#E8DDD4]">
                   <div>
-                    <p className="text-sm text-[#999] uppercase tracking-wide">{lang === 'en' ? 'Dimensions' : 'Dimensioni'}</p>
+                    <p className="text-sm text-[#999] uppercase tracking-wide">{t('products.dimensions')}</p>
                     <p className="text-lg font-semibold text-[#2D5A4A]">{product.dims}</p>
                   </div>
                   {product.persons && (
                     <div>
-                      <p className="text-sm text-[#999] uppercase tracking-wide">{lang === 'en' ? 'Capacity' : 'Capienza'}</p>
-                      <p className="text-lg font-semibold text-[#2D5A4A]">{product.persons} {lang === 'en' ? 'persons' : 'persone'}</p>
+                      <p className="text-sm text-[#999] uppercase tracking-wide">{t('configurator.capacity')}</p>
+                      <p className="text-lg font-semibold text-[#2D5A4A]">{product.persons} {t('products.persons').toLowerCase()}</p>
                     </div>
                   )}
                 </div>
@@ -250,7 +251,7 @@ function ConfiguratorContent() {
             {productType === 'sauna' && (
               <ScrollReveal>
                 <div className="bg-white rounded-lg shadow-sm border border-[#E8DDD4] p-6">
-                  <h2 className="text-xl font-bold text-[#2D5A4A] mb-4">{lang === 'en' ? 'Delivery Mode' : 'Modalità di Consegna'}</h2>
+                  <h2 className="text-xl font-bold text-[#2D5A4A] mb-4">{t('configurator.deliveryMode')}</h2>
                   <div className="space-y-3">
                     <label className="flex items-center gap-4 p-3 rounded-lg border-2 border-transparent hover:border-[#A8D5CC] cursor-pointer transition-colors">
                       <input
@@ -261,7 +262,7 @@ function ConfiguratorContent() {
                         onChange={(e) => setDelivery(e.target.value)}
                         className="w-5 h-5"
                       />
-                      <span className="font-medium text-[#2D5A4A]">{lang === 'en' ? 'Flat-pack' : 'Kit di Montaggio'}</span>
+                      <span className="font-medium text-[#2D5A4A]">{t('configurator.flatpack')}</span>
                     </label>
                     <label className="flex items-center gap-4 p-3 rounded-lg border-2 border-transparent hover:border-[#A8D5CC] cursor-pointer transition-colors">
                       <input
@@ -273,7 +274,7 @@ function ConfiguratorContent() {
                         className="w-5 h-5"
                       />
                       <div className="flex-1">
-                        <span className="font-medium text-[#2D5A4A]">{lang === 'en' ? 'Fully Assembled' : 'Completamente Montato'}</span>
+                        <span className="font-medium text-[#2D5A4A]">{t('configurator.assembled')}</span>
                         {assemblyUpcharge > 0 && (
                           <span className="ml-2 text-sm text-[#6B6B6B]">+€ {assemblyUpcharge.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                         )}
@@ -288,14 +289,14 @@ function ConfiguratorContent() {
             {productType === 'sauna' && (heaters.electric.length > 0 || heaters.wood.length > 0) && (
               <ScrollReveal>
                 <div className="bg-white rounded-lg shadow-sm border border-[#E8DDD4] p-6">
-                  <h2 className="text-xl font-bold text-[#2D5A4A] mb-6">{lang === 'en' ? 'Heater Selection' : 'Scelta della Stufa'}</h2>
+                  <h2 className="text-xl font-bold text-[#2D5A4A] mb-6">{t('configurator.heaterSelection')}</h2>
 
                   {/* Electric Heaters */}
                   {heaters.electric.length > 0 && (
                     <div className="mb-8">
                       <div className="flex items-center gap-2 mb-4 pb-3 border-b border-[#E8DDD4]">
                         <Zap size={20} className="text-[#D4AF37]" />
-                        <h3 className="font-semibold text-[#2D5A4A]">{lang === 'en' ? 'Electric' : 'Elettriche'}</h3>
+                        <h3 className="font-semibold text-[#2D5A4A]">{t('configurator.electric')}</h3>
                       </div>
                       <div className="space-y-3">
                         {heaters.electric.map((heater) => (
@@ -330,7 +331,7 @@ function ConfiguratorContent() {
                     <div>
                       <div className="flex items-center gap-2 mb-4 pb-3 border-b border-[#E8DDD4]">
                         <Flame size={20} className="text-[#C85A3A]" />
-                        <h3 className="font-semibold text-[#2D5A4A]">{lang === 'en' ? 'Wood-Fired' : 'A Legna'}</h3>
+                        <h3 className="font-semibold text-[#2D5A4A]">{t('configurator.woodFired')}</h3>
                       </div>
                       <div className="space-y-3">
                         {heaters.wood.map((heater) => (
@@ -367,7 +368,7 @@ function ConfiguratorContent() {
             {productType === 'hottub' && hottubHeaters.length > 0 && (
               <ScrollReveal>
                 <div className="bg-white rounded-lg shadow-sm border border-[#E8DDD4] p-6">
-                  <h2 className="text-xl font-bold text-[#2D5A4A] mb-6">{lang === 'en' ? 'Stove Selection' : 'Scelta della Stufa'}</h2>
+                  <h2 className="text-xl font-bold text-[#2D5A4A] mb-6">{t('configurator.stoveSelection')}</h2>
                   <div className="space-y-3">
                     {hottubHeaters.map((stove) => (
                       <div key={stove.id} className="flex items-center gap-3 p-3 rounded-lg border-2 border-transparent hover:border-[#A8D5CC] transition-colors">
@@ -401,7 +402,7 @@ function ConfiguratorContent() {
             {accessories.length > 0 && (
               <ScrollReveal>
                 <div className="bg-white rounded-lg shadow-sm border border-[#E8DDD4] p-6">
-                  <h2 className="text-xl font-bold text-[#2D5A4A] mb-6">{lang === 'en' ? 'Accessories' : 'Accessori'}</h2>
+                  <h2 className="text-xl font-bold text-[#2D5A4A] mb-6">{t('configurator.accessories')}</h2>
                   <div className="space-y-3">
                     {accessories.map((accessory) => (
                       <div key={accessory.id} className="flex items-center gap-3 p-3 rounded-lg border-2 border-transparent hover:border-[#A8D5CC] transition-colors">
@@ -442,17 +443,17 @@ function ConfiguratorContent() {
         <ScrollReveal>
           <div className="lg:sticky lg:top-8 h-fit">
             <div className="bg-white rounded-lg shadow-sm border border-[#E8DDD4] p-6">
-              <h3 className="text-lg font-bold text-[#2D5A4A] mb-6">{lang === 'en' ? 'Price Summary' : 'Riepilogo Prezzo'}</h3>
+              <h3 className="text-lg font-bold text-[#2D5A4A] mb-6">{t('configurator.priceSummary')}</h3>
 
               <div className="space-y-3 mb-6 pb-6 border-b border-[#E8DDD4]">
                 <div className="flex justify-between text-sm">
-                  <span className="text-[#6B6B6B]">{lang === 'en' ? 'Base Price' : 'Prezzo Base'}</span>
+                  <span className="text-[#6B6B6B]">{t('configurator.basePrice')}</span>
                   <span className="font-semibold text-[#2D5A4A]">€ {basePrice.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                 </div>
 
                 {delivery === 'assembled' && assemblyUpcharge > 0 && (
                   <div className="flex justify-between text-sm">
-                    <span className="text-[#6B6B6B]">{lang === 'en' ? 'Assembly' : 'Montaggio'}</span>
+                    <span className="text-[#6B6B6B]">{t('configurator.assembly')}</span>
                     <span className="font-semibold text-[#2D5A4A]">€ {assemblyUpcharge.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                   </div>
                 )}
@@ -490,17 +491,17 @@ function ConfiguratorContent() {
 
               {/* Total */}
               <div className="flex justify-between items-baseline mb-6">
-                <span className="text-[#2D5A4A] font-semibold">{lang === 'en' ? 'Total' : 'Totale'}</span>
+                <span className="text-[#2D5A4A] font-semibold">{t('configurator.total')}</span>
                 <span className="text-4xl font-bold text-[#2D5A4A]">€ {totalPrice.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
               </div>
 
               {/* CTA Button */}
               <button className="w-full bg-gradient-to-r from-[#2D5A4A] to-[#1A3A2A] text-white font-semibold py-3 rounded-lg hover:shadow-lg transition-shadow mb-3">
-                {lang === 'en' ? 'Request Quote' : 'Richiedi Preventivo'}
+                {t('configurator.requestQuote')}
               </button>
 
               <Link href="/" className="block text-center text-[#2D5A4A] hover:text-[#1A3A2A] text-sm font-medium">
-                {lang === 'en' ? 'Continue Shopping' : 'Continua lo Shopping'}
+                {t('configurator.continueShopping')}
               </Link>
             </div>
           </div>
@@ -551,14 +552,14 @@ function ConfiguratorContent() {
 
                 {activeInfoModal.desc && (
                   <div className="mb-6">
-                    <h3 className="font-semibold text-[#2D5A4A] mb-2">{lang === 'en' ? 'Description' : 'Descrizione'}</h3>
+                    <h3 className="font-semibold text-[#2D5A4A] mb-2">{t('configurator.description')}</h3>
                     <p className="text-[#6B6B6B] leading-relaxed">{activeInfoModal.desc}</p>
                   </div>
                 )}
 
                 {activeInfoModal.specs && (
                   <div>
-                    <h3 className="font-semibold text-[#2D5A4A] mb-2">{lang === 'en' ? 'Specifications' : 'Specifiche'}</h3>
+                    <h3 className="font-semibold text-[#2D5A4A] mb-2">{t('configurator.specifications')}</h3>
                     <p className="text-[#6B6B6B] leading-relaxed">{activeInfoModal.specs}</p>
                   </div>
                 )}

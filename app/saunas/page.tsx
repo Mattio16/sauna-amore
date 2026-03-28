@@ -7,13 +7,23 @@ import ProductCard from '@/components/ProductCard';
 import ScrollReveal from '@/components/ScrollReveal';
 import { motion } from 'framer-motion';
 
+const pageContent: Record<string, { title: string; subtitle: string; products: string; product: string; noProducts: string; ctaTitle: string; ctaSubtitle: string; ctaBtn: string; all: string }> = {
+  it: { title: 'Saune a Botte', subtitle: 'Saune a botte nordiche in abete e thermowood', products: 'Prodotti', product: 'Prodotto', noProducts: 'Nessun prodotto disponibile in questa categoria', ctaTitle: 'Hai trovato quello che cercavi?', ctaSubtitle: 'Contattaci per un preventivo personalizzato', ctaBtn: 'Richiedi un Preventivo', all: 'Tutti' },
+  en: { title: 'Barrel Saunas', subtitle: 'Nordic barrel saunas in spruce and thermowood', products: 'Products', product: 'Product', noProducts: 'No products available in this category', ctaTitle: 'Found what you were looking for?', ctaSubtitle: 'Contact us for a personalised quote', ctaBtn: 'Request a Quote', all: 'All' },
+  de: { title: 'Fasssaunen', subtitle: 'Nordische Fasssaunen aus Fichte und Thermowood', products: 'Produkte', product: 'Produkt', noProducts: 'Keine Produkte in dieser Kategorie verfügbar', ctaTitle: 'Gefunden, wonach Sie gesucht haben?', ctaSubtitle: 'Kontaktieren Sie uns für ein individuelles Angebot', ctaBtn: 'Angebot Anfordern', all: 'Alle' },
+  fr: { title: 'Saunas Tonneau', subtitle: 'Saunas tonneaux nordiques en épicéa et thermowood', products: 'Produits', product: 'Produit', noProducts: 'Aucun produit disponible dans cette catégorie', ctaTitle: 'Trouvé ce que vous cherchiez ?', ctaSubtitle: 'Contactez-nous pour un devis personnalisé', ctaBtn: 'Demander un Devis', all: 'Tous' },
+  es: { title: 'Saunas Barril', subtitle: 'Saunas barril nórdicas en abeto y thermowood', products: 'Productos', product: 'Producto', noProducts: 'No hay productos disponibles en esta categoría', ctaTitle: '¿Encontraste lo que buscabas?', ctaSubtitle: 'Contáctanos para un presupuesto personalizado', ctaBtn: 'Solicitar Presupuesto', all: 'Todos' },
+  pt: { title: 'Saunas Barril', subtitle: 'Saunas barril nórdicas em abeto e thermowood', products: 'Produtos', product: 'Produto', noProducts: 'Nenhum produto disponível nesta categoria', ctaTitle: 'Encontrou o que procurava?', ctaSubtitle: 'Contacte-nos para um orçamento personalizado', ctaBtn: 'Pedir Orçamento', all: 'Todos' },
+};
+
 export default function SaunasPage() {
   const lang = useLang();
-  const [activeFilter, setActiveFilter] = useState('Tutti');
+  const t = pageContent[lang] || pageContent.en;
+  const [activeFilter, setActiveFilter] = useState('all');
 
-  const sizeFilters = ['Tutti', '2m', '2.4m', '3m', '4m', '5m+'];
+  const sizeFilters = ['all', '2m', '2.4m', '3m', '4m', '5m+'];
 
-  const filteredProducts = activeFilter === 'Tutti'
+  const filteredProducts = activeFilter === 'all'
     ? saunas
     : saunas.filter(product => product.category === activeFilter);
 
@@ -34,13 +44,13 @@ export default function SaunasPage() {
             transition={{ duration: 0.8 }}
           >
             <h1 className="text-4xl md:text-5xl font-bold mb-3 text-amber-50">
-              Saune a Botte
+              {t.title}
             </h1>
             <p className="text-lg md:text-xl text-amber-100 mb-4">
-              Nordic barrel saunas in spruce and thermowood
+              {t.subtitle}
             </p>
             <div className="inline-block bg-teal-600/80 backdrop-blur-sm px-4 py-2 rounded-full text-sm font-semibold">
-              {filteredProducts.length} {filteredProducts.length === 1 ? 'Prodotto' : 'Prodotti'}
+              {filteredProducts.length} {filteredProducts.length === 1 ? t.product : t.products}
             </div>
           </motion.div>
         </div>
@@ -60,7 +70,7 @@ export default function SaunasPage() {
                     : 'bg-amber-50 text-gray-700 hover:bg-amber-100'
                 }`}
               >
-                {filter}
+                {filter === 'all' ? t.all : filter}
               </button>
             ))}
           </div>
@@ -93,7 +103,7 @@ export default function SaunasPage() {
         {filteredProducts.length === 0 && (
           <div className="text-center py-12">
             <p className="text-gray-500 text-lg">
-              Nessun prodotto disponibile in questa categoria
+              {t.noProducts}
             </p>
           </div>
         )}
@@ -103,16 +113,16 @@ export default function SaunasPage() {
       <div className="bg-gradient-to-r from-teal-500 to-teal-600 py-12 mt-8">
         <div className="max-w-7xl mx-auto px-4 text-center">
           <h2 className="text-2xl md:text-3xl font-bold text-white mb-4">
-            Hai trovato quello che cercavi?
+            {t.ctaTitle}
           </h2>
           <p className="text-teal-100 mb-6 text-lg">
-            Contattaci per un preventivo personalizzato
+            {t.ctaSubtitle}
           </p>
           <a
             href="/contact"
             className="inline-block bg-white text-teal-600 font-bold px-8 py-3 rounded-lg hover:bg-amber-50 transition-colors duration-200 shadow-lg"
           >
-            Richiedi un Preventivo
+            {t.ctaBtn}
           </a>
         </div>
       </div>

@@ -1,42 +1,63 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Menu, X, Globe } from 'lucide-react';
+import { Menu, X, Globe, ChevronDown } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useLang } from '@/lib/i18n';
+import { useLang, Lang, LANGUAGES } from '@/lib/i18n';
 
 interface NavbarProps {
-  onToggleLang?: () => void;
+  onSetLang?: (lang: Lang) => void;
 }
 
-const Navbar = ({ onToggleLang }: NavbarProps) => {
+const Navbar = ({ onSetLang }: NavbarProps) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isLangOpen, setIsLangOpen] = useState(false);
+  const langRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
   const lang = useLang();
 
+  const currentLang = LANGUAGES.find(l => l.code === lang) || LANGUAGES[0];
+
+  const navLabels: Record<Lang, { saunas: string; hotTubs: string; iceBaths: string; about: string; contact: string }> = {
+    it: { saunas: 'Saune', hotTubs: 'Vasche', iceBaths: 'Bagni di Ghiaccio', about: 'Chi Siamo', contact: 'Contatti' },
+    en: { saunas: 'Saunas', hotTubs: 'Hot Tubs', iceBaths: 'Ice Baths', about: 'About', contact: 'Contact' },
+    de: { saunas: 'Saunen', hotTubs: 'Whirlpools', iceBaths: 'Eisbäder', about: 'Über Uns', contact: 'Kontakt' },
+    fr: { saunas: 'Saunas', hotTubs: 'Bains', iceBaths: 'Bains de Glace', about: 'À Propos', contact: 'Contact' },
+    es: { saunas: 'Saunas', hotTubs: 'Jacuzzis', iceBaths: 'Baños de Hielo', about: 'Nosotros', contact: 'Contacto' },
+    pt: { saunas: 'Saunas', hotTubs: 'Banheiras', iceBaths: 'Banhos de Gelo', about: 'Sobre Nós', contact: 'Contacto' },
+  };
+
+  const labels = navLabels[lang];
+
   const navItems = [
-    { href: '/saunas', labelIt: 'Saune', labelEn: 'Saunas' },
-    { href: '/hot-tubs', labelIt: 'Vasche', labelEn: 'Hot Tubs' },
-    { href: '/ice-baths', labelIt: 'Bagni di Ghiaccio', labelEn: 'Ice Baths' },
-    { href: '/about', labelIt: 'Chi Siamo', labelEn: 'About' },
-    { href: '/contact', labelIt: 'Contatti', labelEn: 'Contact' },
+    { href: '/saunas', label: labels.saunas },
+    { href: '/hot-tubs', label: labels.hotTubs },
+    { href: '/ice-baths', label: labels.iceBaths },
+    { href: '/about', label: labels.about },
+    { href: '/contact', label: labels.contact },
   ];
 
   useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 10);
-    };
-
+    const handleScroll = () => setIsScrolled(window.scrollY > 10);
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const isActive = (href: string) => pathname === href;
+  // Close language dropdown on outside click
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (langRef.current && !langRef.current.contains(e.target as Node)) {
+        setIsLangOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
-  const label = lang === 'it' ? 'labelIt' : 'labelEn';
+  const isActive = (href: string) => pathname === href;
 
   return (
     <nav
@@ -67,7 +88,7 @@ const Navbar = ({ onToggleLang }: NavbarProps) => {
                     : 'text-sage-900 hover:text-teal-700'
                 }`}
               >
-                {item[label as keyof typeof item]}
+                {item.label}
                 {isActive(item.href) && (
                   <motion.div
                     layoutId="underline"
@@ -81,18 +102,53 @@ const Navbar = ({ onToggleLang }: NavbarProps) => {
             ))}
           </div>
 
-          {/* Right side: Language toggle & Mobile menu button */}
+          {/* Right side: Language dropdown & Mobile menu button */}
           <div className="flex items-center gap-4">
-            <button
-              onClick={onToggleLang}
-              className="p-2 rounded-lg text-sage-900 hover:bg-cream/50 hover:text-teal-700 transition-all duration-200"
-              aria-label="Toggle language"
-            >
-              <Globe size={20} />
-              <span className="ml-1 text-xs font-semibold">
-                {lang.toUpperCase()}
-              </span>
-            </button>
+            {/* Language Dropdown */}
+            <div ref={langRef} className="relative">
+              <button
+                onClick={() => setIsLangOpen(!isLangOpen)}
+                className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-sage-900 hover:bg-cream/50 hover:text-teal-700 transition-all duration-200"
+                aria-label="Select language"
+              >
+                <Globe size={18} />
+                <span className="text-sm font-semibold">{currentLang.flag} {currentLang.code.toUpperCase()}</span>
+                <ChevronDown size={14} className={`transition-transform duration-200 ${isLangOpen ? 'rotate-180' : ''}`} />
+              </button>
+
+              <AnimatePresence>
+                {isLangOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -8, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: -8, scale: 0.95 }}
+                    transition={{ duration: 0.15 }}
+                    className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-[#E8DDD4] overflow-hidden z-50"
+                  >
+                    {LANGUAGES.map((l) => (
+                      <button
+                        key={l.code}
+                        onClick={() => {
+                          onSetLang?.(l.code);
+                          setIsLangOpen(false);
+                        }}
+                        className={`w-full flex items-center gap-3 px-4 py-3 text-sm transition-colors duration-150 ${
+                          lang === l.code
+                            ? 'bg-[#A8D5CC]/20 text-teal-800 font-semibold'
+                            : 'text-[#2D2D2D] hover:bg-[#F5F1ED]'
+                        }`}
+                      >
+                        <span className="text-lg">{l.flag}</span>
+                        <span>{l.name}</span>
+                        {lang === l.code && (
+                          <span className="ml-auto text-teal-600 text-xs">&#10003;</span>
+                        )}
+                      </button>
+                    ))}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
 
             {/* Mobile menu button */}
             <button
@@ -133,7 +189,7 @@ const Navbar = ({ onToggleLang }: NavbarProps) => {
                           : 'text-sage-900 hover:bg-sage-100/50'
                       }`}
                     >
-                      {item[label as keyof typeof item]}
+                      {item.label}
                     </Link>
                   </motion.div>
                 ))}

@@ -1,44 +1,11 @@
 'use client';
 
 import Link from 'next/link';
-import { useLang } from '@/lib/i18n';
+import { useLang, useTranslation } from '@/lib/i18n';
 import { Instagram, Facebook, MessageCircle, Mail, Phone, MapPin } from 'lucide-react';
 
 export default function Footer() {
-  const lang = useLang();
-
-  const content = {
-    it: {
-      tagline: 'Benessere nordico nel cuore delle Marche. Saune finlandesi premium, bagni di ghiaccio e esperienze wellness autentiche.',
-      products: 'Prodotti',
-      saunas: 'Saune',
-      baths: 'Vasche',
-      iceBaths: 'Bagni di Ghiaccio',
-      rental: 'Noleggio Eventi',
-      company: 'Azienda',
-      about: 'Chi Siamo',
-      contact: 'Contatti',
-      privacy: 'Privacy Policy',
-      contactInfo: 'Contatti',
-      allRightsReserved: 'Tutti i diritti riservati.',
-    },
-    en: {
-      tagline: 'Nordic wellness in the heart of Le Marche. Premium Finnish saunas, ice baths, and authentic wellness experiences.',
-      products: 'Products',
-      saunas: 'Saunas',
-      baths: 'Hot Tubs',
-      iceBaths: 'Ice Baths',
-      rental: 'Event Rental',
-      company: 'Company',
-      about: 'About Us',
-      contact: 'Contact',
-      privacy: 'Privacy Policy',
-      contactInfo: 'Contact Info',
-      allRightsReserved: 'All rights reserved.',
-    },
-  };
-
-  const t = content[lang] || content.it;
+  const t = useTranslation();
 
   return (
     <footer className="bg-[#1B4332] text-[#F5F1E8]">
@@ -52,7 +19,7 @@ export default function Footer() {
                 Sauna Amore
               </h2>
               <p className="text-sm text-[#D4C5B9] leading-relaxed">
-                {t.tagline}
+                {t('footer.tagline')}
               </p>
             </div>
 
@@ -85,39 +52,39 @@ export default function Footer() {
           {/* Column 2: Products */}
           <div>
             <h3 className="text-lg font-semibold text-[#F5F1E8] mb-6 uppercase tracking-wide">
-              {t.products}
+              {t('footer.products')}
             </h3>
             <ul className="space-y-3">
               <li>
                 <Link
-                  href="/prodotti/saune"
+                  href="/saunas"
                   className="text-[#D4C5B9] hover:text-[#F5F1E8] transition-colors duration-300"
                 >
-                  {t.saunas}
+                  {t('footer.saunas')}
                 </Link>
               </li>
               <li>
                 <Link
-                  href="/prodotti/vasche"
+                  href="/hot-tubs"
                   className="text-[#D4C5B9] hover:text-[#F5F1E8] transition-colors duration-300"
                 >
-                  {t.baths}
+                  {t('footer.baths')}
                 </Link>
               </li>
               <li>
                 <Link
-                  href="/prodotti/bagni-ghiaccio"
+                  href="/ice-baths"
                   className="text-[#D4C5B9] hover:text-[#F5F1E8] transition-colors duration-300"
                 >
-                  {t.iceBaths}
+                  {t('footer.iceBaths')}
                 </Link>
               </li>
               <li>
                 <Link
-                  href="/prodotti/noleggio"
+                  href="/rental"
                   className="text-[#D4C5B9] hover:text-[#F5F1E8] transition-colors duration-300"
                 >
-                  {t.rental}
+                  {t('footer.rental')}
                 </Link>
               </li>
             </ul>
@@ -126,7 +93,7 @@ export default function Footer() {
           {/* Column 3: Company */}
           <div>
             <h3 className="text-lg font-semibold text-[#F5F1E8] mb-6 uppercase tracking-wide">
-              {t.company}
+              {t('footer.company')}
             </h3>
             <ul className="space-y-3">
               <li>
@@ -134,15 +101,15 @@ export default function Footer() {
                   href="/about"
                   className="text-[#D4C5B9] hover:text-[#F5F1E8] transition-colors duration-300"
                 >
-                  {t.about}
+                  {t('footer.about')}
                 </Link>
               </li>
               <li>
                 <Link
-                  href="/contatti"
+                  href="/contact"
                   className="text-[#D4C5B9] hover:text-[#F5F1E8] transition-colors duration-300"
                 >
-                  {t.contact}
+                  {t('footer.contact')}
                 </Link>
               </li>
               <li>
@@ -150,7 +117,7 @@ export default function Footer() {
                   href="/privacy"
                   className="text-[#D4C5B9] hover:text-[#F5F1E8] transition-colors duration-300"
                 >
-                  {t.privacy}
+                  {t('footer.privacy')}
                 </Link>
               </li>
             </ul>
@@ -159,7 +126,7 @@ export default function Footer() {
           {/* Column 4: Contact Info */}
           <div>
             <h3 className="text-lg font-semibold text-[#F5F1E8] mb-6 uppercase tracking-wide">
-              {t.contactInfo}
+              {t('footer.contactInfo')}
             </h3>
             <ul className="space-y-4">
               <li className="flex items-start space-x-3">
@@ -193,7 +160,7 @@ export default function Footer() {
       <div className="border-t border-[#2D5A3D]">
         <div className="max-w-7xl mx-auto px-4 py-6 sm:px-6 lg:px-8">
           <p className="text-center text-sm text-[#B8ADAA]">
-            © 2026 Sauna Amore. {t.allRightsReserved}
+            {t('footer.copyright')}
           </p>
         </div>
       </div>

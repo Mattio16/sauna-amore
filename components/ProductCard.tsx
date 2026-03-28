@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useLang } from '@/lib/i18n';
+import { useLang, useTranslation } from '@/lib/i18n';
 import { Product } from '@/lib/products';
 import { Users, Maximize2, ArrowRight } from 'lucide-react';
 import ScrollReveal from './ScrollReveal';
@@ -14,6 +14,7 @@ interface ProductCardProps {
 
 export default function ProductCard({ product, type, index = 0 }: ProductCardProps) {
   const lang = useLang();
+  const t = useTranslation();
   const name = lang === 'it' ? product.nameIt : product.nameEn;
   const basePrice = product.flatpack || product.price || 0;
   const configPath = `/configurator?product=${product.id}&type=${type}`;
@@ -35,7 +36,7 @@ export default function ProductCard({ product, type, index = 0 }: ProductCardPro
               href={configPath}
               className="inline-flex items-center gap-2 px-4 py-2 bg-white/95 backdrop-blur-sm rounded-full text-sm font-semibold text-teal hover:bg-teal hover:text-white transition-colors"
             >
-              {lang === 'it' ? 'Configura' : 'Configure'}
+              {t('products.configure')}
               <ArrowRight size={14} />
             </Link>
           </div>
@@ -51,7 +52,7 @@ export default function ProductCard({ product, type, index = 0 }: ProductCardPro
             {product.persons && (
               <span className="flex items-center gap-1.5">
                 <Users size={14} className="text-sage-400" />
-                {product.persons} {lang === 'it' ? 'persone' : 'people'}
+                {product.persons} {t('products.persons').toLowerCase()}
               </span>
             )}
             {product.dims && (
@@ -65,7 +66,7 @@ export default function ProductCard({ product, type, index = 0 }: ProductCardPro
           <div className="mt-auto pt-4 border-t border-gray-100 flex items-center justify-between">
             <div>
               <span className="text-xs text-gray-400 uppercase tracking-wider">
-                {lang === 'it' ? 'a partire da' : 'from'}
+                {t('products.fromPrice')}
               </span>
               <p className="text-xl font-bold text-teal">
                 &euro; {basePrice.toLocaleString('it-IT')}
@@ -75,7 +76,7 @@ export default function ProductCard({ product, type, index = 0 }: ProductCardPro
               href={configPath}
               className="text-sm font-semibold text-teal hover:text-teal-dark flex items-center gap-1 transition-colors"
             >
-              {lang === 'it' ? 'Dettagli' : 'Details'}
+              {t('common.learnMore')}
               <ArrowRight size={14} />
             </Link>
           </div>

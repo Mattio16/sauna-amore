@@ -11,84 +11,58 @@ import { motion } from 'framer-motion';
 export default function HomePage() {
   const lang = useLang();
 
-  const t = {
-    hero: {
-      it: {
-        title: 'Il Benessere Nordico a Casa Tua',
-        subtitle: 'Scopri la tradizione baltica con saune in legno massiccio, vasche idromassaggio e vasche ghiacciatte premium nelle Marche',
-        cta: 'Scopri i Nostri Prodotti',
-      },
-      en: {
-        title: 'Nordic Wellness at Your Home',
-        subtitle: 'Experience authentic Baltic tradition with premium solid wood saunas, luxury hot tubs, and ice baths in Le Marche',
-        cta: 'Discover Our Products',
-      },
-    },
-    products: {
-      it: {
-        title: 'I Nostri Prodotti',
-        saunas: 'Saune in Legno',
-        hotTubs: 'Vasche Idromassaggio',
-        iceBaths: 'Vasche Ghiacciatte',
-        discover: 'Scopri',
-      },
-      en: {
-        title: 'Our Products',
-        saunas: 'Solid Wood Saunas',
-        hotTubs: 'Hot Tubs',
-        iceBaths: 'Ice Baths',
-        discover: 'Discover',
-      },
-    },
-    why: {
-      it: {
-        title: 'Perché Scegliere Sauna Amore',
-        quality: 'Qualità Premium',
-        qualityDesc: 'Artigianato baltico autentico con materiali superiori e costruzione duratura',
-        delivery: 'Consegna in Tutta Italia',
-        deliveryDesc: 'Spedizione rapida e affidabile dei nostri prodotti in tutta Italia',
-        service: 'Servizio Personalizzato',
-        serviceDesc: 'Supporto dedicato per trovare la soluzione di benessere perfetta per te',
-      },
-      en: {
-        title: 'Why Choose Sauna Amore',
-        quality: 'Premium Quality',
-        qualityDesc: 'Authentic Baltic craftsmanship with superior materials and lasting build quality',
-        delivery: 'Delivery Across Italy',
-        deliveryDesc: 'Fast and reliable shipping of our products throughout Italy',
-        service: 'Personalised Service',
-        serviceDesc: 'Dedicated support to find the perfect wellness solution for you',
-      },
-    },
-    featured: {
-      it: {
-        title: 'Saune in Primo Piano',
-        viewAll: 'Vedi tutti i Prodotti',
-      },
-      en: {
-        title: 'Featured Saunas',
-        viewAll: 'View All Products',
-      },
-    },
-    cta: {
-      it: {
-        title: 'Pronto a trasformare il tuo giardino?',
-        quote: 'Richiedi Preventivo',
-        browse: 'Scopri i Prodotti',
-      },
-      en: {
-        title: 'Ready to Transform Your Garden?',
-        quote: 'Request Quote',
-        browse: 'Browse Products',
-      },
-    },
+  const pick = <T,>(obj: Record<string, T>): T => obj[lang] || obj.en;
+
+  const heroTexts: Record<string, { title: string; subtitle: string; cta: string }> = {
+    it: { title: 'Il Benessere Nordico a Casa Tua', subtitle: 'Scopri la tradizione baltica con saune in legno massiccio, vasche idromassaggio e vasche ghiacciatte premium nelle Marche', cta: 'Scopri i Nostri Prodotti' },
+    en: { title: 'Nordic Wellness at Your Home', subtitle: 'Experience authentic Baltic tradition with premium solid wood saunas, luxury hot tubs, and ice baths in Le Marche', cta: 'Discover Our Products' },
+    de: { title: 'Nordisches Wellness bei Ihnen Zuhause', subtitle: 'Erleben Sie authentische baltische Tradition mit hochwertigen Massivholz-Saunen, Luxus-Whirlpools und Eisbädern in den Marken', cta: 'Unsere Produkte Entdecken' },
+    fr: { title: 'Le Bien-être Nordique Chez Vous', subtitle: 'Découvrez la tradition balte avec des saunas en bois massif, bains à remous de luxe et bains de glace dans les Marches', cta: 'Découvrir Nos Produits' },
+    es: { title: 'Bienestar Nórdico en Tu Hogar', subtitle: 'Descubre la tradición báltica con saunas de madera maciza, jacuzzis de lujo y baños de hielo en Le Marche', cta: 'Descubrir Nuestros Productos' },
+    pt: { title: 'Bem-estar Nórdico na Sua Casa', subtitle: 'Descubra a tradição báltica com saunas de madeira maciça, banheiras de luxo e banhos de gelo em Le Marche', cta: 'Descobrir os Nossos Produtos' },
   };
 
-  const content = lang === 'it' ? t.hero.it : t.hero.en;
-  const productsContent = lang === 'it' ? t.products.it : t.products.en;
-  const whyContent = lang === 'it' ? t.why.it : t.why.en;
-  const featuredContent = lang === 'it' ? t.featured.it : t.featured.en;
-  const ctaContent = lang === 'it' ? t.cta.it : t.cta.en;
+  const productsTexts: Record<string, { title: string; saunas: string; hotTubs: string; iceBaths: string; discover: string; models: string }> = {
+    it: { title: 'I Nostri Prodotti', saunas: 'Saune in Legno', hotTubs: 'Vasche Idromassaggio', iceBaths: 'Vasche Ghiacciatte', discover: 'Scopri', models: 'Modelli' },
+    en: { title: 'Our Products', saunas: 'Solid Wood Saunas', hotTubs: 'Hot Tubs', iceBaths: 'Ice Baths', discover: 'Discover', models: 'Models' },
+    de: { title: 'Unsere Produkte', saunas: 'Massivholz-Saunen', hotTubs: 'Whirlpools', iceBaths: 'Eisbäder', discover: 'Entdecken', models: 'Modelle' },
+    fr: { title: 'Nos Produits', saunas: 'Saunas en Bois Massif', hotTubs: 'Bains à Remous', iceBaths: 'Bains de Glace', discover: 'Découvrir', models: 'Modèles' },
+    es: { title: 'Nuestros Productos', saunas: 'Saunas de Madera', hotTubs: 'Jacuzzis', iceBaths: 'Baños de Hielo', discover: 'Descubrir', models: 'Modelos' },
+    pt: { title: 'Os Nossos Produtos', saunas: 'Saunas de Madeira', hotTubs: 'Banheiras', iceBaths: 'Banhos de Gelo', discover: 'Descobrir', models: 'Modelos' },
+  };
+
+  const whyTexts: Record<string, { title: string; quality: string; qualityDesc: string; delivery: string; deliveryDesc: string; service: string; serviceDesc: string }> = {
+    it: { title: 'Perché Scegliere Sauna Amore', quality: 'Qualità Premium', qualityDesc: 'Artigianato baltico autentico con materiali superiori e costruzione duratura', delivery: 'Consegna in Tutta Italia', deliveryDesc: 'Spedizione rapida e affidabile dei nostri prodotti in tutta Italia', service: 'Servizio Personalizzato', serviceDesc: 'Supporto dedicato per trovare la soluzione di benessere perfetta per te' },
+    en: { title: 'Why Choose Sauna Amore', quality: 'Premium Quality', qualityDesc: 'Authentic Baltic craftsmanship with superior materials and lasting build quality', delivery: 'Delivery Across Italy', deliveryDesc: 'Fast and reliable shipping of our products throughout Italy', service: 'Personalised Service', serviceDesc: 'Dedicated support to find the perfect wellness solution for you' },
+    de: { title: 'Warum Sauna Amore', quality: 'Premium-Qualität', qualityDesc: 'Authentische baltische Handwerkskunst mit überlegenen Materialien und langlebiger Bauqualität', delivery: 'Lieferung in ganz Italien', deliveryDesc: 'Schneller und zuverlässiger Versand unserer Produkte in ganz Italien', service: 'Persönlicher Service', serviceDesc: 'Engagierter Support für die perfekte Wellness-Lösung für Sie' },
+    fr: { title: 'Pourquoi Sauna Amore', quality: 'Qualité Premium', qualityDesc: 'Artisanat balte authentique avec des matériaux supérieurs et une qualité de construction durable', delivery: 'Livraison dans toute l\'Italie', deliveryDesc: 'Expédition rapide et fiable de nos produits dans toute l\'Italie', service: 'Service Personnalisé', serviceDesc: 'Support dédié pour trouver la solution bien-être parfaite pour vous' },
+    es: { title: 'Por Qué Sauna Amore', quality: 'Calidad Premium', qualityDesc: 'Artesanía báltica auténtica con materiales superiores y calidad de construcción duradera', delivery: 'Entrega en Toda Italia', deliveryDesc: 'Envío rápido y fiable de nuestros productos en toda Italia', service: 'Servicio Personalizado', serviceDesc: 'Soporte dedicado para encontrar la solución de bienestar perfecta para ti' },
+    pt: { title: 'Porquê Sauna Amore', quality: 'Qualidade Premium', qualityDesc: 'Artesanato báltico autêntico com materiais superiores e qualidade de construção duradoura', delivery: 'Entrega em Toda a Itália', deliveryDesc: 'Envio rápido e fiável dos nossos produtos em toda a Itália', service: 'Serviço Personalizado', serviceDesc: 'Suporte dedicado para encontrar a solução de bem-estar perfeita para si' },
+  };
+
+  const featuredTexts: Record<string, { title: string; viewAll: string }> = {
+    it: { title: 'Saune in Primo Piano', viewAll: 'Vedi tutti i Prodotti' },
+    en: { title: 'Featured Saunas', viewAll: 'View All Products' },
+    de: { title: 'Ausgewählte Saunen', viewAll: 'Alle Produkte Anzeigen' },
+    fr: { title: 'Saunas en Vedette', viewAll: 'Voir Tous les Produits' },
+    es: { title: 'Saunas Destacadas', viewAll: 'Ver Todos los Productos' },
+    pt: { title: 'Saunas em Destaque', viewAll: 'Ver Todos os Produtos' },
+  };
+
+  const ctaTexts: Record<string, { title: string; quote: string; browse: string }> = {
+    it: { title: 'Pronto a trasformare il tuo giardino?', quote: 'Richiedi Preventivo', browse: 'Scopri i Prodotti' },
+    en: { title: 'Ready to Transform Your Garden?', quote: 'Request Quote', browse: 'Browse Products' },
+    de: { title: 'Bereit, Ihren Garten zu verwandeln?', quote: 'Angebot Anfordern', browse: 'Produkte Entdecken' },
+    fr: { title: 'Prêt à transformer votre jardin ?', quote: 'Demander un Devis', browse: 'Parcourir les Produits' },
+    es: { title: '¿Listo para transformar tu jardín?', quote: 'Solicitar Presupuesto', browse: 'Ver Productos' },
+    pt: { title: 'Pronto para transformar o seu jardim?', quote: 'Pedir Orçamento', browse: 'Explorar Produtos' },
+  };
+
+  const content = pick(heroTexts);
+  const productsContent = pick(productsTexts);
+  const whyContent = pick(whyTexts);
+  const featuredContent = pick(featuredTexts);
+  const ctaContent = pick(ctaTexts);
 
   const firstSaunaImage = saunas[0]?.image || '';
   const saunasCount = saunas.length;
@@ -198,7 +172,7 @@ export default function HomePage() {
                     </div>
                     <div>
                       <p className="text-cream/80 text-lg font-semibold mb-4">
-                        {saunasCount} {lang === 'it' ? 'Modelli' : 'Models'}
+                        {saunasCount} {productsContent.models}
                       </p>
                       <div className="inline-flex items-center gap-2 px-4 py-2 bg-cream/20 backdrop-blur-sm rounded-full group-hover:bg-cream group-hover:text-teal transition-all duration-300">
                         <span className="text-cream group-hover:text-teal font-semibold">
@@ -233,7 +207,7 @@ export default function HomePage() {
                     </div>
                     <div>
                       <p className="text-cream/80 text-lg font-semibold mb-4">
-                        {hotTubsCount} {lang === 'it' ? 'Modelli' : 'Models'}
+                        {hotTubsCount} {productsContent.models}
                       </p>
                       <div className="inline-flex items-center gap-2 px-4 py-2 bg-cream/20 backdrop-blur-sm rounded-full group-hover:bg-cream group-hover:text-teal transition-all duration-300">
                         <span className="text-cream group-hover:text-teal font-semibold">
@@ -268,7 +242,7 @@ export default function HomePage() {
                     </div>
                     <div>
                       <p className="text-cream/80 text-lg font-semibold mb-4">
-                        {iceBathsCount} {lang === 'it' ? 'Modelli' : 'Models'}
+                        {iceBathsCount} {productsContent.models}
                       </p>
                       <div className="inline-flex items-center gap-2 px-4 py-2 bg-cream/20 backdrop-blur-sm rounded-full group-hover:bg-cream group-hover:text-teal transition-all duration-300">
                         <span className="text-cream group-hover:text-teal font-semibold">
