@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect, Suspense } from 'react';
+import { useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useLang } from '@/lib/i18n';
 import { saunas, hottubs, icebaths, saunaHeaters, hottubHeaters, saunaAccessories, hottubAccessories, icebathAccessories, Product, Heater, Accessory } from '@/lib/products';
@@ -16,6 +16,11 @@ interface InfoModalContent {
   specs?: string;
 }
 
+// Helper to pick correct language string
+function n(item: { nameIt: string; nameEn: string }, lang: string): string {
+  return lang === 'en' ? item.nameEn : item.nameIt;
+}
+
 function ConfiguratorContent() {
   const searchParams = useSearchParams();
   const lang = useLang();
@@ -28,12 +33,11 @@ function ConfiguratorContent() {
   const [selectedHeater, setSelectedHeater] = useState<string | null>(null);
   const [selectedStove, setSelectedStove] = useState<string | null>(null);
   const [selectedAccessories, setSelectedAccessories] = useState<string[]>([]);
-  const [selectedColor, setSelectedColor] = useState('RAL5010');
   const [activeInfoModal, setActiveInfoModal] = useState<InfoModalContent | null>(null);
   const [carouselIndex, setCarouselIndex] = useState(0);
 
   // Get product based on type
-  const getProduct = () => {
+  const getProduct = (): Product | undefined => {
     switch (productType) {
       case 'sauna':
         return saunas.find(p => p.id === productId);
@@ -49,6 +53,8 @@ function ConfiguratorContent() {
   const product = getProduct();
   if (!product) return <div className="p-8 text-center">{lang === 'en' ? 'Product not found' : 'Prodotto non trovato'}</div>;
 
+  const productName = n(product, lang);
+
   // Carousel handlers
   const images = product.images || [];
   const nextImage = () => {
@@ -61,36 +67,60 @@ function ConfiguratorContent() {
   // Get heater categories
   const getHeaters = () => {
     if (productType === 'sauna') {
-      const heaters = saunaHeaters.filter(h => product.compatibleHeaters?.includes(h.id));
+      const allHeaters = product.compatibleHeaters
+        ? saunaHeaters.filter(h => product.compatibleHeaters!.includes(h.id))
+        : saunaHeaters;
       return {
-        electric: heaters.filter(h => h.type === 'electric'),
-        wood: heaters.filter(h => h.type === 'wood'),
+        electric: allHeaters.filter(h => h.type === 'electric'),
+        wood: allHeaters.filter(h => h.type === 'wood'),
       };
     }
-    return { electric: [], wood: [] };
+    return { electric: [] as Heater[], wood: [] as Heater[] };
   };
 
   // Get accessories
-  const getAccessories = () => {
+  const getAccessories = (): Accessory[] => {
     switch (productType) {
       case 'sauna':
-        return saunaAccessories.filter(a => product.compatibleAccessories?.includes(a.id));
+        return product.compatibleAccessories
+          ? saunaAccessories.filter(a => product.compatibleAccessories!.includes(a.id))
+          : saunaAccessories;
       case 'hottub':
-        return hottubAccessories.filter(a => product.compatibleAccessories?.includes(a.id));
+        return product.compatibleAccessories
+          ? hottubAccessories.filter(a => product.compatibleAccessories!.includes(a.id))
+          : hottubAccessories;
       case 'icebath':
-        return icebathAccessories.filter(a => product.compatibleAccessories?.includes(a.id));
+        return product.compatibleAccessories
+          ? icebathAccessories.filter(a => product.compatibleAccessories!.includes(a.id))
+          : icebathAccessories;
       default:
         return [];
     }
   };
 
+  // Build info modal for a heater
+  const heaterModal = (heater: Heater): InfoModalContent => ({
+    name: n(heater, lang),
+    price: heater.price,
+  });
+
+  // Build info modal for an accessory
+  const accessoryModal = (acc: Accessory): InfoModalContent => ({
+    name: n(acc, lang),
+    price: acc.price,
+    image: acc.image,
+    desc: lang === 'en' ? acc.descEn : acc.descIt,
+    specs: lang === 'en' ? acc.specsEn : acc.specsIt,
+  });
+
   // Calculate price
+  const basePrice = product.flatpack || 0;
   const calculatePrice = () => {
-    let total = product.price || 0;
+    let total = basePrice;
 
     // Delivery mode
-    if (productType === 'sauna' && delivery === 'assembled' && product.assembledPrice) {
-      total = product.assembledPrice;
+    if (productType === 'sauna' && delivery === 'assembled' && product.assembled) {
+      total = product.assembled;
     }
 
     // Selected heater
@@ -117,6 +147,7 @@ function ConfiguratorContent() {
   const heaters = getHeaters();
   const accessories = getAccessories();
   const totalPrice = calculatePrice();
+  const assemblyUpcharge = (product.assembled && product.flatpack) ? product.assembled - product.flatpack : 0;
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#FFFBF7] to-[#F5F1ED]">
@@ -140,8 +171,8 @@ function ConfiguratorContent() {
                 <AnimatePresence mode="wait">
                   <motion.img
                     key={carouselIndex}
-                    src={product.images?.[carouselIndex] || '/placeholder.jpg'}
-                    alt={product.name}
+                    src={images[carouselIndex] || product.image || '/placeholder.jpg'}
+                    alt={productName}
                     className="w-full h-full object-cover"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
@@ -150,7 +181,7 @@ function ConfiguratorContent() {
                   />
                 </AnimatePresence>
 
-                {(product.images?.length || 0) > 1 && (
+                {images.length > 1 && (
                   <>
                     <button
                       onClick={prevImage}
@@ -170,9 +201,9 @@ function ConfiguratorContent() {
                 )}
 
                 {/* Image indicator */}
-                {(product.images?.length || 0) > 1 && (
+                {images.length > 1 && (
                   <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
-                    {product.images?.map((_, idx) => (
+                    {images.map((_, idx) => (
                       <button
                         key={idx}
                         onClick={() => setCarouselIndex(idx)}
@@ -191,33 +222,21 @@ function ConfiguratorContent() {
           {/* Product Info */}
           <ScrollReveal>
             <div className="mb-12">
-              <h1 className="text-4xl font-bold text-[#2D5A4A] mb-2">{product.name}</h1>
-              <p className="text-[#6B6B6B] text-lg mb-4">{product.description}</p>
+              <h1 className="text-4xl font-bold text-[#2D5A4A] mb-2">{productName}</h1>
+              {product.subtitleIt && (
+                <p className="text-[#6B6B6B] text-lg mb-4">{lang === 'en' ? product.subtitleEn : product.subtitleIt}</p>
+              )}
 
-              {product.dimensions && (
+              {product.dims && (
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 py-6 border-t border-b border-[#E8DDD4]">
-                  {product.dimensions.width && (
-                    <div>
-                      <p className="text-sm text-[#999] uppercase tracking-wide">{lang === 'en' ? 'Width' : 'Larghezza'}</p>
-                      <p className="text-lg font-semibold text-[#2D5A4A]">{product.dimensions.width} cm</p>
-                    </div>
-                  )}
-                  {product.dimensions.depth && (
-                    <div>
-                      <p className="text-sm text-[#999] uppercase tracking-wide">{lang === 'en' ? 'Depth' : 'Profondità'}</p>
-                      <p className="text-lg font-semibold text-[#2D5A4A]">{product.dimensions.depth} cm</p>
-                    </div>
-                  )}
-                  {product.dimensions.height && (
-                    <div>
-                      <p className="text-sm text-[#999] uppercase tracking-wide">{lang === 'en' ? 'Height' : 'Altezza'}</p>
-                      <p className="text-lg font-semibold text-[#2D5A4A]">{product.dimensions.height} cm</p>
-                    </div>
-                  )}
-                  {product.capacity && (
+                  <div>
+                    <p className="text-sm text-[#999] uppercase tracking-wide">{lang === 'en' ? 'Dimensions' : 'Dimensioni'}</p>
+                    <p className="text-lg font-semibold text-[#2D5A4A]">{product.dims}</p>
+                  </div>
+                  {product.persons && (
                     <div>
                       <p className="text-sm text-[#999] uppercase tracking-wide">{lang === 'en' ? 'Capacity' : 'Capienza'}</p>
-                      <p className="text-lg font-semibold text-[#2D5A4A]">{product.capacity} {lang === 'en' ? 'persons' : 'persone'}</p>
+                      <p className="text-lg font-semibold text-[#2D5A4A]">{product.persons} {lang === 'en' ? 'persons' : 'persone'}</p>
                     </div>
                   )}
                 </div>
@@ -255,8 +274,8 @@ function ConfiguratorContent() {
                       />
                       <div className="flex-1">
                         <span className="font-medium text-[#2D5A4A]">{lang === 'en' ? 'Fully Assembled' : 'Completamente Montato'}</span>
-                        {product.assembledPrice && (
-                          <span className="ml-2 text-sm text-[#6B6B6B]">+€ {(product.assembledPrice - product.price).toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                        {assemblyUpcharge > 0 && (
+                          <span className="ml-2 text-sm text-[#6B6B6B]">+€ {assemblyUpcharge.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                         )}
                       </div>
                     </label>
@@ -290,18 +309,11 @@ function ConfiguratorContent() {
                               className="w-5 h-5"
                             />
                             <div className="flex-1">
-                              <p className="font-medium text-[#2D5A4A]">{heater.name}</p>
-                              {heater.specs && <p className="text-sm text-[#999]">{heater.specs}</p>}
+                              <p className="font-medium text-[#2D5A4A]">{n(heater, lang)}</p>
                             </div>
                             <span className="text-sm font-semibold text-[#2D5A4A]">+€ {heater.price.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                             <button
-                              onClick={() => setActiveInfoModal({
-                                name: heater.name,
-                                price: heater.price,
-                                image: heater.image,
-                                desc: heater.description,
-                                specs: heater.specs,
-                              })}
+                              onClick={() => setActiveInfoModal(heaterModal(heater))}
                               className="p-2 hover:bg-[#F5F1ED] rounded-full transition-colors"
                               aria-label="More info"
                             >
@@ -332,18 +344,11 @@ function ConfiguratorContent() {
                               className="w-5 h-5"
                             />
                             <div className="flex-1">
-                              <p className="font-medium text-[#2D5A4A]">{heater.name}</p>
-                              {heater.specs && <p className="text-sm text-[#999]">{heater.specs}</p>}
+                              <p className="font-medium text-[#2D5A4A]">{n(heater, lang)}</p>
                             </div>
                             <span className="text-sm font-semibold text-[#2D5A4A]">+€ {heater.price.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                             <button
-                              onClick={() => setActiveInfoModal({
-                                name: heater.name,
-                                price: heater.price,
-                                image: heater.image,
-                                desc: heater.description,
-                                specs: heater.specs,
-                              })}
+                              onClick={() => setActiveInfoModal(heaterModal(heater))}
                               className="p-2 hover:bg-[#F5F1ED] rounded-full transition-colors"
                               aria-label="More info"
                             >
@@ -375,18 +380,11 @@ function ConfiguratorContent() {
                           className="w-5 h-5"
                         />
                         <div className="flex-1">
-                          <p className="font-medium text-[#2D5A4A]">{stove.name}</p>
-                          {stove.specs && <p className="text-sm text-[#999]">{stove.specs}</p>}
+                          <p className="font-medium text-[#2D5A4A]">{n(stove, lang)}</p>
                         </div>
                         <span className="text-sm font-semibold text-[#2D5A4A]">+€ {stove.price.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                         <button
-                          onClick={() => setActiveInfoModal({
-                            name: stove.name,
-                            price: stove.price,
-                            image: stove.image,
-                            desc: stove.description,
-                            specs: stove.specs,
-                          })}
+                          onClick={() => setActiveInfoModal(heaterModal(stove))}
                           className="p-2 hover:bg-[#F5F1ED] rounded-full transition-colors"
                           aria-label="More info"
                         >
@@ -421,18 +419,11 @@ function ConfiguratorContent() {
                           className="w-5 h-5"
                         />
                         <div className="flex-1">
-                          <p className="font-medium text-[#2D5A4A]">{accessory.name}</p>
-                          {accessory.specs && <p className="text-sm text-[#999]">{accessory.specs}</p>}
+                          <p className="font-medium text-[#2D5A4A]">{n(accessory, lang)}</p>
                         </div>
                         <span className="text-sm font-semibold text-[#2D5A4A]">+€ {accessory.price.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                         <button
-                          onClick={() => setActiveInfoModal({
-                            name: accessory.name,
-                            price: accessory.price,
-                            image: accessory.image,
-                            desc: accessory.description,
-                            specs: accessory.specs,
-                          })}
+                          onClick={() => setActiveInfoModal(accessoryModal(accessory))}
                           className="p-2 hover:bg-[#F5F1ED] rounded-full transition-colors"
                           aria-label="More info"
                         >
@@ -456,35 +447,41 @@ function ConfiguratorContent() {
               <div className="space-y-3 mb-6 pb-6 border-b border-[#E8DDD4]">
                 <div className="flex justify-between text-sm">
                   <span className="text-[#6B6B6B]">{lang === 'en' ? 'Base Price' : 'Prezzo Base'}</span>
-                  <span className="font-semibold text-[#2D5A4A]">€ {product.price.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                  <span className="font-semibold text-[#2D5A4A]">€ {basePrice.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                 </div>
 
-                {delivery === 'assembled' && product.assembledPrice && (
+                {delivery === 'assembled' && assemblyUpcharge > 0 && (
                   <div className="flex justify-between text-sm">
-                    <span className="text-[#6B6B6B]">{lang === 'en' ? 'Assembled' : 'Montaggio'}</span>
-                    <span className="font-semibold text-[#2D5A4A]">€ {(product.assembledPrice - product.price).toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                    <span className="text-[#6B6B6B]">{lang === 'en' ? 'Assembly' : 'Montaggio'}</span>
+                    <span className="font-semibold text-[#2D5A4A]">€ {assemblyUpcharge.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                   </div>
                 )}
 
-                {selectedHeater && (
-                  <div className="flex justify-between text-sm">
-                    <span className="text-[#6B6B6B]">{saunaHeaters.find(h => h.id === selectedHeater)?.name}</span>
-                    <span className="font-semibold text-[#2D5A4A]">€ {saunaHeaters.find(h => h.id === selectedHeater)?.price.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-                  </div>
-                )}
+                {selectedHeater && (() => {
+                  const h = saunaHeaters.find(h => h.id === selectedHeater);
+                  return h ? (
+                    <div className="flex justify-between text-sm">
+                      <span className="text-[#6B6B6B]">{n(h, lang)}</span>
+                      <span className="font-semibold text-[#2D5A4A]">€ {h.price.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                    </div>
+                  ) : null;
+                })()}
 
-                {selectedStove && (
-                  <div className="flex justify-between text-sm">
-                    <span className="text-[#6B6B6B]">{hottubHeaters.find(s => s.id === selectedStove)?.name}</span>
-                    <span className="font-semibold text-[#2D5A4A]">€ {hottubHeaters.find(s => s.id === selectedStove)?.price.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-                  </div>
-                )}
+                {selectedStove && (() => {
+                  const s = hottubHeaters.find(s => s.id === selectedStove);
+                  return s ? (
+                    <div className="flex justify-between text-sm">
+                      <span className="text-[#6B6B6B]">{n(s, lang)}</span>
+                      <span className="font-semibold text-[#2D5A4A]">€ {s.price.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                    </div>
+                  ) : null;
+                })()}
 
                 {selectedAccessories.map((accId) => {
                   const acc = [...saunaAccessories, ...hottubAccessories, ...icebathAccessories].find(a => a.id === accId);
                   return acc ? (
                     <div key={accId} className="flex justify-between text-sm">
-                      <span className="text-[#6B6B6B]">{acc.name}</span>
+                      <span className="text-[#6B6B6B]">{n(acc, lang)}</span>
                       <span className="font-semibold text-[#2D5A4A]">€ {acc.price.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                     </div>
                   ) : null;
