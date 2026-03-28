@@ -50,11 +50,12 @@ function ConfiguratorContent() {
   if (!product) return <div className="p-8 text-center">{lang === 'en' ? 'Product not found' : 'Prodotto non trovato'}</div>;
 
   // Carousel handlers
+  const images = product.images || [];
   const nextImage = () => {
-    if (product.images) setCarouselIndex((prev) => (prev + 1) % product.images.length);
+    if (images.length > 0) setCarouselIndex((prev) => (prev + 1) % images.length);
   };
   const prevImage = () => {
-    if (product.images) setCarouselIndex((prev) => (prev - 1 + (product.images?.length || 1)) % (product.images?.length || 1));
+    if (images.length > 0) setCarouselIndex((prev) => (prev - 1 + images.length) % images.length);
   };
 
   // Get heater categories
