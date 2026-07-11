@@ -1,0 +1,158 @@
+// Sauna Amore — Phase 1 schema
+// Postgres (Neon). All prices in whole euros (EUR, no cents used in catalog).
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Category {
+  SAUNA
+  HOT_TUB
+  ICE_BATH
+  ACCESSORY
+}
+
+enum OrderStatus {
+  NEW
+  CONTACTED
+  QUOTED
+  CONFIRMED
+  DELIVERED
+  CANCELLED
+}
+
+enum DisplayType {
+  RADIO
+  DROPDOWN
+}
+
+model Product {
+  id            String         @id @default(cuid())
+  sku           String         @unique // e.g. "S16", "WS18", "TP2V"
+  slug          String         @unique // e.g. "s16-sauna-botte-1-6m"
+  category      Category
+  subcategory   String? // "2m" | "3m" | "fiberglass" | "wood" | accessory group
+  nameIt        String
+  nameEn        String
+  descriptionIt String?        @db.Text
+  descriptionEn String?        @db.Text
+  specsIt       String?        @db.Text
+  specsEn       String?        @db.Text
+  basePrice     Int // starting price: cheapest configuration (spruce, flat-pack, no heater)
+  capacity      Int? // persons
+  dimensions    String? // "160×200×210cm"
+  isPublished   Boolean        @default(true)
+  sortOrder     Int            @default(0)
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  images     ProductImage[]
+  options    ProductOption[]
+  orderItems OrderItem[]
+
+  @@index([category, isPublished, sortOrder])
+}
+
+model ProductImage {
+  id        String  @id @default(cuid())
+  productId String
+  url       String // Vercel Blob URL (phase 1 seeds current external URLs)
+  alt       String?
+  sortOrder Int     @default(0)
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([productId, sortOrder])
+}
+
+// e.g. "wood" (Spruce/Thermowood), "assembly" (Flat-pack/Assembled), "heater"
+model OptionGroup {
+  id          String      @id @default(cuid())
+  code        String      @unique // "wood" | "assembly" | "sauna-heater" | "hottub-heater"
+  nameIt      String
+  nameEn      String
+  displayType DisplayType @default(RADIO)
+  sortOrder   Int         @default(0)
+
+  options Option[]
+}
+
+model Option {
+  id        String @id @default(cuid())
+  groupId   String
+  code      String // "spruce" | "thermowood" | "flatpack" | heater sku...
+  nameIt    String
+  nameEn    String
+  sortOrder Int    @default(0)
+
+  group    OptionGroup     @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  products ProductOption[]
+
+  @@unique([groupId, code])
+}
+
+// Which options a product offers, and the price delta for THIS product.
+// (Thermowood costs +€610 on an S16 but +€930 on an S3 — deltas live here.)
+model ProductOption {
+  id         String  @id @default(cuid())
+  productId  String
+  optionId   String
+  priceDelta Int     @default(0)
+  isDefault  Boolean @default(false)
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  option  Option  @relation(fields: [optionId], references: [id], onDelete: Cascade)
+
+  @@unique([productId, optionId])
+  @@index([productId])
+}
+
+model Order {
+  id            String      @id @default(cuid())
+  orderNumber   String      @unique // "SA-2026-0001"
+  status        OrderStatus @default(NEW)
+  customerName  String
+  email         String
+  phone         String?
+  address       String?
+  city          String?
+  postalCode    String?
+  message       String?     @db.Text
+  locale        String      @default("it")
+  totalEstimate Int
+  adminNotes    String?     @db.Text
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  items OrderItem[]
+
+  @@index([status, createdAt])
+}
+
+model OrderItem {
+  id              String  @id @default(cuid())
+  orderId         String
+  productId       String? // nullable: product may be deleted later
+  productName     String // snapshot at order time
+  optionsSnapshot Json // [{ group, option, priceDelta }]
+  unitPrice       Int // base + deltas at order time
+  quantity        Int     @default(1)
+
+  order   Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
+
+  @@index([orderId])
+}
+
+model AdminUser {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  name         String?
+  createdAt    DateTime @default(now())
+}
