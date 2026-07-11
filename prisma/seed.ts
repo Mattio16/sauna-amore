@@ -1,229 +1,300 @@
 /**
- * Sauna Amore — seed script.
- * Builds the database from the existing hard-coded catalog in lib/products.ts:
- *  - Merges Spruce (…E) / Thermowood (…T) variant pairs into ONE product
- *    with a "wood" option (per-product price delta).
- *  - Adds an "assembly" option (flat-pack default / assembled) where prices exist.
- *  - Attaches heater option groups to saunas and hot tubs.
- *  - Seeds accessories as simple products.
- *  - Creates the admin user from ADMIN_EMAIL / ADMIN_PASSWORD env vars.
+ * Sauna Amore — seed for Product Lineup 2026/27 (curated 12-product range).
  *
- * Idempotent: safe to re-run (upserts + replaces images/options per product).
+ * Source of truth: "Product Lineup 2026/27" (July 2026):
+ *  - 6 saunas (good-better-best), 3 hot tubs, 2 ice baths, 1 garden shower
+ *  - Wood is an option (spruce standard / thermowood premium), not a product
+ *  - Heater menu on every sauna: standard electric (included) / smart HUUM (+990) /
+ *    wood-fired (+690 small, +990 large). S16 is electric-only.
+ *  - Base price = suggested retail incl. IVA, spruce flat-pack, standard heater.
+ *  - Assembly/ground prep quoted separately (not a configurator option).
+ *  - Cut models are deleted from the site (available to order, invisible).
+ *
+ * Accessories (secchielli, pietre, oli…) still seed from lib/products.ts.
+ * Idempotent: upserts by SKU, replaces images/options, deletes non-lineup products.
  * Run: npx prisma db seed
  */
 import { PrismaClient, Category, DisplayType } from '@prisma/client';
 import bcrypt from 'bcryptjs';
-import {
-  saunas,
-  hottubs,
-  icebaths,
-  saunaHeaters,
-  hottubHeaters,
-  saunaAccessories,
-  hottubAccessories,
-  icebathAccessories,
-  type Product as CatalogProduct,
-  type Heater,
-  type Accessory,
-} from '../lib/products';
+import { saunaAccessories, hottubAccessories, icebathAccessories, type Accessory } from '../lib/products';
 
 const prisma = new PrismaClient();
 
-// ---------- helpers ----------
+// ---------------- option groups ----------------
 
-function slugify(s: string): string {
-  return s
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/[̀-ͯ]/g, '')
-    .replace(/[×ø]/g, (c) => (c === '×' ? 'x' : 'o'))
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '');
-}
+const GROUPS = [
+  { code: 'wood', nameIt: 'Legno', nameEn: 'Wood', sortOrder: 0 },
+  { code: 'sauna-heater', nameIt: 'Stufa', nameEn: 'Heater', sortOrder: 1 },
+  { code: 'tub-filter', nameIt: 'Filtrazione', nameEn: 'Filtration', sortOrder: 2 },
+  { code: 'tub-cover', nameIt: 'Copertura', nameEn: 'Cover', sortOrder: 3 },
+  { code: 'chiller', nameIt: 'Raffreddamento', nameEn: 'Chilling', sortOrder: 4 },
+];
 
-/** "S16E 1.6m Spruce" -> "S16 1.6m" (drop variant id + wood word) */
-function mergedName(name: string, variantId: string, baseSku: string): string {
-  return name
-    .replace(variantId, baseSku)
-    .replace(/\b(Spruce|Thermowood|Thermo|flat-pack)\b/gi, '')
-    .replace(/\s{2,}/g, ' ')
-    .trim();
-}
+const OPTIONS = [
+  { group: 'wood', code: 'spruce', nameIt: 'Abete classico', nameEn: 'Classic spruce', sortOrder: 0 },
+  { group: 'wood', code: 'thermowood', nameIt: 'Thermowood premium', nameEn: 'Premium thermowood', sortOrder: 1 },
+  { group: 'sauna-heater', code: 'electric-standard', nameIt: 'Elettrica standard (Harvia)', nameEn: 'Standard electric (Harvia)', sortOrder: 0 },
+  { group: 'sauna-heater', code: 'electric-smart', nameIt: 'Elettrica smart (HUUM + WiFi)', nameEn: 'Smart electric (HUUM + WiFi)', sortOrder: 1 },
+  { group: 'sauna-heater', code: 'wood-fired', nameIt: 'A legna (set con canna fumaria)', nameEn: 'Wood-fired (incl. chimney set)', sortOrder: 2 },
+  { group: 'tub-filter', code: 'no-filter', nameIt: 'Senza filtrazione', nameEn: 'No filtration', sortOrder: 0 },
+  { group: 'tub-filter', code: 'filter-set', nameIt: 'Set filtrazione', nameEn: 'Filter set', sortOrder: 1 },
+  { group: 'tub-cover', code: 'no-cover', nameIt: 'Senza copertura', nameEn: 'No cover', sortOrder: 0 },
+  { group: 'tub-cover', code: 'insulated-cover', nameIt: 'Copertura isolata', nameEn: 'Insulated cover', sortOrder: 1 },
+  { group: 'chiller', code: 'no-chiller', nameIt: 'Acqua naturale', nameEn: 'Natural water', sortOrder: 0 },
+  { group: 'chiller', code: 'chiller-pro', nameIt: 'Chiller Pro 7kW + filtro (sempre freddo)', nameEn: 'Pro chiller 7kW + filter (always cold)', sortOrder: 1 },
+];
 
-type MergedProduct = {
+// ---------------- lineup ----------------
+
+type LineupProduct = {
   sku: string;
+  slug: string;
   category: Category;
-  subcategory?: string;
+  subcategory: string | null;
   nameIt: string;
   nameEn: string;
+  descriptionIt: string;
+  descriptionEn: string;
+  specsIt?: string;
+  specsEn?: string;
   basePrice: number;
-  capacity?: number;
-  dimensions?: string;
-  images: string[];
-  woodDelta?: number; // thermowood surcharge; undefined = no wood option
-  assemblyDelta?: number; // assembled surcharge; undefined = no assembly option
+  capacity: number | null;
+  dimensions: string | null;
   sortOrder: number;
+  images: string[];
+  options: { group: string; code: string; delta: number; isDefault?: boolean }[];
 };
 
-/**
- * Merge …E/…T variant pairs. Products without a matching pair (fiberglass
- * tubs, ice baths) pass through as single products.
- */
-function mergeVariants(items: CatalogProduct[], category: Category): MergedProduct[] {
-  const byBase = new Map<string, CatalogProduct[]>();
-  for (const p of items) {
-    const base = /[ET]$/.test(p.id) ? p.id.slice(0, -1) : p.id;
-    byBase.set(base, [...(byBase.get(base) ?? []), p]);
-  }
+const heaterMenu = (woodFiredDelta: number) => [
+  { group: 'sauna-heater', code: 'electric-standard', delta: 0, isDefault: true },
+  { group: 'sauna-heater', code: 'electric-smart', delta: 990 },
+  { group: 'sauna-heater', code: 'wood-fired', delta: woodFiredDelta },
+];
+const woodToggle = (thermoDelta: number) => [
+  { group: 'wood', code: 'spruce', delta: 0, isDefault: true },
+  { group: 'wood', code: 'thermowood', delta: thermoDelta },
+];
+const img = (sku: string, n: number) =>
+  Array.from({ length: n }, (_, i) => `/images/products/${sku}/${i + 1}.jpg`);
 
-  const out: MergedProduct[] = [];
-  let sort = 0;
-  for (const [baseSku, group] of Array.from(byBase.entries())) {
-    const spruce = group.find((p) => p.id.endsWith('E')) ?? group[0];
-    const thermo = group.length > 1 ? group.find((p) => p.id.endsWith('T')) : undefined;
+const LINEUP: LineupProduct[] = [
+  // ---------- Saunas (6) ----------
+  {
+    sku: 'S16', slug: 's16-mini', category: 'SAUNA', subcategory: '1.6m',
+    nameIt: 'S16 · Mini', nameEn: 'S16 · Mini',
+    descriptionIt: "La porta d'ingresso alla vera sauna finlandese. Compatta, si monta in poche ore e vive bene anche nei giardini piccoli. Elettrica: si accende, si aspettano 40 minuti, si entra.",
+    descriptionEn: 'The entry to true Finnish sauna. Compact, assembled in a few hours, at home even in small gardens. Electric: switch on, wait 40 minutes, step in.',
+    basePrice: 2590, capacity: 3, dimensions: '160×200×210 cm', sortOrder: 0,
+    specsIt: 'Diametro: Ø2 m | Montata (LxPxA): 160×200×210 cm | Kit (LxPxA): 200×120×150 cm | Volume cabina: 4,2 m³ | Lunghezza cabina: 145 cm | Peso: ~500 kg | Capienza cabina: 2–3 persone | Spessore legno: 40 mm | Larghezza panche: 49 cm | Riscaldamento: ~1 h',
+    specsEn: 'Diameter: Ø2 m | Assembled (LxWxH): 160×200×210 cm | Flat-pack (LxWxH): 200×120×150 cm | Steam room volume: 4.2 m³ | Steam room length: 145 cm | Weight: ~500 kg | Steam room capacity: 2–3 persons | Wood thickness: 40 mm | Bench width: 49 cm | Heating time: ~1 h',
+    images: img('s16', 5),
+    options: [
+      ...woodToggle(400),
+      { group: 'sauna-heater', code: 'electric-standard', delta: 0, isDefault: true },
+      { group: 'sauna-heater', code: 'electric-smart', delta: 990 },
+    ],
+  },
+  {
+    sku: 'S2V', slug: 's2v-2-4m', category: 'SAUNA', subcategory: '2.4m',
+    nameIt: 'S2V · 2.4m', nameEn: 'S2V · 2.4m',
+    descriptionIt: "La nostra raccomandazione. Appena più lunga della 2 metri ma sensibilmente più comoda: quattro persone sedute bene, tre cerchi d'acciaio, proporzioni perfette. Se non sai quale scegliere, è questa.",
+    descriptionEn: "Our recommendation. Barely longer than the 2-metre but noticeably roomier: four people seated well, three steel hoops, perfect proportions. If you don't know which to choose, it's this one.",
+    basePrice: 2990, capacity: 4, dimensions: '240×200×210 cm', sortOrder: 1,
+    specsIt: 'Diametro: Ø2 m | Montata (LxPxA): 240×200×210 cm | Kit (LxPxA): 240×120×150 cm | Volume cabina: 5,3 m³ | Lunghezza cabina: 185 cm | Peso: ~670 kg | Capienza cabina: ~4 persone | Spessore legno: 40 mm | Larghezza panche: 49 cm | Riscaldamento: ~1 h',
+    specsEn: 'Diameter: Ø2 m | Assembled (LxWxH): 240×200×210 cm | Flat-pack (LxWxH): 240×120×150 cm | Steam room volume: 5.3 m³ | Steam room length: 185 cm | Weight: ~670 kg | Steam room capacity: ~4 persons | Wood thickness: 40 mm | Bench width: 49 cm | Heating time: ~1 h',
+    images: img('s2v', 5),
+    options: [...woodToggle(450), ...heaterMenu(690)],
+  },
+  {
+    sku: 'S3', slug: 's3-3m', category: 'SAUNA', subcategory: '3m',
+    nameIt: 'S3 · 3m', nameEn: 'S3 · 3m',
+    descriptionIt: 'Per famiglie e gruppi: sei persone, panche comode, il classico dei classici. Il passo su misura per chi chiede "e quella più grande?".',
+    descriptionEn: 'For families and groups: six people, comfortable benches, the classic of classics. The right step up for anyone asking "and the bigger one?".',
+    basePrice: 3590, capacity: 6, dimensions: '300×200×210 cm', sortOrder: 2,
+    specsIt: 'Diametro: Ø2 m | Montata (LxPxA): 300×200×210 cm | Kit (LxPxA): 300×80×150 cm | Volume cabina: 6,0 m³ | Lunghezza cabina: 280 cm | Peso: ~650 kg | Capienza cabina: ~6 persone | Spessore legno: 40 mm | Larghezza panche: 49 cm | Riscaldamento: ~1 h',
+    specsEn: 'Diameter: Ø2 m | Assembled (LxWxH): 300×200×210 cm | Flat-pack (LxWxH): 300×80×150 cm | Steam room volume: 6.0 m³ | Steam room length: 280 cm | Weight: ~650 kg | Steam room capacity: ~6 persons | Wood thickness: 40 mm | Bench width: 49 cm | Heating time: ~1 h',
+    images: img('s3', 4),
+    options: [...woodToggle(500), ...heaterMenu(990)],
+  },
+  {
+    sku: 'S4P', slug: 's4p-4m-spogliatoio', category: 'SAUNA', subcategory: '4m',
+    nameIt: 'S4P · 4m con spogliatoio', nameEn: 'S4P · 4m with changing room',
+    descriptionIt: "La macchina da ospitalità. Spogliatoio interno con porta richiudibile: gli ospiti si cambiano dentro, la struttura si chiude tra un noleggio e l'altro. Il cuore del Wellness Corner per agriturismi e B&B.",
+    descriptionEn: 'The hospitality machine. Interior changing room with lockable door: guests change inside, and it locks between rentals. The heart of the Wellness Corner for agriturismi and B&Bs.',
+    basePrice: 4490, capacity: 8, dimensions: '400×200×210 cm', sortOrder: 3,
+    specsIt: 'Diametro: Ø2 m | Montata (LxPxA): 400×200×210 cm | Kit (LxPxA): 400×80×150 cm | Volume cabina: 8 m³ | Cabina sauna: 280 cm + spogliatoio | Peso: ~720 kg | Capienza: ~4 in cabina, 8 totale | Spessore legno: 40 mm | Larghezza panche: 49 cm | Riscaldamento: ~1 h',
+    specsEn: 'Diameter: Ø2 m | Assembled (LxWxH): 400×200×210 cm | Flat-pack (LxWxH): 400×80×150 cm | Steam room volume: 8 m³ | Steam room: 280 cm + changing room | Weight: ~720 kg | Capacity: ~4 in steam room, 8 total | Wood thickness: 40 mm | Bench width: 49 cm | Heating time: ~1 h',
+    images: img('s4p', 5),
+    options: [...woodToggle(550), ...heaterMenu(990)],
+  },
+  {
+    sku: 'SQR2V', slug: 'sqr2v-cube', category: 'SAUNA', subcategory: '2.4m',
+    nameIt: 'SQR2V · Cube 2.4m', nameEn: 'SQR2V · Cube 2.4m',
+    descriptionIt: 'Per chi trova la botte troppo rustica. Linee moderne, stessa capienza della S2V: la scelta è puramente estetica. Perfetta accanto a ville e giardini contemporanei.',
+    descriptionEn: 'For those who find the barrel too rustic. Modern lines, same capacity as the S2V — the choice is purely aesthetic. Perfect beside contemporary villas and gardens.',
+    basePrice: 3290, capacity: 4, dimensions: '240×220×230 cm', sortOrder: 4,
+    specsIt: 'Montata (LxPxA): 240×220×230 cm | Kit (LxPxA): 240×120×150 cm | Volume cabina: 6,7 m³ | Lunghezza cabina: 185 cm | Peso: ~670 kg | Capienza cabina: ~4 persone | Spessore legno: 40 mm | Larghezza panche: 49 cm | Riscaldamento: ~1 h',
+    specsEn: 'Assembled (LxWxH): 240×220×230 cm | Flat-pack (LxWxH): 240×120×150 cm | Steam room volume: 6.7 m³ | Steam room length: 185 cm | Weight: ~670 kg | Steam room capacity: ~4 persons | Wood thickness: 40 mm | Bench width: 49 cm | Heating time: ~1 h',
+    images: img('sqr2v', 4),
+    options: [...woodToggle(500), ...heaterMenu(690)],
+  },
+  {
+    sku: 'S5P', slug: 's5p-panorama', category: 'SAUNA', subcategory: '5m',
+    nameIt: 'S5P · 5m Panorama', nameEn: 'S5P · 5m Panorama',
+    descriptionIt: "L'ammiraglia. Cinque metri con salotto interno e finestra panoramica: la sauna che si guarda il tramonto. Prodotta su ordinazione.",
+    descriptionEn: 'The flagship. Five metres with interior sitting room and panoramic window: the sauna that watches the sunset. Built to order.',
+    basePrice: 6490, capacity: 6, dimensions: '500×220×230 cm', sortOrder: 5,
+    specsIt: 'Diametro: Ø2,2 m | Montata (LxPxA): 500×220×230 cm | Kit (LxPxA): 500×120×150 cm | Volume cabina: 8,2 m³ | Cabina sauna: 200 cm + salotto (letto 210×180 cm) | Peso: ~1500 kg | Capienza cabina: ~6 persone | Spessore legno: 40 mm | Larghezza panche: 49 cm | Riscaldamento: ~1 h',
+    specsEn: 'Diameter: Ø2.2 m | Assembled (LxWxH): 500×220×230 cm | Flat-pack (LxWxH): 500×120×150 cm | Steam room volume: 8.2 m³ | Steam room: 200 cm + lounge (bed 210×180 cm) | Weight: ~1500 kg | Steam room capacity: ~6 persons | Wood thickness: 40 mm | Bench width: 49 cm | Heating time: ~1 h',
+    images: img('s5p', 4),
+    options: [...woodToggle(600), ...heaterMenu(990)],
+  },
 
-    const base = spruce.flatpack ?? spruce.price ?? 0;
-    const images = Array.from(
-      new Set(group.flatMap((p) => p.images ?? (p.image ? [p.image] : []))),
-    );
+  // ---------- Hot tubs (3) ----------
+  {
+    sku: 'LT18', slug: 'lt18-thermowood', category: 'HOT_TUB', subcategory: 'legno',
+    nameIt: 'LT18 · Thermowood Ø1.8m', nameEn: 'LT18 · Thermowood Ø1.8m',
+    descriptionIt: 'La tinozza romantica in thermowood scuro, riscaldata dalla stufa a legna esterna da 27kW. Acqua a 38° in poche ore, anche a gennaio.',
+    descriptionEn: 'The romantic tub in dark thermowood, heated by the 27kW external wood stove. Water at 38° in a few hours, even in January.',
+    basePrice: 2390, capacity: 6, dimensions: 'Ø180 cm', sortOrder: 0,
+    images: img('lt18', 3),
+    options: [
+      { group: 'tub-filter', code: 'no-filter', delta: 0, isDefault: true },
+      { group: 'tub-filter', code: 'filter-set', delta: 390 },
+      { group: 'tub-cover', code: 'no-cover', delta: 0, isDefault: true },
+      { group: 'tub-cover', code: 'insulated-cover', delta: 340 },
+    ],
+  },
+  {
+    sku: 'TP8', slug: 'tp8-ottagonale', category: 'HOT_TUB', subcategory: 'vetroresina',
+    nameIt: 'TP8 · Ottagonale 1.8×1.8m', nameEn: 'TP8 · Octagonal 1.8×1.8m',
+    descriptionIt: "La scelta giusta per agriturismi e famiglie: interno in vetroresina facile da pulire, sedute stampate, quattro poggiatesta, stufa esterna inox. Pronta per l'inverno.",
+    descriptionEn: 'The right answer for agriturismi and families: easy-clean fiberglass interior, moulded seats, four headrests, stainless external stove. Winter-proof.',
+    basePrice: 2790, capacity: 6, dimensions: '180×180 cm', sortOrder: 1,
+    images: img('tp8', 3),
+    options: [
+      { group: 'tub-filter', code: 'no-filter', delta: 0, isDefault: true },
+      { group: 'tub-filter', code: 'filter-set', delta: 390 },
+      { group: 'tub-cover', code: 'no-cover', delta: 0, isDefault: true },
+      { group: 'tub-cover', code: 'insulated-cover', delta: 340 },
+    ],
+  },
+  {
+    sku: 'TP2V', slug: 'tp2v-rotonda', category: 'HOT_TUB', subcategory: 'vetroresina',
+    nameIt: 'TP2V · Rotonda Ø2m stufa integrata', nameEn: 'TP2V · Round Ø2m integrated stove',
+    descriptionIt: 'Un prezzo, niente da aggiungere: stufa inox integrata e canna fumaria incluse. La risposta per chi dice "dammi quella completa".',
+    descriptionEn: 'One price, nothing to add: built-in stainless stove and chimney included. For those who say "just give me the complete one".',
+    basePrice: 2490, capacity: 6, dimensions: 'Ø200 cm', sortOrder: 2,
+    images: img('tp2v', 2),
+    options: [],
+  },
 
-    out.push({
-      sku: baseSku,
-      category,
-      subcategory: spruce.category,
-      nameIt: thermo ? mergedName(spruce.nameIt, spruce.id, baseSku) : spruce.nameIt,
-      nameEn: thermo ? mergedName(spruce.nameEn, spruce.id, baseSku) : spruce.nameEn,
-      basePrice: base,
-      capacity: spruce.persons,
-      dimensions: spruce.dims,
-      images,
-      woodDelta: thermo ? (thermo.flatpack ?? thermo.price ?? 0) - base : undefined,
-      assemblyDelta:
-        spruce.assembled && spruce.flatpack ? spruce.assembled - spruce.flatpack : undefined,
-      sortOrder: sort++,
-    });
-  }
-  return out;
-}
+  // ---------- Ice baths (2) ----------
+  {
+    sku: 'TP10', slug: 'tp10-fiberglass', category: 'ICE_BATH', subcategory: null,
+    nameIt: 'TP10 · Fiberglass Ø1m', nameEn: 'TP10 · Fiberglass Ø1m',
+    descriptionIt: "Il tuffo che rigenera, con copertura isolata inclusa. D'estate all'ombra, d'inverno sotto le stelle. Aggiungi il chiller e l'acqua resta sempre a 4°.",
+    descriptionEn: 'The regenerating plunge, insulated cover included. In summer shade or under winter stars. Add the chiller and the water stays at 4° all year.',
+    basePrice: 1190, capacity: 1, dimensions: 'Ø100 cm', sortOrder: 0,
+    images: img('tp10', 4),
+    options: [
+      { group: 'chiller', code: 'no-chiller', delta: 0, isDefault: true },
+      { group: 'chiller', code: 'chiller-pro', delta: 2490 },
+    ],
+  },
+  {
+    sku: 'LN9', slug: 'ln9-inox', category: 'ICE_BATH', subcategory: null,
+    nameIt: 'LN9 · Acciaio inox e legno Ø0.9m', nameEn: 'LN9 · Stainless steel & wood Ø0.9m',
+    descriptionIt: 'Il bagno di ghiaccio bello da vedere: acciaio inox e legno, per giardini di design e spa. Si abbina naturalmente alla sauna Cube.',
+    descriptionEn: 'The ice bath that looks beautiful: stainless steel and wood, for design gardens and spas. Pairs naturally with the Cube sauna.',
+    basePrice: 1690, capacity: 1, dimensions: 'Ø90 cm', sortOrder: 1,
+    images: img('ln9', 3),
+    options: [
+      { group: 'chiller', code: 'no-chiller', delta: 0, isDefault: true },
+      { group: 'chiller', code: 'chiller-pro', delta: 2490 },
+    ],
+  },
 
-// ---------- option groups ----------
+  // ---------- Garden shower (universal upsell) ----------
+  {
+    sku: 'SHOWER', slug: 'doccia-giardino', category: 'ACCESSORY', subcategory: 'garden',
+    nameIt: 'Doccia da giardino', nameEn: 'Garden shower',
+    descriptionIt: 'Il risciacquo freddo che completa il rituale caldo-freddo. In abete o thermowood, si collega al tubo da giardino.',
+    descriptionEn: 'The cold rinse that completes the hot-cold ritual. In spruce or thermowood, connects to a garden hose.',
+    basePrice: 1390, capacity: null, dimensions: null, sortOrder: 0,
+    images: img('shower', 3),
+    options: [...woodToggle(430)],
+  },
+];
 
-async function seedOptionGroups() {
-  const groups = [
-    { code: 'wood', nameIt: 'Tipo di Legno', nameEn: 'Wood Type', sortOrder: 0 },
-    { code: 'assembly', nameIt: 'Montaggio', nameEn: 'Assembly', sortOrder: 1 },
-    { code: 'sauna-heater', nameIt: 'Stufa', nameEn: 'Heater', sortOrder: 2 },
-    { code: 'hottub-heater', nameIt: 'Stufa', nameEn: 'Heater', sortOrder: 2 },
-  ];
-  for (const g of groups) {
-    await prisma.optionGroup.upsert({
-      where: { code: g.code },
-      update: { nameIt: g.nameIt, nameEn: g.nameEn, sortOrder: g.sortOrder },
-      create: { ...g, displayType: DisplayType.RADIO },
-    });
-  }
+const LINEUP_SKUS = LINEUP.map((p) => p.sku);
 
-  const options: { group: string; code: string; nameIt: string; nameEn: string; sortOrder: number }[] = [
-    { group: 'wood', code: 'spruce', nameIt: 'Abete (Spruce)', nameEn: 'Spruce', sortOrder: 0 },
-    { group: 'wood', code: 'thermowood', nameIt: 'Thermowood', nameEn: 'Thermowood', sortOrder: 1 },
-    { group: 'assembly', code: 'flatpack', nameIt: 'Kit da montare (Flat-pack)', nameEn: 'Flat-pack kit', sortOrder: 0 },
-    { group: 'assembly', code: 'assembled', nameIt: 'Montata', nameEn: 'Assembled', sortOrder: 1 },
-    { group: 'sauna-heater', code: 'none', nameIt: 'Senza stufa (predisposizione)', nameEn: 'No heater (prepared)', sortOrder: 0 },
-    { group: 'hottub-heater', code: 'none', nameIt: 'Senza stufa (predisposizione)', nameEn: 'No heater (prepared)', sortOrder: 0 },
-    ...saunaHeaters.map((h: Heater, i: number) => ({
-      group: 'sauna-heater', code: h.id.toLowerCase(), nameIt: h.nameIt, nameEn: h.nameEn, sortOrder: i + 1,
-    })),
-    ...hottubHeaters.map((h: Heater, i: number) => ({
-      group: 'hottub-heater', code: h.id.toLowerCase(), nameIt: h.nameIt, nameEn: h.nameEn, sortOrder: i + 1,
-    })),
-  ];
+// ---------------- seeding ----------------
 
+async function seedOptions() {
+  await prisma.optionGroup.deleteMany({});
   const groupIds = new Map<string, string>();
-  for (const g of await prisma.optionGroup.findMany()) groupIds.set(g.code, g.id);
-
-  const optionIds = new Map<string, string>(); // "group:code" -> id
-  for (const o of options) {
-    const groupId = groupIds.get(o.group)!;
-    const rec = await prisma.option.upsert({
-      where: { groupId_code: { groupId, code: o.code } },
-      update: { nameIt: o.nameIt, nameEn: o.nameEn, sortOrder: o.sortOrder },
-      create: { groupId, code: o.code, nameIt: o.nameIt, nameEn: o.nameEn, sortOrder: o.sortOrder },
+  for (const g of GROUPS) {
+    const rec = await prisma.optionGroup.create({ data: { ...g, displayType: DisplayType.RADIO } });
+    groupIds.set(g.code, rec.id);
+  }
+  const optionIds = new Map<string, string>();
+  for (const o of OPTIONS) {
+    const rec = await prisma.option.create({
+      data: { groupId: groupIds.get(o.group)!, code: o.code, nameIt: o.nameIt, nameEn: o.nameEn, sortOrder: o.sortOrder },
     });
     optionIds.set(`${o.group}:${o.code}`, rec.id);
   }
   return optionIds;
 }
 
-// ---------- products ----------
-
-async function upsertProduct(
-  p: MergedProduct,
-  optionIds: Map<string, string>,
-  heaterGroup: 'sauna-heater' | 'hottub-heater' | null,
-  heaters: Heater[],
-) {
-  const slug = slugify(`${p.sku} ${p.nameIt}`);
-  const product = await prisma.product.upsert({
-    where: { sku: p.sku },
-    update: {
-      nameIt: p.nameIt, nameEn: p.nameEn, basePrice: p.basePrice,
-      capacity: p.capacity, dimensions: p.dimensions,
-      category: p.category, subcategory: p.subcategory, sortOrder: p.sortOrder,
-    },
-    create: {
-      sku: p.sku, slug, category: p.category, subcategory: p.subcategory,
-      nameIt: p.nameIt, nameEn: p.nameEn, basePrice: p.basePrice,
-      capacity: p.capacity, dimensions: p.dimensions, sortOrder: p.sortOrder,
-    },
-  });
-
-  // replace images
-  await prisma.productImage.deleteMany({ where: { productId: product.id } });
-  await prisma.productImage.createMany({
-    data: p.images.map((url, i) => ({ productId: product.id, url, sortOrder: i })),
-  });
-
-  // replace options
-  await prisma.productOption.deleteMany({ where: { productId: product.id } });
-  const rows: { productId: string; optionId: string; priceDelta: number; isDefault: boolean }[] = [];
-
-  if (p.woodDelta !== undefined) {
-    rows.push(
-      { productId: product.id, optionId: optionIds.get('wood:spruce')!, priceDelta: 0, isDefault: true },
-      { productId: product.id, optionId: optionIds.get('wood:thermowood')!, priceDelta: p.woodDelta, isDefault: false },
-    );
-  }
-  if (p.assemblyDelta !== undefined) {
-    rows.push(
-      { productId: product.id, optionId: optionIds.get('assembly:flatpack')!, priceDelta: 0, isDefault: true },
-      { productId: product.id, optionId: optionIds.get('assembly:assembled')!, priceDelta: p.assemblyDelta, isDefault: false },
-    );
-  }
-  if (heaterGroup) {
-    rows.push({
-      productId: product.id, optionId: optionIds.get(`${heaterGroup}:none`)!, priceDelta: 0, isDefault: true,
+async function seedLineup(optionIds: Map<string, string>) {
+  for (const p of LINEUP) {
+    const data = {
+      slug: p.slug, category: p.category, subcategory: p.subcategory,
+      nameIt: p.nameIt, nameEn: p.nameEn,
+      descriptionIt: p.descriptionIt, descriptionEn: p.descriptionEn,
+      specsIt: p.specsIt ?? null, specsEn: p.specsEn ?? null,
+      basePrice: p.basePrice, capacity: p.capacity, dimensions: p.dimensions,
+      sortOrder: p.sortOrder, isPublished: true,
+    };
+    const product = await prisma.product.upsert({
+      where: { sku: p.sku },
+      update: data,
+      create: { sku: p.sku, ...data },
     });
-    for (const h of heaters) {
-      rows.push({
-        productId: product.id, optionId: optionIds.get(`${heaterGroup}:${h.id.toLowerCase()}`)!,
-        priceDelta: h.price, isDefault: false,
-      });
-    }
+    await prisma.productImage.deleteMany({ where: { productId: product.id } });
+    await prisma.productImage.createMany({
+      data: p.images.map((url, i) => ({ productId: product.id, url, sortOrder: i })),
+    });
+    await prisma.productOption.createMany({
+      data: p.options.map((o) => ({
+        productId: product.id,
+        optionId: optionIds.get(`${o.group}:${o.code}`)!,
+        priceDelta: o.delta,
+        isDefault: o.isDefault ?? false,
+      })),
+    });
+    console.log(`✔ ${p.sku} — ${p.nameIt}`);
   }
-  if (rows.length) await prisma.productOption.createMany({ data: rows });
+
+  const removed = await prisma.product.deleteMany({
+    where: { sku: { notIn: LINEUP_SKUS }, NOT: { sku: { startsWith: 'ACC-' } } },
+  });
+  if (removed.count) console.log(`✔ Removed ${removed.count} products not in the 2026/27 lineup`);
 }
 
 async function seedAccessories(items: Accessory[], subcategory: string, startSort: number) {
   let sort = startSort;
   for (const a of items) {
     const sku = `ACC-${a.id}`;
-    const slug = slugify(`${a.id} ${a.nameIt}`);
+    const slug = `${a.id} ${a.nameIt}`.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
     const product = await prisma.product.upsert({
       where: { sku },
       update: {
         nameIt: a.nameIt, nameEn: a.nameEn, basePrice: a.price,
         descriptionIt: a.descIt, descriptionEn: a.descEn,
-        specsIt: a.specsIt, specsEn: a.specsEn, sortOrder: sort,
+        specsIt: a.specsIt, specsEn: a.specsEn, sortOrder: sort, subcategory,
       },
       create: {
         sku, slug, category: Category.ACCESSORY, subcategory,
@@ -234,15 +305,11 @@ async function seedAccessories(items: Accessory[], subcategory: string, startSor
     });
     await prisma.productImage.deleteMany({ where: { productId: product.id } });
     if (a.image) {
-      await prisma.productImage.create({
-        data: { productId: product.id, url: a.image, alt: a.nameEn, sortOrder: 0 },
-      });
+      await prisma.productImage.create({ data: { productId: product.id, url: a.image, alt: a.nameEn, sortOrder: 0 } });
     }
     sort++;
   }
 }
-
-// ---------- admin user ----------
 
 async function seedAdmin() {
   const email = process.env.ADMIN_EMAIL;
@@ -252,38 +319,20 @@ async function seedAdmin() {
     return;
   }
   const passwordHash = await bcrypt.hash(password, 12);
-  await prisma.adminUser.upsert({
-    where: { email },
-    update: { passwordHash },
-    create: { email, passwordHash, name: 'Admin' },
-  });
+  await prisma.adminUser.upsert({ where: { email }, update: { passwordHash }, create: { email, passwordHash, name: 'Admin' } });
   console.log(`✔ Admin user: ${email}`);
 }
 
-// ---------- main ----------
-
 async function main() {
-  const optionIds = await seedOptionGroups();
-  console.log('✔ Option groups & options');
-
-  const mergedSaunas = mergeVariants(saunas, Category.SAUNA);
-  for (const p of mergedSaunas) await upsertProduct(p, optionIds, 'sauna-heater', saunaHeaters);
-  console.log(`✔ Saunas: ${saunas.length} variants → ${mergedSaunas.length} products`);
-
-  const mergedTubs = mergeVariants(hottubs, Category.HOT_TUB);
-  for (const p of mergedTubs) await upsertProduct(p, optionIds, 'hottub-heater', hottubHeaters);
-  console.log(`✔ Hot tubs: ${hottubs.length} variants → ${mergedTubs.length} products`);
-
-  const mergedIce = mergeVariants(icebaths, Category.ICE_BATH);
-  for (const p of mergedIce) await upsertProduct(p, optionIds, null, []);
-  console.log(`✔ Ice baths: ${mergedIce.length} products`);
-
-  await seedAccessories(saunaAccessories, 'sauna', 0);
+  const optionIds = await seedOptions();
+  console.log('✔ Option groups (wood, heater menu, tub & ice options)');
+  await seedLineup(optionIds);
+  await seedAccessories(saunaAccessories, 'sauna', 10);
   await seedAccessories(hottubAccessories, 'hottub', 100);
   await seedAccessories(icebathAccessories, 'icebath', 200);
   console.log(`✔ Accessories: ${saunaAccessories.length + hottubAccessories.length + icebathAccessories.length}`);
-
   await seedAdmin();
+  console.log('✔ Lineup 2026/27: 6 saunas · 3 hot tubs · 2 ice baths · 1 garden shower');
 }
 
 main()

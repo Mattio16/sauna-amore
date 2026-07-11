@@ -9,15 +9,16 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        sage: { 50: '#f0f7f2', 100: '#dcede0', 200: '#B5D5C5', 300: '#8bbfa3', 400: '#5ea37f', DEFAULT: '#B5D5C5' },
-        teal: { DEFAULT: '#2D6A4F', dark: '#1B4332', light: '#40916C' },
+        pine: { DEFAULT: '#2e4636', deep: '#26382b', dark: '#1d3a2a', night: '#1a261e' },
+        moss: { DEFAULT: '#8fa383', light: '#b7c4a6' },
+        mist: { DEFAULT: '#eef0e8', card: '#f9faf5' },
+        line: { DEFAULT: '#d7ddc9' },
+        inksoft: { DEFAULT: '#5f7361' },
         cream: { DEFAULT: '#FAF8F0', dark: '#F0ECE0' },
-        'warm-brown': { DEFAULT: '#8B6914', light: '#A67C1A' },
-        forest: { DEFAULT: '#1B4332', light: '#2D6A4F' },
       },
       fontFamily: {
-        display: ['Playfair Display', 'Georgia', 'serif'],
-        body: ['Inter', 'system-ui', 'sans-serif'],
+        display: ['Cormorant Garamond', 'Georgia', 'serif'],
+        body: ['Gantari', 'system-ui', 'sans-serif'],
       },
       animation: {
         'fade-up': 'fadeUp 0.7s ease-out forwards',

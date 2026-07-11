@@ -1,26 +1,37 @@
 'use client';
 
-import { useState, ReactNode } from 'react';
+import { useState, useEffect, ReactNode } from 'react';
 import { usePathname } from 'next/navigation';
-import { LangContext, Lang } from '@/lib/i18n';
-import Navbar from '@/components/Navbar';
-import Footer from '@/components/Footer';
+import { LangContext, Lang, isLang } from '@/lib/i18n';
+import SiteNav from '@/components/site/SiteNav';
+import SiteFooter from '@/components/site/SiteFooter';
 
 export default function ClientLayout({ children }: { children: ReactNode }) {
-  const [lang, setLang] = useState<Lang>('it');
+  const [lang, setLangState] = useState<Lang>('it');
   const pathname = usePathname();
-  const isAdmin = pathname?.startsWith('/admin');
 
-  if (isAdmin) {
-    // Admin area has its own layout — no public navbar/footer.
+  useEffect(() => {
+    const saved = typeof window !== 'undefined' ? localStorage.getItem('lang') : null;
+    if (isLang(saved)) setLangState(saved);
+  }, []);
+
+  function setLang(l: Lang) {
+    setLangState(l);
+    localStorage.setItem('lang', l);
+  }
+
+  if (pathname?.startsWith('/admin')) {
     return <>{children}</>;
   }
 
+  // Pages with a full-bleed photo header get a transparent nav at the top.
+  const overlay = ['/', '/saunas', '/hot-tubs', '/ice-baths', '/rental', '/about'].includes(pathname ?? '/');
+
   return (
     <LangContext.Provider value={lang}>
-      <Navbar onSetLang={setLang} />
+      <SiteNav lang={lang} onSetLang={setLang} overlay={overlay} />
       <main className="min-h-screen">{children}</main>
-      <Footer />
+      <SiteFooter />
     </LangContext.Provider>
   );
 }
