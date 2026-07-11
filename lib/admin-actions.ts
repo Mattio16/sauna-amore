@@ -1,0 +1,198 @@
+'use server';
+
+import { revalidatePath } from 'next/cache';
+import { redirect } from 'next/navigation';
+import { getServerSession } from 'next-auth/next';
+import { Category, OrderStatus } from '@prisma/client';
+import { prisma } from './db';
+import { authOptions } from './auth';
+
+async function requireAdmin() {
+  const session = await getServerSession(authOptions);
+  if (!session) throw new Error('Unauthorized');
+}
+
+function str(fd: FormData, key: string): string {
+  return String(fd.get(key) ?? '').trim();
+}
+function num(fd: FormData, key: string): number {
+  const n = Number(fd.get(key));
+  return Number.isFinite(n) ? Math.round(n) : 0;
+}
+
+// ---------- products ----------
+
+export async function saveProduct(fd: FormData) {
+  await requireAdmin();
+  const id = str(fd, 'id');
+  const data = {
+    sku: str(fd, 'sku').toUpperCase(),
+    nameIt: str(fd, 'nameIt'),
+    nameEn: str(fd, 'nameEn'),
+    category: str(fd, 'category') as Category,
+    subcategory: str(fd, 'subcategory') || null,
+    basePrice: num(fd, 'basePrice'),
+    capacity: num(fd, 'capacity') || null,
+    dimensions: str(fd, 'dimensions') || null,
+    descriptionIt: str(fd, 'descriptionIt') || null,
+    descriptionEn: str(fd, 'descriptionEn') || null,
+    specsIt: str(fd, 'specsIt') || null,
+    specsEn: str(fd, 'specsEn') || null,
+    sortOrder: num(fd, 'sortOrder'),
+    isPublished: fd.get('isPublished') === 'on',
+  };
+  if (!data.sku || !data.nameIt || !data.basePrice) throw new Error('SKU, name and price are required');
+
+  let productId = id;
+  if (id) {
+    await prisma.product.update({ where: { id }, data });
+  } else {
+    const slug = `${data.sku} ${data.nameIt}`
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '');
+    const created = await prisma.product.create({ data: { ...data, slug } });
+    productId = created.id;
+  }
+  revalidatePath('/admin/products');
+  redirect(`/admin/products/${productId}?saved=1`);
+}
+
+export async function deleteProduct(fd: FormData) {
+  await requireAdmin();
+  await prisma.product.delete({ where: { id: str(fd, 'id') } });
+  revalidatePath('/admin/products');
+  redirect('/admin/products');
+}
+
+export async function togglePublish(fd: FormData) {
+  await requireAdmin();
+  const id = str(fd, 'id');
+  const current = await prisma.product.findUniqueOrThrow({ where: { id }, select: { isPublished: true } });
+  await prisma.product.update({ where: { id }, data: { isPublished: !current.isPublished } });
+  revalidatePath('/admin/products');
+}
+
+// ---------- images ----------
+
+export async function addImageUrl(fd: FormData) {
+  await requireAdmin();
+  const productId = str(fd, 'productId');
+  const url = str(fd, 'url');
+  if (!url.startsWith('http')) throw new Error('Invalid URL');
+  const count = await prisma.productImage.count({ where: { productId } });
+  await prisma.productImage.create({ data: { productId, url, sortOrder: count } });
+  revalidatePath(`/admin/products/${productId}`);
+}
+
+export async function deleteImage(fd: FormData) {
+  await requireAdmin();
+  const image = await prisma.productImage.delete({ where: { id: str(fd, 'id') } });
+  revalidatePath(`/admin/products/${image.productId}`);
+}
+
+export async function moveImage(fd: FormData) {
+  await requireAdmin();
+  const id = str(fd, 'id');
+  const dir = str(fd, 'dir') === 'up' ? -1 : 1;
+  const img = await prisma.productImage.findUniqueOrThrow({ where: { id } });
+  const siblings = await prisma.productImage.findMany({
+    where: { productId: img.productId },
+    orderBy: { sortOrder: 'asc' },
+  });
+  const idx = siblings.findIndex((s) => s.id === id);
+  const swapWith = siblings[idx + dir];
+  if (swapWith) {
+    await prisma.$transaction([
+      prisma.productImage.update({ where: { id }, data: { sortOrder: swapWith.sortOrder } }),
+      prisma.productImage.update({ where: { id: swapWith.id }, data: { sortOrder: img.sortOrder } }),
+    ]);
+  }
+  revalidatePath(`/admin/products/${img.productId}`);
+}
+
+// ---------- product options ----------
+
+export async function setProductOption(fd: FormData) {
+  await requireAdmin();
+  const productId = str(fd, 'productId');
+  const optionId = str(fd, 'optionId');
+  const enabled = fd.get('enabled') === 'on';
+  const priceDelta = num(fd, 'priceDelta');
+  const isDefault = fd.get('isDefault') === 'on';
+
+  const existing = await prisma.productOption.findUnique({
+    where: { productId_optionId: { productId, optionId } },
+  });
+
+  if (!enabled) {
+    if (existing) await prisma.productOption.delete({ where: { id: existing.id } });
+  } else {
+    if (isDefault) {
+      // only one default per group for this product
+      const option = await prisma.option.findUniqueOrThrow({ where: { id: optionId } });
+      const groupOptionIds = (
+        await prisma.option.findMany({ where: { groupId: option.groupId }, select: { id: true } })
+      ).map((o) => o.id);
+      await prisma.productOption.updateMany({
+        where: { productId, optionId: { in: groupOptionIds } },
+        data: { isDefault: false },
+      });
+    }
+    await prisma.productOption.upsert({
+      where: { productId_optionId: { productId, optionId } },
+      update: { priceDelta, isDefault },
+      create: { productId, optionId, priceDelta, isDefault },
+    });
+  }
+  revalidatePath(`/admin/products/${productId}`);
+}
+
+// ---------- global options ----------
+
+export async function saveOption(fd: FormData) {
+  await requireAdmin();
+  const id = str(fd, 'id');
+  const data = {
+    nameIt: str(fd, 'nameIt'),
+    nameEn: str(fd, 'nameEn'),
+    sortOrder: num(fd, 'sortOrder'),
+  };
+  await prisma.option.update({ where: { id }, data });
+  revalidatePath('/admin/options');
+}
+
+export async function createOption(fd: FormData) {
+  await requireAdmin();
+  const groupId = str(fd, 'groupId');
+  const nameEn = str(fd, 'nameEn');
+  const code = nameEn.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+  if (!code) throw new Error('Name required');
+  const count = await prisma.option.count({ where: { groupId } });
+  await prisma.option.create({
+    data: { groupId, code, nameEn, nameIt: str(fd, 'nameIt') || nameEn, sortOrder: count },
+  });
+  revalidatePath('/admin/options');
+}
+
+export async function deleteOption(fd: FormData) {
+  await requireAdmin();
+  await prisma.option.delete({ where: { id: str(fd, 'id') } });
+  revalidatePath('/admin/options');
+}
+
+// ---------- orders ----------
+
+export async function updateOrder(fd: FormData) {
+  await requireAdmin();
+  const id = str(fd, 'id');
+  await prisma.order.update({
+    where: { id },
+    data: {
+      status: str(fd, 'status') as OrderStatus,
+      adminNotes: str(fd, 'adminNotes') || null,
+    },
+  });
+  revalidatePath('/admin/orders');
+  revalidatePath(`/admin/orders/${id}`);
+}
