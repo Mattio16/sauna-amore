@@ -28,6 +28,9 @@ const GROUPS = [
   { code: 'tub-filter', nameIt: 'Filtrazione', nameEn: 'Filtration', sortOrder: 2 },
   { code: 'tub-cover', nameIt: 'Copertura', nameEn: 'Cover', sortOrder: 3 },
   { code: 'chiller', nameIt: 'Raffreddamento', nameEn: 'Chilling', sortOrder: 4 },
+  { code: 'diameter', nameIt: 'Diametro', nameEn: 'Diameter', sortOrder: 5 },
+  { code: 'front-windows', nameIt: 'Finestre frontali', nameEn: 'Front windows', sortOrder: 6 },
+  { code: 'back-windows', nameIt: 'Finestre posteriori', nameEn: 'Back windows', sortOrder: 7 },
 ];
 
 const OPTIONS = [
@@ -42,6 +45,17 @@ const OPTIONS = [
   { group: 'tub-cover', code: 'insulated-cover', nameIt: 'Copertura isolata', nameEn: 'Insulated cover', sortOrder: 1 },
   { group: 'chiller', code: 'no-chiller', nameIt: 'Acqua naturale', nameEn: 'Natural water', sortOrder: 0 },
   { group: 'chiller', code: 'chiller-pro', nameIt: 'Chiller Pro 7kW + filtro (sempre freddo)', nameEn: 'Pro chiller 7kW + filter (always cold)', sortOrder: 1 },
+  { group: 'diameter', code: 'd2', nameIt: 'Ø2 m', nameEn: 'Ø2 m', sortOrder: 0 },
+  { group: 'diameter', code: 'd22', nameIt: 'Ø2,2 m (più alta e spaziosa)', nameEn: 'Ø2.2 m (taller and roomier)', sortOrder: 1 },
+  { group: 'front-windows', code: 'fw-none', nameIt: 'Senza finestre', nameEn: 'No windows', sortOrder: 0 },
+  { group: 'front-windows', code: 'fw-2-fixed', nameIt: '2 finestre fisse', nameEn: '2 non-openable windows', sortOrder: 1 },
+  { group: 'front-windows', code: 'fw-2-open', nameIt: '2 finestre apribili', nameEn: '2 openable windows', sortOrder: 2 },
+  { group: 'front-windows', code: 'fw-glass-wall', nameIt: 'Parete vetrata con porta in vetro', nameEn: 'Glass wall with glass door', sortOrder: 3 },
+  { group: 'back-windows', code: 'bw-none', nameIt: 'Senza finestre', nameEn: 'No windows', sortOrder: 0 },
+  { group: 'back-windows', code: 'bw-2-fixed', nameIt: '2 finestre fisse', nameEn: '2 non-openable windows', sortOrder: 1 },
+  { group: 'back-windows', code: 'bw-2-open', nameIt: '2 finestre apribili', nameEn: '2 openable windows', sortOrder: 2 },
+  { group: 'back-windows', code: 'bw-panoramic', nameIt: 'Finestra panoramica', nameEn: 'Panoramic window', sortOrder: 3 },
+  { group: 'back-windows', code: 'bw-round-panoramic', nameIt: 'Finestra panoramica rotonda', nameEn: 'Round panoramic window', sortOrder: 4 },
 ];
 
 // ---------------- lineup ----------------
@@ -74,6 +88,24 @@ const woodToggle = (thermoDelta: number) => [
   { group: 'wood', code: 'spruce', delta: 0, isDefault: true },
   { group: 'wood', code: 'thermowood', delta: thermoDelta },
 ];
+// Window & diameter menus. Deltas = Baltresto public option price + ~30% margin, rounded.
+const frontWindows = () => [
+  { group: 'front-windows', code: 'fw-none', delta: 0, isDefault: true },
+  { group: 'front-windows', code: 'fw-2-fixed', delta: 190 },
+  { group: 'front-windows', code: 'fw-2-open', delta: 300 },
+  { group: 'front-windows', code: 'fw-glass-wall', delta: 1190 },
+];
+const backWindows = () => [
+  { group: 'back-windows', code: 'bw-none', delta: 0, isDefault: true },
+  { group: 'back-windows', code: 'bw-2-fixed', delta: 190 },
+  { group: 'back-windows', code: 'bw-2-open', delta: 300 },
+  { group: 'back-windows', code: 'bw-panoramic', delta: 460 },
+  { group: 'back-windows', code: 'bw-round-panoramic', delta: 870 },
+];
+const diameterChoice = () => [
+  { group: 'diameter', code: 'd2', delta: 0, isDefault: true },
+  { group: 'diameter', code: 'd22', delta: 390 },
+];
 const img = (sku: string, n: number) =>
   Array.from({ length: n }, (_, i) => `/images/products/${sku}/${i + 1}.jpg`);
 
@@ -92,6 +124,7 @@ const LINEUP: LineupProduct[] = [
       ...woodToggle(400),
       { group: 'sauna-heater', code: 'electric-standard', delta: 0, isDefault: true },
       { group: 'sauna-heater', code: 'electric-smart', delta: 990 },
+      ...frontWindows(), ...backWindows(),
     ],
   },
   {
@@ -102,8 +135,8 @@ const LINEUP: LineupProduct[] = [
     basePrice: 2990, capacity: 4, dimensions: '240×200×210 cm', sortOrder: 1,
     specsIt: 'Diametro: Ø2 m | Montata (LxPxA): 240×200×210 cm | Kit (LxPxA): 240×120×150 cm | Volume cabina: 5,3 m³ | Lunghezza cabina: 185 cm | Peso: ~670 kg | Capienza cabina: ~4 persone | Spessore legno: 40 mm | Larghezza panche: 49 cm | Riscaldamento: ~1 h',
     specsEn: 'Diameter: Ø2 m | Assembled (LxWxH): 240×200×210 cm | Flat-pack (LxWxH): 240×120×150 cm | Steam room volume: 5.3 m³ | Steam room length: 185 cm | Weight: ~670 kg | Steam room capacity: ~4 persons | Wood thickness: 40 mm | Bench width: 49 cm | Heating time: ~1 h',
-    images: img('s2v', 5),
-    options: [...woodToggle(450), ...heaterMenu(690)],
+    images: img('s2v', 6),
+    options: [...woodToggle(450), ...heaterMenu(690), ...diameterChoice(), ...frontWindows(), ...backWindows()],
   },
   {
     sku: 'S3', slug: 's3-3m', category: 'SAUNA', subcategory: '3m',
@@ -114,7 +147,7 @@ const LINEUP: LineupProduct[] = [
     specsIt: 'Diametro: Ø2 m | Montata (LxPxA): 300×200×210 cm | Kit (LxPxA): 300×80×150 cm | Volume cabina: 6,0 m³ | Lunghezza cabina: 280 cm | Peso: ~650 kg | Capienza cabina: ~6 persone | Spessore legno: 40 mm | Larghezza panche: 49 cm | Riscaldamento: ~1 h',
     specsEn: 'Diameter: Ø2 m | Assembled (LxWxH): 300×200×210 cm | Flat-pack (LxWxH): 300×80×150 cm | Steam room volume: 6.0 m³ | Steam room length: 280 cm | Weight: ~650 kg | Steam room capacity: ~6 persons | Wood thickness: 40 mm | Bench width: 49 cm | Heating time: ~1 h',
     images: img('s3', 4),
-    options: [...woodToggle(500), ...heaterMenu(990)],
+    options: [...woodToggle(500), ...heaterMenu(990), ...diameterChoice(), ...frontWindows(), ...backWindows()],
   },
   {
     sku: 'S4P', slug: 's4p-4m-spogliatoio', category: 'SAUNA', subcategory: '4m',
@@ -125,7 +158,7 @@ const LINEUP: LineupProduct[] = [
     specsIt: 'Diametro: Ø2 m | Montata (LxPxA): 400×200×210 cm | Kit (LxPxA): 400×80×150 cm | Volume cabina: 8 m³ | Cabina sauna: 280 cm + spogliatoio | Peso: ~720 kg | Capienza: ~4 in cabina, 8 totale | Spessore legno: 40 mm | Larghezza panche: 49 cm | Riscaldamento: ~1 h',
     specsEn: 'Diameter: Ø2 m | Assembled (LxWxH): 400×200×210 cm | Flat-pack (LxWxH): 400×80×150 cm | Steam room volume: 8 m³ | Steam room: 280 cm + changing room | Weight: ~720 kg | Capacity: ~4 in steam room, 8 total | Wood thickness: 40 mm | Bench width: 49 cm | Heating time: ~1 h',
     images: img('s4p', 5),
-    options: [...woodToggle(550), ...heaterMenu(990)],
+    options: [...woodToggle(550), ...heaterMenu(990), ...diameterChoice(), ...frontWindows(), ...backWindows()],
   },
   {
     sku: 'SQR2V', slug: 'sqr2v-cube', category: 'SAUNA', subcategory: '2.4m',
@@ -136,7 +169,7 @@ const LINEUP: LineupProduct[] = [
     specsIt: 'Montata (LxPxA): 240×220×230 cm | Kit (LxPxA): 240×120×150 cm | Volume cabina: 6,7 m³ | Lunghezza cabina: 185 cm | Peso: ~670 kg | Capienza cabina: ~4 persone | Spessore legno: 40 mm | Larghezza panche: 49 cm | Riscaldamento: ~1 h',
     specsEn: 'Assembled (LxWxH): 240×220×230 cm | Flat-pack (LxWxH): 240×120×150 cm | Steam room volume: 6.7 m³ | Steam room length: 185 cm | Weight: ~670 kg | Steam room capacity: ~4 persons | Wood thickness: 40 mm | Bench width: 49 cm | Heating time: ~1 h',
     images: img('sqr2v', 4),
-    options: [...woodToggle(500), ...heaterMenu(690)],
+    options: [...woodToggle(500), ...heaterMenu(690), ...frontWindows(), ...backWindows()],
   },
   {
     sku: 'S5P', slug: 's5p-panorama', category: 'SAUNA', subcategory: '5m',
@@ -147,7 +180,7 @@ const LINEUP: LineupProduct[] = [
     specsIt: 'Diametro: Ø2,2 m | Montata (LxPxA): 500×220×230 cm | Kit (LxPxA): 500×120×150 cm | Volume cabina: 8,2 m³ | Cabina sauna: 200 cm + salotto (letto 210×180 cm) | Peso: ~1500 kg | Capienza cabina: ~6 persone | Spessore legno: 40 mm | Larghezza panche: 49 cm | Riscaldamento: ~1 h',
     specsEn: 'Diameter: Ø2.2 m | Assembled (LxWxH): 500×220×230 cm | Flat-pack (LxWxH): 500×120×150 cm | Steam room volume: 8.2 m³ | Steam room: 200 cm + lounge (bed 210×180 cm) | Weight: ~1500 kg | Steam room capacity: ~6 persons | Wood thickness: 40 mm | Bench width: 49 cm | Heating time: ~1 h',
     images: img('s5p', 4),
-    options: [...woodToggle(600), ...heaterMenu(990)],
+    options: [...woodToggle(600), ...heaterMenu(990), ...frontWindows(), ...backWindows()],
   },
 
   // ---------- Hot tubs (3) ----------
@@ -156,7 +189,9 @@ const LINEUP: LineupProduct[] = [
     nameIt: 'LT18 · Thermowood Ø1.8m', nameEn: 'LT18 · Thermowood Ø1.8m',
     descriptionIt: 'La tinozza romantica in thermowood scuro, riscaldata dalla stufa a legna esterna da 27kW. Acqua a 38° in poche ore, anche a gennaio.',
     descriptionEn: 'The romantic tub in dark thermowood, heated by the 27kW external wood stove. Water at 38° in a few hours, even in January.',
-    basePrice: 2390, capacity: 6, dimensions: 'Ø180 cm', sortOrder: 0,
+    basePrice: 2390, capacity: 7, dimensions: 'Ø180 cm', sortOrder: 0,
+    specsIt: 'Diametro: Ø1,8 m | Capienza: 7–8 persone | Volume: 1.900 l | Peso: 250 kg | Altezza: 112 cm | Profondità: 98 cm | Sedute: 32 × 35 cm | Spessore legno: 41 mm | Stufa: esterna a legna 27 kW',
+    specsEn: 'Diameter: Ø1.8 m | Capacity: 7–8 persons | Volume: 1,900 l | Weight: 250 kg | Height: 112 cm | Depth: 98 cm | Seats: 32 × 35 cm | Wood thickness: 41 mm | Stove: external wood-fired 27 kW',
     images: img('lt18', 3),
     options: [
       { group: 'tub-filter', code: 'no-filter', delta: 0, isDefault: true },
@@ -171,6 +206,8 @@ const LINEUP: LineupProduct[] = [
     descriptionIt: "La scelta giusta per agriturismi e famiglie: interno in vetroresina facile da pulire, sedute stampate, quattro poggiatesta, stufa esterna inox. Pronta per l'inverno.",
     descriptionEn: 'The right answer for agriturismi and families: easy-clean fiberglass interior, moulded seats, four headrests, stainless external stove. Winter-proof.',
     basePrice: 2790, capacity: 6, dimensions: '180×180 cm', sortOrder: 1,
+    specsIt: 'Dimensioni: 180×180 cm | Capienza: 6 persone | Volume: 1.200 l | Peso: 180 kg | Altezza: 110 cm | Profondità: 96 cm | Interno: vetroresina 5 mm | Esterno: thermowood 18 mm | Stufa: esterna inox',
+    specsEn: 'Size: 180×180 cm | Capacity: 6 persons | Volume: 1,200 l | Weight: 180 kg | Height: 110 cm | Depth: 96 cm | Interior: 5 mm fiberglass | Exterior: 18 mm thermowood | Stove: external stainless',
     images: img('tp8', 3),
     options: [
       { group: 'tub-filter', code: 'no-filter', delta: 0, isDefault: true },
@@ -185,6 +222,8 @@ const LINEUP: LineupProduct[] = [
     descriptionIt: 'Un prezzo, niente da aggiungere: stufa inox integrata e canna fumaria incluse. La risposta per chi dice "dammi quella completa".',
     descriptionEn: 'One price, nothing to add: built-in stainless stove and chimney included. For those who say "just give me the complete one".',
     basePrice: 2490, capacity: 6, dimensions: 'Ø200 cm', sortOrder: 2,
+    specsIt: 'Diametro: Ø2 m | Capienza: 4–6 persone | Volume: 1.100 l | Peso: 265 kg | Altezza: 110 cm | Profondità: 83 cm | Stufa: integrata inox AISI304 30 kW | Interno: vetroresina 5 mm | Esterno: thermowood 18 mm | Canna fumaria: inclusa',
+    specsEn: 'Diameter: Ø2 m | Capacity: 4–6 persons | Volume: 1,100 l | Weight: 265 kg | Height: 110 cm | Depth: 83 cm | Stove: integrated stainless AISI304 30 kW | Interior: 5 mm fiberglass | Exterior: 18 mm thermowood | Chimney: included',
     images: img('tp2v', 2),
     options: [],
   },
@@ -195,7 +234,9 @@ const LINEUP: LineupProduct[] = [
     nameIt: 'TP10 · Fiberglass Ø1m', nameEn: 'TP10 · Fiberglass Ø1m',
     descriptionIt: "Il tuffo che rigenera, con copertura isolata inclusa. D'estate all'ombra, d'inverno sotto le stelle. Aggiungi il chiller e l'acqua resta sempre a 4°.",
     descriptionEn: 'The regenerating plunge, insulated cover included. In summer shade or under winter stars. Add the chiller and the water stays at 4° all year.',
-    basePrice: 1190, capacity: 1, dimensions: 'Ø100 cm', sortOrder: 0,
+    basePrice: 1190, capacity: 1, dimensions: 'Ø106 cm', sortOrder: 0,
+    specsIt: 'Diametro: Ø106 cm | Capienza: 1 persona | Volume: 400 l | Peso: 65 kg | Altezza: 103 cm | Profondità: 93,5 cm | Esterno: thermowood | Copertura isolata: inclusa',
+    specsEn: 'Diameter: Ø106 cm | Capacity: 1 person | Volume: 400 l | Weight: 65 kg | Height: 103 cm | Depth: 93.5 cm | Exterior: thermowood | Insulated cover: included',
     images: img('tp10', 4),
     options: [
       { group: 'chiller', code: 'no-chiller', delta: 0, isDefault: true },
@@ -204,10 +245,12 @@ const LINEUP: LineupProduct[] = [
   },
   {
     sku: 'LN9', slug: 'ln9-inox', category: 'ICE_BATH', subcategory: null,
-    nameIt: 'LN9 · Acciaio inox e legno Ø0.9m', nameEn: 'LN9 · Stainless steel & wood Ø0.9m',
+    nameIt: 'LN9 · Acciaio inox e legno Ø0.86m', nameEn: 'LN9 · Stainless steel & wood Ø0.86m',
     descriptionIt: 'Il bagno di ghiaccio bello da vedere: acciaio inox e legno, per giardini di design e spa. Si abbina naturalmente alla sauna Cube.',
     descriptionEn: 'The ice bath that looks beautiful: stainless steel and wood, for design gardens and spas. Pairs naturally with the Cube sauna.',
-    basePrice: 1690, capacity: 1, dimensions: 'Ø90 cm', sortOrder: 1,
+    basePrice: 1690, capacity: 1, dimensions: 'Ø86 cm', sortOrder: 1,
+    specsIt: 'Diametro: Ø86 cm | Capienza: 1 persona | Volume: 400 l | Peso: 120 kg | Altezza: 105 cm | Profondità: 96 cm | Vasca: acciaio inox | Esterno: thermowood 41 mm | Set base: cerchi inox, panca, scarico, bordo decorativo',
+    specsEn: 'Diameter: Ø86 cm | Capacity: 1 person | Volume: 400 l | Weight: 120 kg | Height: 105 cm | Depth: 96 cm | Tub: stainless steel | Exterior: 41 mm thermowood | Basic set: stainless hoops, bench, drain, decorative rim',
     images: img('ln9', 3),
     options: [
       { group: 'chiller', code: 'no-chiller', delta: 0, isDefault: true },
