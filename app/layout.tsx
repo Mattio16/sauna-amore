@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import ClientLayout from './ClientLayout';
+import { Analytics } from '@vercel/analytics/next';
 
 export const metadata: Metadata = {
   title: 'Sauna Amore | Saune e Vasche Idromassaggio Nordiche Premium',
@@ -27,6 +28,7 @@ export default function RootLayout({
     <html lang="it">
       <body>
         <ClientLayout>{children}</ClientLayout>
+        <Analytics />
       </body>
     </html>
   );
