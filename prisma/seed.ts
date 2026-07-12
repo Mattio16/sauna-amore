@@ -29,8 +29,9 @@ const GROUPS = [
   { code: 'tub-cover', nameIt: 'Copertura', nameEn: 'Cover', sortOrder: 3 },
   { code: 'chiller', nameIt: 'Raffreddamento', nameEn: 'Chilling', sortOrder: 4 },
   { code: 'diameter', nameIt: 'Diametro', nameEn: 'Diameter', sortOrder: 5 },
-  { code: 'front-windows', nameIt: 'Finestre frontali', nameEn: 'Front windows', sortOrder: 6 },
-  { code: 'back-windows', nameIt: 'Finestre posteriori', nameEn: 'Back windows', sortOrder: 7 },
+  { code: 'roof', nameIt: 'Tetto', nameEn: 'Roof', sortOrder: 6 },
+  { code: 'front-windows', nameIt: 'Finestre frontali', nameEn: 'Front windows', sortOrder: 7 },
+  { code: 'back-windows', nameIt: 'Finestre posteriori', nameEn: 'Back windows', sortOrder: 8 },
 ];
 
 const OPTIONS = [
@@ -47,6 +48,9 @@ const OPTIONS = [
   { group: 'chiller', code: 'chiller-pro', description: '7 kW chiller with filtration keeps the water at 4–6° all year round, always ready to plunge. The gym and hospitality spec.', nameIt: 'Chiller Pro 7kW + filtro (sempre freddo)', nameEn: 'Pro chiller 7kW + filter (always cold)', sortOrder: 1 },
   { group: 'diameter', code: 'd2', description: 'Standard Ø2 m barrel: 210 cm interior height, fits most gardens and doorways.', nameIt: 'Ø2 m', nameEn: 'Ø2 m', sortOrder: 0 },
   { group: 'diameter', code: 'd22', description: 'Ø2.2 m barrel: 20 cm more headroom (230 cm) and noticeably wider benches. Worth it for taller users.', nameIt: 'Ø2,2 m (più alta e spaziosa)', nameEn: 'Ø2.2 m (taller and roomier)', sortOrder: 1 },
+  { group: 'roof', code: 'roof-brown', description: 'Brown bitumen shingles — the warm classic that suits spruce especially well. Included in the price.', nameIt: 'Marrone', nameEn: 'Brown', sortOrder: 0 },
+  { group: 'roof', code: 'roof-black', description: 'Black bitumen shingles — a sharp, modern look that pairs beautifully with thermowood. Included in the price.', nameIt: 'Nero', nameEn: 'Black', sortOrder: 1 },
+  { group: 'roof', code: 'roof-green', description: 'Green bitumen shingles — blends the sauna into hedges and garden greenery. Included in the price.', nameIt: 'Verde', nameEn: 'Green', sortOrder: 2 },
   { group: 'front-windows', code: 'fw-none', description: 'Solid wood front — maximum heat retention and privacy.', nameIt: 'Senza finestre', nameEn: 'No windows', sortOrder: 0 },
   { group: 'front-windows', code: 'fw-2-fixed', description: 'Two fixed windows either side of the door bring daylight into the cabin.', nameIt: '2 finestre fisse', nameEn: '2 non-openable windows', sortOrder: 1 },
   { group: 'front-windows', code: 'fw-2-open', description: 'Two opening windows for daylight plus quick airing between sessions.', nameIt: '2 finestre apribili', nameEn: '2 openable windows', sortOrder: 2 },
@@ -107,6 +111,11 @@ const diameterChoice = () => [
   { group: 'diameter', code: 'd2', delta: 0, isDefault: true },
   { group: 'diameter', code: 'd22', delta: 390 },
 ];
+const roofChoice = () => [
+  { group: 'roof', code: 'roof-brown', delta: 0, isDefault: true },
+  { group: 'roof', code: 'roof-black', delta: 0 },
+  { group: 'roof', code: 'roof-green', delta: 0 },
+];
 const img = (sku: string, n: number) =>
   Array.from({ length: n }, (_, i) => `/images/products/${sku}/${i + 1}.jpg`);
 
@@ -126,7 +135,7 @@ const LINEUP: LineupProduct[] = [
       ...woodToggle(400),
       { group: 'sauna-heater', code: 'electric-standard', delta: 0, isDefault: true, supplier: 240 },
       { group: 'sauna-heater', code: 'electric-smart', delta: 990, supplier: 1210 },
-      ...frontWindows(), ...backWindows(),
+      ...roofChoice(), ...frontWindows(), ...backWindows(),
     ],
   },
   {
@@ -139,7 +148,7 @@ const LINEUP: LineupProduct[] = [
     specsIt: 'Diametro: Ø2 m | Montata (LxPxA): 240×200×210 cm | Kit (LxPxA): 240×120×150 cm | Volume cabina: 5,3 m³ | Lunghezza cabina: 185 cm | Peso: ~670 kg | Capienza cabina: ~4 persone | Spessore legno: 40 mm | Larghezza panche: 49 cm | Riscaldamento: ~1 h',
     specsEn: 'Diameter: Ø2 m | Assembled (LxWxH): 240×200×210 cm | Flat-pack (LxWxH): 240×120×150 cm | Steam room volume: 5.3 m³ | Steam room length: 185 cm | Weight: ~670 kg | Steam room capacity: ~4 persons | Wood thickness: 40 mm | Bench width: 49 cm | Heating time: ~1 h',
     images: img('s2v', 6),
-    options: [...woodToggle(450), ...heaterMenu(690, 270, 730), ...diameterChoice(), ...frontWindows(), ...backWindows()],
+    options: [...woodToggle(450), ...heaterMenu(690, 270, 730), ...diameterChoice(), ...roofChoice(), ...frontWindows(), ...backWindows()],
   },
   {
     sku: 'S3', slug: 's3-3m', category: 'SAUNA', subcategory: '3m',
@@ -151,7 +160,7 @@ const LINEUP: LineupProduct[] = [
     specsIt: 'Diametro: Ø2 m | Montata (LxPxA): 300×200×210 cm | Kit (LxPxA): 300×80×150 cm | Volume cabina: 6,0 m³ | Lunghezza cabina: 280 cm | Peso: ~650 kg | Capienza cabina: ~6 persone | Spessore legno: 40 mm | Larghezza panche: 49 cm | Riscaldamento: ~1 h',
     specsEn: 'Diameter: Ø2 m | Assembled (LxWxH): 300×200×210 cm | Flat-pack (LxWxH): 300×80×150 cm | Steam room volume: 6.0 m³ | Steam room length: 280 cm | Weight: ~650 kg | Steam room capacity: ~6 persons | Wood thickness: 40 mm | Bench width: 49 cm | Heating time: ~1 h',
     images: img('s3', 4),
-    options: [...woodToggle(500), ...heaterMenu(990, 420, 1120), ...diameterChoice(), ...frontWindows(), ...backWindows()],
+    options: [...woodToggle(500), ...heaterMenu(990, 420, 1120), ...diameterChoice(), ...roofChoice(), ...frontWindows(), ...backWindows()],
   },
   {
     sku: 'S4P', slug: 's4p-4m-spogliatoio', category: 'SAUNA', subcategory: '4m',
@@ -163,7 +172,7 @@ const LINEUP: LineupProduct[] = [
     specsIt: 'Diametro: Ø2 m | Montata (LxPxA): 400×200×210 cm | Kit (LxPxA): 400×80×150 cm | Volume cabina: 8 m³ | Cabina sauna: 280 cm + spogliatoio | Peso: ~720 kg | Capienza: ~4 in cabina, 8 totale | Spessore legno: 40 mm | Larghezza panche: 49 cm | Riscaldamento: ~1 h',
     specsEn: 'Diameter: Ø2 m | Assembled (LxWxH): 400×200×210 cm | Flat-pack (LxWxH): 400×80×150 cm | Steam room volume: 8 m³ | Steam room: 280 cm + changing room | Weight: ~720 kg | Capacity: ~4 in steam room, 8 total | Wood thickness: 40 mm | Bench width: 49 cm | Heating time: ~1 h',
     images: img('s4p', 5),
-    options: [...woodToggle(550), ...heaterMenu(990, 420, 1120), ...diameterChoice(), ...frontWindows(), ...backWindows()],
+    options: [...woodToggle(550), ...heaterMenu(990, 420, 1120), ...diameterChoice(), ...roofChoice(), ...frontWindows(), ...backWindows()],
   },
   {
     sku: 'SQR2V', slug: 'cube-vetro-panoramico', category: 'SAUNA', subcategory: '2m',
@@ -174,7 +183,7 @@ const LINEUP: LineupProduct[] = [
     specsIt: 'Montata (LxPxA): 200×220×230 cm | Kit (LxPxA): 200×120×150 cm | Volume cabina: 6,7 m³ | Lunghezza cabina: 185 cm | Peso: ~640 kg | Capienza cabina: ~4 persone | Larghezza panche: 49 cm | Riscaldamento: ~1 h',
     specsEn: 'Assembled (LxWxH): 200×220×230 cm | Flat-pack (LxWxH): 200×120×150 cm | Steam room volume: 6.7 m³ | Steam room length: 185 cm | Weight: ~640 kg | Steam room capacity: ~4 persons | Bench width: 49 cm | Heating time: ~1 h',
     images: img('sqr2v', 5),
-    options: [...woodToggle(500), ...heaterMenu(690, 270, 730)],
+    options: [...woodToggle(500), ...heaterMenu(690, 270, 730), ...roofChoice()],
   },
   {
     sku: 'S5P', slug: 's5p-panorama', category: 'SAUNA', subcategory: '5m',
@@ -186,7 +195,7 @@ const LINEUP: LineupProduct[] = [
     specsIt: 'Diametro: Ø2,2 m | Montata (LxPxA): 500×220×230 cm | Kit (LxPxA): 500×120×150 cm | Volume cabina: 8,2 m³ | Cabina sauna: 200 cm + salotto (letto 210×180 cm) | Peso: ~1500 kg | Capienza cabina: ~6 persone | Spessore legno: 40 mm | Larghezza panche: 49 cm | Riscaldamento: ~1 h',
     specsEn: 'Diameter: Ø2.2 m | Assembled (LxWxH): 500×220×230 cm | Flat-pack (LxWxH): 500×120×150 cm | Steam room volume: 8.2 m³ | Steam room: 200 cm + lounge (bed 210×180 cm) | Weight: ~1500 kg | Steam room capacity: ~6 persons | Wood thickness: 40 mm | Bench width: 49 cm | Heating time: ~1 h',
     images: img('s5p', 4),
-    options: [...woodToggle(600), ...heaterMenu(990, 420, 1120), ...frontWindows(), ...backWindows()],
+    options: [...woodToggle(600), ...heaterMenu(990, 420, 1120), ...roofChoice(), ...frontWindows(), ...backWindows()],
   },
 
   // ---------- Hot tubs (3) ----------

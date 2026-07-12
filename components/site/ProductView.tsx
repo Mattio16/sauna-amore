@@ -13,6 +13,7 @@ export type OptionGroupData = {
   sortOrder: number;
   options: {
     optionId: string;
+    code: string;
     nameIt: string;
     nameEn: string;
     description: string | null;
@@ -39,6 +40,12 @@ export type ProductData = {
   category: string;
   images: string[];
   optionGroups: OptionGroupData[];
+};
+
+const SWATCHES: Record<string, string> = {
+  'roof-brown': '#4d3b33',
+  'roof-black': '#33383b',
+  'roof-green': '#55604d',
 };
 
 export default function ProductView({ product, related }: { product: ProductData; related: ProductCardData[] }) {
@@ -186,7 +193,15 @@ export default function ProductView({ product, related }: { product: ProductData
                                   active ? 'border-pine bg-pine text-mist' : 'border-line bg-mist-card text-pine hover:border-moss'
                                 }`}
                               >
-                                <span className="block font-medium">{pickName(o, lang)}</span>
+                                <span className="block font-medium">
+                                  {SWATCHES[o.code] && (
+                                    <span
+                                      className="inline-block w-3.5 h-3.5 rounded-full mr-2 align-[-2px] border border-white/40"
+                                      style={{ backgroundColor: SWATCHES[o.code] }}
+                                    />
+                                  )}
+                                  {pickName(o, lang)}
+                                </span>
                                 <span className={`block text-xs mt-0.5 ${active ? 'text-moss-light' : 'text-moss'}`}>
                                   {o.priceDelta > 0 ? `+ ${euro(o.priceDelta)}` : '—'}
                                 </span>

@@ -37,7 +37,7 @@ const it = {
     finalKicker: 'Ti aspettiamo', finalH2a: 'Il tuo giardino', finalH2b: 'merita quiete',
     finalSub: 'Raccontaci il tuo spazio. Disegneremo il resto.',
   },
-  optionGroups: { wood: 'Legno', 'sauna-heater': 'Stufa', 'tub-filter': 'Filtrazione', 'tub-cover': 'Copertura', chiller: 'Raffreddamento', diameter: 'Diametro', 'front-windows': 'Finestre frontali', 'back-windows': 'Finestre posteriori' } as Record<string, string>,
+  optionGroups: { wood: 'Legno', 'sauna-heater': 'Stufa', 'tub-filter': 'Filtrazione', 'tub-cover': 'Copertura', chiller: 'Raffreddamento', roof: 'Tetto', diameter: 'Diametro', 'front-windows': 'Finestre frontali', 'back-windows': 'Finestre posteriori' } as Record<string, string>,
   cat: {
     saunasTitle: 'Saune a botte', saunasSub: 'Legno massiccio baltico, abete o thermowood. Da 2 a 6 persone.',
     tubsTitle: 'Vasche idromassaggio', tubsSub: 'Riscaldate a legna, in legno o vetroresina.',
@@ -101,7 +101,7 @@ const en: Dict = {
     finalKicker: 'We await you', finalH2a: 'Your garden', finalH2b: 'deserves stillness',
     finalSub: "Tell us about your space. We'll design the rest.",
   },
-  optionGroups: { wood: 'Wood', 'sauna-heater': 'Heater', 'tub-filter': 'Filtration', 'tub-cover': 'Cover', chiller: 'Chilling', diameter: 'Diameter', 'front-windows': 'Front windows', 'back-windows': 'Back windows' } as Record<string, string>,
+  optionGroups: { wood: 'Wood', 'sauna-heater': 'Heater', 'tub-filter': 'Filtration', 'tub-cover': 'Cover', chiller: 'Chilling', roof: 'Roof', diameter: 'Diameter', 'front-windows': 'Front windows', 'back-windows': 'Back windows' } as Record<string, string>,
   cat: {
     saunasTitle: 'Barrel saunas', saunasSub: 'Solid Baltic timber, spruce or thermowood. For 2 to 6 people.',
     tubsTitle: 'Hot tubs', tubsSub: 'Wood-fired, in timber or fiberglass.',
@@ -163,7 +163,7 @@ const nl: Dict = {
     finalKicker: 'Wij verwachten u', finalH2a: 'Uw tuin', finalH2b: 'verdient stilte',
     finalSub: 'Vertel ons over uw ruimte. Wij ontwerpen de rest.',
   },
-  optionGroups: { wood: 'Hout', 'sauna-heater': 'Kachel', 'tub-filter': 'Filtratie', 'tub-cover': 'Afdekking', chiller: 'Koeling', diameter: 'Diameter', 'front-windows': 'Ramen voorzijde', 'back-windows': 'Ramen achterzijde' } as Record<string, string>,
+  optionGroups: { wood: 'Hout', 'sauna-heater': 'Kachel', 'tub-filter': 'Filtratie', 'tub-cover': 'Afdekking', chiller: 'Koeling', roof: 'Dak', diameter: 'Diameter', 'front-windows': 'Ramen voorzijde', 'back-windows': 'Ramen achterzijde' } as Record<string, string>,
   cat: {
     saunasTitle: "Barrelsauna's", saunasSub: 'Massief Baltisch hout, vuren of thermowood. Voor 2 tot 6 personen.',
     tubsTitle: 'Hottubs', tubsSub: 'Houtgestookt, in hout of glasvezel.',
@@ -225,7 +225,7 @@ const de: Dict = {
     finalKicker: 'Wir erwarten Sie', finalH2a: 'Ihr Garten', finalH2b: 'verdient Stille',
     finalSub: 'Erzählen Sie uns von Ihrem Raum. Wir gestalten den Rest.',
   },
-  optionGroups: { wood: 'Holz', 'sauna-heater': 'Ofen', 'tub-filter': 'Filtration', 'tub-cover': 'Abdeckung', chiller: 'Kühlung', diameter: 'Durchmesser', 'front-windows': 'Fenster vorne', 'back-windows': 'Fenster hinten' } as Record<string, string>,
+  optionGroups: { wood: 'Holz', 'sauna-heater': 'Ofen', 'tub-filter': 'Filtration', 'tub-cover': 'Abdeckung', chiller: 'Kühlung', roof: 'Dach', diameter: 'Durchmesser', 'front-windows': 'Fenster vorne', 'back-windows': 'Fenster hinten' } as Record<string, string>,
   cat: {
     saunasTitle: 'Fasssaunen', saunasSub: 'Baltisches Massivholz, Fichte oder Thermoholz. Für 2 bis 6 Personen.',
     tubsTitle: 'Badefässer', tubsSub: 'Holzbefeuert, aus Holz oder Fiberglas.',
@@ -287,7 +287,7 @@ const ru: Dict = {
     finalKicker: 'Мы вас ждём', finalH2a: 'Ваш сад', finalH2b: 'заслуживает тишины',
     finalSub: 'Расскажите о вашем пространстве. Остальное мы придумаем.',
   },
-  optionGroups: { wood: 'Дерево', 'sauna-heater': 'Печь', 'tub-filter': 'Фильтрация', 'tub-cover': 'Крышка', chiller: 'Охлаждение', diameter: 'Диаметр', 'front-windows': 'Окна спереди', 'back-windows': 'Окна сзади' } as Record<string, string>,
+  optionGroups: { wood: 'Дерево', 'sauna-heater': 'Печь', 'tub-filter': 'Фильтрация', 'tub-cover': 'Крышка', chiller: 'Охлаждение', roof: 'Крыша', diameter: 'Диаметр', 'front-windows': 'Окна спереди', 'back-windows': 'Окна сзади' } as Record<string, string>,
   cat: {
     saunasTitle: 'Бочковые сауны', saunasSub: 'Массив балтийской древесины, ель или термоясень. На 2–6 человек.',
     tubsTitle: 'Купели', tubsSub: 'На дровах, из дерева или стеклопластика.',

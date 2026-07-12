@@ -23,6 +23,7 @@ export default async function ProductPage({ params }: { params: { slug: string }
     }
     groupsMap.get(g.id)!.options.push({
       optionId: po.optionId,
+      code: po.option.code,
       nameIt: po.option.nameIt,
       nameEn: po.option.nameEn,
       description: (po.option as unknown as { description?: string | null }).description ?? null,
