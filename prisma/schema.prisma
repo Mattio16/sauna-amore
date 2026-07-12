@@ -84,12 +84,13 @@ model OptionGroup {
 }
 
 model Option {
-  id        String @id @default(cuid())
-  groupId   String
-  code      String // "spruce" | "thermowood" | "flatpack" | heater sku...
-  nameIt    String
-  nameEn    String
-  sortOrder Int    @default(0)
+  id          String  @id @default(cuid())
+  groupId     String
+  code        String // "spruce" | "thermowood" | heater sku...
+  nameIt      String
+  nameEn      String
+  description String? @db.Text // short customer-facing blurb shown when selected
+  sortOrder   Int     @default(0)
 
   group    OptionGroup     @relation(fields: [groupId], references: [id], onDelete: Cascade)
   products ProductOption[]

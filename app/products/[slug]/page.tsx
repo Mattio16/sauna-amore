@@ -25,6 +25,7 @@ export default async function ProductPage({ params }: { params: { slug: string }
       optionId: po.optionId,
       nameIt: po.option.nameIt,
       nameEn: po.option.nameEn,
+      description: (po.option as unknown as { description?: string | null }).description ?? null,
       priceDelta: po.priceDelta,
       isDefault: po.isDefault,
       sortOrder: po.option.sortOrder,

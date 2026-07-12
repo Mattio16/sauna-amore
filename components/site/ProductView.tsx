@@ -15,6 +15,7 @@ export type OptionGroupData = {
     optionId: string;
     nameIt: string;
     nameEn: string;
+    description: string | null;
     priceDelta: number;
     isDefault: boolean;
     sortOrder: number;
@@ -167,30 +168,38 @@ export default function ProductView({ product, related }: { product: ProductData
             {product.optionGroups.length > 0 && (
               <Reveal delay={120}>
                 <div className="space-y-7 mb-8">
-                  {product.optionGroups.map((g) => (
-                    <div key={g.id}>
-                      <h3 className="text-xs font-semibold tracking-[0.2em] uppercase text-pine mb-3">{pickName(g, lang)}</h3>
-                      <div className="flex flex-wrap gap-2.5">
-                        {g.options.map((o) => {
-                          const active = selected[g.id] === o.optionId;
-                          return (
-                            <button
-                              key={o.optionId}
-                              onClick={() => setSelected({ ...selected, [g.id]: o.optionId })}
-                              className={`rounded-2xl border px-4 py-3 text-left text-sm transition-all ${
-                                active ? 'border-pine bg-pine text-mist' : 'border-line bg-mist-card text-pine hover:border-moss'
-                              }`}
-                            >
-                              <span className="block font-medium">{pickName(o, lang)}</span>
-                              <span className={`block text-xs mt-0.5 ${active ? 'text-moss-light' : 'text-moss'}`}>
-                                {o.priceDelta > 0 ? `+ ${euro(o.priceDelta)}` : '—'}
-                              </span>
-                            </button>
-                          );
-                        })}
+                  {product.optionGroups.map((g) => {
+                    const selectedOpt = g.options.find((o) => o.optionId === selected[g.id]);
+                    return (
+                      <div key={g.id}>
+                        <h3 className="text-xs font-semibold tracking-[0.2em] uppercase text-pine mb-3">{pickName(g, lang)}</h3>
+                        <div className="flex flex-wrap gap-2.5">
+                          {g.options.map((o) => {
+                            const active = selected[g.id] === o.optionId;
+                            return (
+                              <button
+                                key={o.optionId}
+                                onClick={() => setSelected({ ...selected, [g.id]: o.optionId })}
+                                className={`rounded-2xl border px-4 py-3 text-left text-sm transition-all ${
+                                  active ? 'border-pine bg-pine text-mist' : 'border-line bg-mist-card text-pine hover:border-moss'
+                                }`}
+                              >
+                                <span className="block font-medium">{pickName(o, lang)}</span>
+                                <span className={`block text-xs mt-0.5 ${active ? 'text-moss-light' : 'text-moss'}`}>
+                                  {o.priceDelta > 0 ? `+ ${euro(o.priceDelta)}` : '—'}
+                                </span>
+                              </button>
+                            );
+                          })}
+                        </div>
+                        {selectedOpt?.description && (
+                          <p key={selectedOpt.optionId} className="mt-3 text-sm text-inksoft leading-relaxed border-l-2 border-moss-light pl-3">
+                            {selectedOpt.description}
+                          </p>
+                        )}
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </Reveal>
             )}

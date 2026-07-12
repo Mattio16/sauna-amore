@@ -138,10 +138,14 @@ export async function setProductOption(fd: FormData) {
   const priceDelta = num(fd, 'priceDelta');
   const isDefault = fd.get('isDefault') === 'on';
 
-  // Inline rename (applies to this option everywhere it is used).
+  // Inline rename + description (applies to this option everywhere it is used).
   const name = str(fd, 'name');
   if (name) {
-    await prisma.option.update({ where: { id: optionId }, data: { nameIt: name, nameEn: name } });
+    const description = str(fd, 'description') || null;
+    await prisma.option.update({
+      where: { id: optionId },
+      data: { nameIt: name, nameEn: name, description } as never,
+    });
   }
 
   const existing = await prisma.productOption.findUnique({

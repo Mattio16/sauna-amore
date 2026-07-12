@@ -153,6 +153,13 @@ export default async function EditProductPage({
                       <button className="rounded border border-stone-300 px-2 py-1 text-xs hover:bg-white">
                         Save
                       </button>
+                      <textarea
+                        name="description"
+                        rows={1}
+                        defaultValue={(opt as unknown as { description?: string | null }).description ?? ''}
+                        placeholder="Short customer-facing description (shown when this option is selected)…"
+                        className="col-span-6 rounded border border-stone-200 px-2 py-1 text-xs text-stone-600 mt-0.5"
+                      />
                     </form>
                     <form action={deleteOptionFromProduct}>
                       <input type="hidden" name="productId" value={product.id} />

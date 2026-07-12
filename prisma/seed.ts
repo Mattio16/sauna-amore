@@ -34,28 +34,28 @@ const GROUPS = [
 ];
 
 const OPTIONS = [
-  { group: 'wood', code: 'spruce', nameIt: 'Abete classico', nameEn: 'Classic spruce', sortOrder: 0 },
-  { group: 'wood', code: 'thermowood', nameIt: 'Thermowood premium', nameEn: 'Premium thermowood', sortOrder: 1 },
-  { group: 'sauna-heater', code: 'electric-standard', nameIt: 'Elettrica standard (Harvia)', nameEn: 'Standard electric (Harvia)', sortOrder: 0 },
-  { group: 'sauna-heater', code: 'electric-smart', nameIt: 'Elettrica smart (HUUM + WiFi)', nameEn: 'Smart electric (HUUM + WiFi)', sortOrder: 1 },
-  { group: 'sauna-heater', code: 'wood-fired', nameIt: 'A legna (set con canna fumaria)', nameEn: 'Wood-fired (incl. chimney set)', sortOrder: 2 },
-  { group: 'tub-filter', code: 'no-filter', nameIt: 'Senza filtrazione', nameEn: 'No filtration', sortOrder: 0 },
-  { group: 'tub-filter', code: 'filter-set', nameIt: 'Set filtrazione', nameEn: 'Filter set', sortOrder: 1 },
-  { group: 'tub-cover', code: 'no-cover', nameIt: 'Senza copertura', nameEn: 'No cover', sortOrder: 0 },
-  { group: 'tub-cover', code: 'insulated-cover', nameIt: 'Copertura isolata', nameEn: 'Insulated cover', sortOrder: 1 },
-  { group: 'chiller', code: 'no-chiller', nameIt: 'Acqua naturale', nameEn: 'Natural water', sortOrder: 0 },
-  { group: 'chiller', code: 'chiller-pro', nameIt: 'Chiller Pro 7kW + filtro (sempre freddo)', nameEn: 'Pro chiller 7kW + filter (always cold)', sortOrder: 1 },
-  { group: 'diameter', code: 'd2', nameIt: 'Ø2 m', nameEn: 'Ø2 m', sortOrder: 0 },
-  { group: 'diameter', code: 'd22', nameIt: 'Ø2,2 m (più alta e spaziosa)', nameEn: 'Ø2.2 m (taller and roomier)', sortOrder: 1 },
-  { group: 'front-windows', code: 'fw-none', nameIt: 'Senza finestre', nameEn: 'No windows', sortOrder: 0 },
-  { group: 'front-windows', code: 'fw-2-fixed', nameIt: '2 finestre fisse', nameEn: '2 non-openable windows', sortOrder: 1 },
-  { group: 'front-windows', code: 'fw-2-open', nameIt: '2 finestre apribili', nameEn: '2 openable windows', sortOrder: 2 },
-  { group: 'front-windows', code: 'fw-glass-wall', nameIt: 'Parete vetrata con porta in vetro', nameEn: 'Glass wall with glass door', sortOrder: 3 },
-  { group: 'back-windows', code: 'bw-none', nameIt: 'Senza finestre', nameEn: 'No windows', sortOrder: 0 },
-  { group: 'back-windows', code: 'bw-2-fixed', nameIt: '2 finestre fisse', nameEn: '2 non-openable windows', sortOrder: 1 },
-  { group: 'back-windows', code: 'bw-2-open', nameIt: '2 finestre apribili', nameEn: '2 openable windows', sortOrder: 2 },
-  { group: 'back-windows', code: 'bw-panoramic', nameIt: 'Finestra panoramica', nameEn: 'Panoramic window', sortOrder: 3 },
-  { group: 'back-windows', code: 'bw-round-panoramic', nameIt: 'Finestra panoramica rotonda', nameEn: 'Round panoramic window', sortOrder: 4 },
+  { group: 'wood', code: 'spruce', description: 'Light Nordic spruce with 40 mm solid walls — the classic sauna look. Benefits from a protective wood treatment every few years.', nameIt: 'Abete classico', nameEn: 'Classic spruce', sortOrder: 0 },
+  { group: 'wood', code: 'thermowood', description: 'Heat-treated timber: darker tone, higher durability and much lower maintenance. Resists moisture and insects without treatment.', nameIt: 'Thermowood premium', nameEn: 'Premium thermowood', sortOrder: 1 },
+  { group: 'sauna-heater', code: 'electric-standard', description: 'Harvia electric stove sized to the sauna (6–9 kW), sauna stones included. Set the temperature and it is ready in about an hour.', nameIt: 'Elettrica standard (Harvia)', nameEn: 'Standard electric (Harvia)', sortOrder: 0 },
+  { group: 'sauna-heater', code: 'electric-smart', description: 'HUUM Drop 9 kW with UKU WiFi control: start the sauna from your phone and arrive to 80°. 55 kg of stones for soft, even steam.', nameIt: 'Elettrica smart (HUUM + WiFi)', nameEn: 'Smart electric (HUUM + WiFi)', sortOrder: 1 },
+  { group: 'sauna-heater', code: 'wood-fired', description: 'The authentic ritual: crackling fire, no electricity needed. Complete set with chimney kit and sauna stones.', nameIt: 'A legna (set con canna fumaria)', nameEn: 'Wood-fired (incl. chimney set)', sortOrder: 2 },
+  { group: 'tub-filter', code: 'no-filter', description: 'Drain-and-refill use: empty the tub after a few sessions and refill with fresh water.', nameIt: 'Senza filtrazione', nameEn: 'No filtration', sortOrder: 0 },
+  { group: 'tub-filter', code: 'filter-set', description: 'Circulation filter set keeps the water clean and clear for weeks between changes.', nameIt: 'Set filtrazione', nameEn: 'Filter set', sortOrder: 1 },
+  { group: 'tub-cover', code: 'no-cover', description: 'Open tub — cover can be added later at any time.', nameIt: 'Senza copertura', nameEn: 'No cover', sortOrder: 0 },
+  { group: 'tub-cover', code: 'insulated-cover', description: 'Insulated lid keeps the heat overnight (less firewood to reheat) and keeps leaves and rain out.', nameIt: 'Copertura isolata', nameEn: 'Insulated cover', sortOrder: 1 },
+  { group: 'chiller', code: 'no-chiller', description: 'Fill with cold tap water — in winter, nature does the chilling for free.', nameIt: 'Acqua naturale', nameEn: 'Natural water', sortOrder: 0 },
+  { group: 'chiller', code: 'chiller-pro', description: '7 kW chiller with filtration keeps the water at 4–6° all year round, always ready to plunge. The gym and hospitality spec.', nameIt: 'Chiller Pro 7kW + filtro (sempre freddo)', nameEn: 'Pro chiller 7kW + filter (always cold)', sortOrder: 1 },
+  { group: 'diameter', code: 'd2', description: 'Standard Ø2 m barrel: 210 cm interior height, fits most gardens and doorways.', nameIt: 'Ø2 m', nameEn: 'Ø2 m', sortOrder: 0 },
+  { group: 'diameter', code: 'd22', description: 'Ø2.2 m barrel: 20 cm more headroom (230 cm) and noticeably wider benches. Worth it for taller users.', nameIt: 'Ø2,2 m (più alta e spaziosa)', nameEn: 'Ø2.2 m (taller and roomier)', sortOrder: 1 },
+  { group: 'front-windows', code: 'fw-none', description: 'Solid wood front — maximum heat retention and privacy.', nameIt: 'Senza finestre', nameEn: 'No windows', sortOrder: 0 },
+  { group: 'front-windows', code: 'fw-2-fixed', description: 'Two fixed windows either side of the door bring daylight into the cabin.', nameIt: '2 finestre fisse', nameEn: '2 non-openable windows', sortOrder: 1 },
+  { group: 'front-windows', code: 'fw-2-open', description: 'Two opening windows for daylight plus quick airing between sessions.', nameIt: '2 finestre apribili', nameEn: '2 openable windows', sortOrder: 2 },
+  { group: 'front-windows', code: 'fw-glass-wall', description: 'Full tempered-glass front wall with glass door — the panoramic experience, safe next to the stove.', nameIt: 'Parete vetrata con porta in vetro', nameEn: 'Glass wall with glass door', sortOrder: 3 },
+  { group: 'back-windows', code: 'bw-none', description: 'Solid wood back wall — the warmest, most traditional configuration.', nameIt: 'Senza finestre', nameEn: 'No windows', sortOrder: 0 },
+  { group: 'back-windows', code: 'bw-2-fixed', description: 'Two fixed windows on the back wall for light from both sides.', nameIt: '2 finestre fisse', nameEn: '2 non-openable windows', sortOrder: 1 },
+  { group: 'back-windows', code: 'bw-2-open', description: 'Two opening back windows — cross-ventilation dries the cabin quickly.', nameIt: '2 finestre apribili', nameEn: '2 openable windows', sortOrder: 2 },
+  { group: 'back-windows', code: 'bw-panoramic', description: 'Half-moon panoramic window behind the benches: your garden becomes the view from the top bench.', nameIt: 'Finestra panoramica', nameEn: 'Panoramic window', sortOrder: 3 },
+  { group: 'back-windows', code: 'bw-round-panoramic', description: 'The full round glass back wall — the most spectacular option, best facing a view.', nameIt: 'Finestra panoramica rotonda', nameEn: 'Round panoramic window', sortOrder: 4 },
 ];
 
 // ---------------- lineup ----------------
@@ -296,7 +296,10 @@ async function seedOptions() {
   const optionIds = new Map<string, string>();
   for (const o of OPTIONS) {
     const rec = await prisma.option.create({
-      data: { groupId: groupIds.get(o.group)!, code: o.code, nameIt: o.nameIt, nameEn: o.nameEn, sortOrder: o.sortOrder },
+      data: {
+        groupId: groupIds.get(o.group)!, code: o.code, nameIt: o.nameIt, nameEn: o.nameEn,
+        description: (o as { description?: string }).description ?? null, sortOrder: o.sortOrder,
+      } as never,
     });
     optionIds.set(`${o.group}:${o.code}`, rec.id);
   }
