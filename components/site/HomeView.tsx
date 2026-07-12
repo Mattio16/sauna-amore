@@ -1,13 +1,75 @@
 'use client';
 
 import Link from 'next/link';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useT, euro } from '@/lib/i18n';
 import Reveal from './Reveal';
 import Parallax from './Parallax';
 import ProductCard, { ProductCardData } from './ProductCard';
 
 type Coll = { count: number; min: number };
+
+/** Full-bleed autoplay video band. Loads lazily when scrolled near; the poster
+ *  frame shows instantly. Respects prefers-reduced-motion (poster only). */
+function VideoBand() {
+  const ref = useRef<HTMLDivElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [load, setLoad] = useState(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          setLoad(true);
+          io.disconnect();
+        }
+      },
+      { rootMargin: '400px' },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
+  // Pause when off-screen to save battery.
+  useEffect(() => {
+    const el = ref.current;
+    const video = videoRef.current;
+    if (!el || !video || !load) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) video.play().catch(() => {});
+        else video.pause();
+      },
+      { threshold: 0.2 },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [load]);
+
+  return (
+    <section ref={ref} className="w-full my-6">
+      {load ? (
+        <video
+          ref={videoRef}
+          autoPlay
+          muted
+          loop
+          playsInline
+          poster="/images/site/video-poster.jpg"
+          className="w-full h-auto block"
+        >
+          <source src="/videos/hero.mp4" type="video/mp4" />
+        </video>
+      ) : (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src="/images/site/video-poster.jpg" alt="" loading="lazy" className="w-full h-auto block" />
+      )}
+    </section>
+  );
+}
 
 export default function HomeView({
   collections,
@@ -128,6 +190,9 @@ export default function HomeView({
           ))}
         </div>
       </section>
+
+      {/* ---------- Full-bleed video band ---------- */}
+      <VideoBand />
 
       {/* ---------- Full-bleed editorial (Composed for you) ---------- */}
       <section className="relative min-h-[560px] flex items-center overflow-hidden bg-pine-dark my-10">
