@@ -32,6 +32,7 @@ const GROUPS = [
   { code: 'roof', nameIt: 'Tetto', nameEn: 'Roof', sortOrder: 6 },
   { code: 'front-windows', nameIt: 'Finestre frontali', nameEn: 'Front windows', sortOrder: 7 },
   { code: 'back-windows', nameIt: 'Finestre posteriori', nameEn: 'Back windows', sortOrder: 8 },
+  { code: 'stairs', nameIt: 'Scaletta', nameEn: 'Stairs', sortOrder: 9 },
 ];
 
 const OPTIONS = [
@@ -51,6 +52,9 @@ const OPTIONS = [
   { group: 'roof', code: 'roof-brown', description: 'Brown bitumen shingles — the warm classic that suits spruce especially well. Included in the price.', nameIt: 'Marrone', nameEn: 'Brown', sortOrder: 0 },
   { group: 'roof', code: 'roof-black', description: 'Black bitumen shingles — a sharp, modern look that pairs beautifully with thermowood. Included in the price.', nameIt: 'Nero', nameEn: 'Black', sortOrder: 1 },
   { group: 'roof', code: 'roof-green', description: 'Green bitumen shingles — blends the sauna into hedges and garden greenery. Included in the price.', nameIt: 'Verde', nameEn: 'Green', sortOrder: 2 },
+  { group: 'stairs', code: 'no-stairs', description: 'No steps — fine when the tub sits against a deck or terrace edge.', nameIt: 'Senza scaletta', nameEn: 'No stairs', sortOrder: 0 },
+  { group: 'stairs', code: 'stairs-classic', description: 'Solid wooden three-step ladder — the safe, easy way in and out.', nameIt: 'Scaletta classica', nameEn: 'Classic stairs', sortOrder: 1 },
+  { group: 'stairs', code: 'stairs-lux', description: 'Curved two-tier LUX platform that hugs the tub — doubles as a seat and looks built-in.', nameIt: 'Scaletta LUX', nameEn: 'Stairs LUX', sortOrder: 2 },
   { group: 'front-windows', code: 'fw-none', description: 'Solid wood front — maximum heat retention and privacy.', nameIt: 'Senza finestre', nameEn: 'No windows', sortOrder: 0 },
   { group: 'front-windows', code: 'fw-2-fixed', description: 'Two fixed windows either side of the door bring daylight into the cabin.', nameIt: '2 finestre fisse', nameEn: '2 non-openable windows', sortOrder: 1 },
   { group: 'front-windows', code: 'fw-2-open', description: 'Two opening windows for daylight plus quick airing between sessions.', nameIt: '2 finestre apribili', nameEn: '2 openable windows', sortOrder: 2 },
@@ -115,6 +119,11 @@ const roofChoice = () => [
   { group: 'roof', code: 'roof-brown', delta: 0, isDefault: true },
   { group: 'roof', code: 'roof-black', delta: 0 },
   { group: 'roof', code: 'roof-green', delta: 0 },
+];
+const stairsChoice = () => [
+  { group: 'stairs', code: 'no-stairs', delta: 0, isDefault: true },
+  { group: 'stairs', code: 'stairs-classic', delta: 80 },
+  { group: 'stairs', code: 'stairs-lux', delta: 300 },
 ];
 const img = (sku: string, n: number) =>
   Array.from({ length: n }, (_, i) => `/images/products/${sku}/${i + 1}.jpg`);
@@ -214,6 +223,7 @@ const LINEUP: LineupProduct[] = [
       { group: 'tub-filter', code: 'filter-set', delta: 390, supplier: 280 },
       { group: 'tub-cover', code: 'no-cover', delta: 0, isDefault: true },
       { group: 'tub-cover', code: 'insulated-cover', delta: 340, supplier: 240 },
+      ...stairsChoice(),
     ],
   },
   {
@@ -231,6 +241,7 @@ const LINEUP: LineupProduct[] = [
       { group: 'tub-filter', code: 'filter-set', delta: 390, supplier: 280 },
       { group: 'tub-cover', code: 'no-cover', delta: 0, isDefault: true },
       { group: 'tub-cover', code: 'insulated-cover', delta: 340, supplier: 240 },
+      ...stairsChoice(),
     ],
   },
   {
@@ -243,7 +254,7 @@ const LINEUP: LineupProduct[] = [
     specsIt: 'Diametro: Ø2 m | Capienza: 4–6 persone | Volume: 1.100 l | Peso: 265 kg | Altezza: 110 cm | Profondità: 83 cm | Stufa: integrata inox AISI304 30 kW | Interno: vetroresina 5 mm | Esterno: thermowood 18 mm | Canna fumaria: inclusa',
     specsEn: 'Diameter: Ø2 m | Capacity: 4–6 persons | Volume: 1,100 l | Weight: 265 kg | Height: 110 cm | Depth: 83 cm | Stove: integrated stainless AISI304 30 kW | Interior: 5 mm fiberglass | Exterior: 18 mm thermowood | Chimney: included',
     images: img('tp2v', 2),
-    options: [],
+    options: [...stairsChoice()],
   },
 
   // ---------- Ice baths (2) ----------
