@@ -121,6 +121,16 @@ export async function setProductOption(fd: FormData) {
   const priceDelta = num(fd, 'priceDelta');
   const isDefault = fd.get('isDefault') === 'on';
 
+  // Inline rename (applies to this option everywhere it is used).
+  const nameIt = str(fd, 'nameIt');
+  const nameEn = str(fd, 'nameEn');
+  if (nameIt || nameEn) {
+    await prisma.option.update({
+      where: { id: optionId },
+      data: { ...(nameIt ? { nameIt } : {}), ...(nameEn ? { nameEn } : {}) },
+    });
+  }
+
   const existing = await prisma.productOption.findUnique({
     where: { productId_optionId: { productId, optionId } },
   });
@@ -146,6 +156,39 @@ export async function setProductOption(fd: FormData) {
     });
   }
   revalidatePath(`/admin/products/${productId}`);
+}
+
+/** Create a new option inside a group and enable it for the given product. */
+export async function createOptionForProduct(fd: FormData) {
+  await requireAdmin();
+  const productId = str(fd, 'productId');
+  const groupId = str(fd, 'groupId');
+  const nameEn = str(fd, 'nameEn');
+  const nameIt = str(fd, 'nameIt') || nameEn;
+  const priceDelta = num(fd, 'priceDelta');
+  if (!nameEn) throw new Error('Name required');
+
+  let code = nameEn.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'option';
+  const clash = await prisma.option.findUnique({ where: { groupId_code: { groupId, code } } });
+  if (clash) code = `${code}-${Date.now().toString(36)}`;
+
+  const count = await prisma.option.count({ where: { groupId } });
+  const option = await prisma.option.create({
+    data: { groupId, code, nameIt, nameEn, sortOrder: count },
+  });
+  await prisma.productOption.create({
+    data: { productId, optionId: option.id, priceDelta, isDefault: false },
+  });
+  revalidatePath(`/admin/products/${productId}`);
+}
+
+/** Delete an option globally (removes it from every product that offers it). */
+export async function deleteOptionFromProduct(fd: FormData) {
+  await requireAdmin();
+  const productId = str(fd, 'productId');
+  await prisma.option.delete({ where: { id: str(fd, 'optionId') } });
+  revalidatePath(`/admin/products/${productId}`);
+  revalidatePath('/admin/options');
 }
 
 // ---------- global options ----------
@@ -183,14 +226,48 @@ export async function deleteOption(fd: FormData) {
 
 // ---------- orders ----------
 
+function timestamp(): string {
+  return new Intl.DateTimeFormat('it-IT', {
+    timeZone: 'Europe/Rome',
+    day: '2-digit', month: '2-digit', year: 'numeric',
+    hour: '2-digit', minute: '2-digit',
+  }).format(new Date());
+}
+
+/**
+ * Updates status and appends the new note (if any) to the permanent,
+ * timestamped note log. Committed notes are never edited or removed.
+ */
 export async function updateOrder(fd: FormData) {
   await requireAdmin();
   const id = str(fd, 'id');
+  const newNote = str(fd, 'newNote');
+  const current = await prisma.order.findUniqueOrThrow({ where: { id }, select: { adminNotes: true } });
+  const adminNotes = newNote
+    ? `${current.adminNotes ? current.adminNotes + '\n' : ''}[${timestamp()}] ${newNote}`
+    : current.adminNotes;
+  await prisma.order.update({
+    where: { id },
+    data: { status: str(fd, 'status') as OrderStatus, adminNotes },
+  });
+  revalidatePath('/admin/orders');
+  revalidatePath(`/admin/orders/${id}`);
+}
+
+export async function updateOrderCustomer(fd: FormData) {
+  await requireAdmin();
+  const id = str(fd, 'id');
+  const email = str(fd, 'email');
+  if (!str(fd, 'customerName') || !email.includes('@')) throw new Error('Name and valid email required');
   await prisma.order.update({
     where: { id },
     data: {
-      status: str(fd, 'status') as OrderStatus,
-      adminNotes: str(fd, 'adminNotes') || null,
+      customerName: str(fd, 'customerName'),
+      email,
+      phone: str(fd, 'phone') || null,
+      address: str(fd, 'address') || null,
+      city: str(fd, 'city') || null,
+      postalCode: str(fd, 'postalCode') || null,
     },
   });
   revalidatePath('/admin/orders');

@@ -3,7 +3,14 @@ import { notFound } from 'next/navigation';
 import { prisma } from '@/lib/db';
 import ProductForm, { DeleteProductButton } from '@/components/admin/ProductForm';
 import ImageUploader from '@/components/admin/ImageUploader';
-import { addImageUrl, deleteImage, moveImage, setProductOption } from '@/lib/admin-actions';
+import {
+  addImageUrl,
+  deleteImage,
+  moveImage,
+  setProductOption,
+  createOptionForProduct,
+  deleteOptionFromProduct,
+} from '@/lib/admin-actions';
 
 export const dynamic = 'force-dynamic';
 
@@ -110,31 +117,66 @@ export default async function EditProductPage({
               {group.options.map((opt) => {
                 const po = byOptionId.get(opt.id);
                 return (
-                  <form
-                    key={opt.id}
-                    action={setProductOption}
-                    className="grid grid-cols-[1.2rem_1fr_8rem_5.5rem_4.5rem] items-center gap-3 rounded px-2 py-1.5 hover:bg-stone-50 text-sm"
-                  >
-                    <input type="hidden" name="productId" value={product.id} />
-                    <input type="hidden" name="optionId" value={opt.id} />
-                    <input type="checkbox" name="enabled" defaultChecked={!!po} />
-                    <span className={po ? 'text-stone-900' : 'text-stone-400'}>{opt.nameEn}</span>
-                    <input
-                      name="priceDelta"
-                      type="number"
-                      defaultValue={po?.priceDelta ?? 0}
-                      className="rounded border border-stone-300 px-2 py-1 text-right"
-                    />
-                    <label className="flex items-center gap-1 text-xs text-stone-500">
-                      <input type="checkbox" name="isDefault" defaultChecked={po?.isDefault ?? false} />
-                      default
-                    </label>
-                    <button className="rounded border border-stone-300 px-2 py-1 text-xs hover:bg-white">
-                      Save
-                    </button>
-                  </form>
+                  <div key={opt.id} className="flex items-center gap-2">
+                    <form
+                      action={setProductOption}
+                      className="flex-1 grid grid-cols-[1.2rem_1fr_1fr_6.5rem_4.5rem_3.5rem] items-center gap-2 rounded px-2 py-1.5 hover:bg-stone-50 text-sm"
+                    >
+                      <input type="hidden" name="productId" value={product.id} />
+                      <input type="hidden" name="optionId" value={opt.id} />
+                      <input type="checkbox" name="enabled" defaultChecked={!!po} />
+                      <input
+                        name="nameIt"
+                        defaultValue={opt.nameIt}
+                        title="Name (Italian) — renames this option everywhere"
+                        className={`rounded border border-stone-200 px-2 py-1 ${po ? 'text-stone-900' : 'text-stone-400'}`}
+                      />
+                      <input
+                        name="nameEn"
+                        defaultValue={opt.nameEn}
+                        title="Name (English) — renames this option everywhere"
+                        className={`rounded border border-stone-200 px-2 py-1 ${po ? 'text-stone-900' : 'text-stone-400'}`}
+                      />
+                      <input
+                        name="priceDelta"
+                        type="number"
+                        defaultValue={po?.priceDelta ?? 0}
+                        className="rounded border border-stone-300 px-2 py-1 text-right"
+                      />
+                      <label className="flex items-center gap-1 text-xs text-stone-500">
+                        <input type="checkbox" name="isDefault" defaultChecked={po?.isDefault ?? false} />
+                        default
+                      </label>
+                      <button className="rounded border border-stone-300 px-2 py-1 text-xs hover:bg-white">
+                        Save
+                      </button>
+                    </form>
+                    <form action={deleteOptionFromProduct}>
+                      <input type="hidden" name="productId" value={product.id} />
+                      <input type="hidden" name="optionId" value={opt.id} />
+                      <button
+                        className="text-red-400 hover:text-red-600 px-1 text-sm"
+                        title="Delete this option everywhere (removes it from all products that offer it)"
+                      >
+                        ✕
+                      </button>
+                    </form>
+                  </div>
                 );
               })}
+              <form
+                action={createOptionForProduct}
+                className="grid grid-cols-[1fr_1fr_6.5rem_auto] items-center gap-2 rounded border border-dashed border-stone-300 px-2 py-2 mt-1 text-sm"
+              >
+                <input type="hidden" name="productId" value={product.id} />
+                <input type="hidden" name="groupId" value={group.id} />
+                <input name="nameIt" placeholder="New option (Italian)" className="rounded border border-stone-200 px-2 py-1" />
+                <input name="nameEn" placeholder="New option (English)" required className="rounded border border-stone-200 px-2 py-1" />
+                <input name="priceDelta" type="number" placeholder="+ €" className="rounded border border-stone-300 px-2 py-1 text-right" />
+                <button className="rounded bg-stone-900 text-white px-3 py-1 text-xs hover:bg-stone-700">
+                  + Add option
+                </button>
+              </form>
             </div>
           </div>
         ))}

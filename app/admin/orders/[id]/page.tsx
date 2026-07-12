@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { prisma } from '@/lib/db';
 import { euro, formatDate } from '@/lib/format';
-import { updateOrder } from '@/lib/admin-actions';
+import { updateOrder, updateOrderCustomer } from '@/lib/admin-actions';
 
 export const dynamic = 'force-dynamic';
 
@@ -16,6 +16,7 @@ export default async function OrderDetailPage({ params }: { params: { id: string
   if (!order) notFound();
 
   const statuses = ['NEW', 'CONTACTED', 'QUOTED', 'CONFIRMED', 'DELIVERED', 'CANCELLED'];
+  const noteLines = (order.adminNotes ?? '').split('\n').filter((l) => l.trim());
 
   return (
     <div className="space-y-6 max-w-3xl">
@@ -30,30 +31,63 @@ export default async function OrderDetailPage({ params }: { params: { id: string
       </div>
 
       {/* Customer */}
-      <section className="bg-white rounded-xl shadow-sm p-6 grid md:grid-cols-2 gap-4 text-sm">
-        <div>
-          <h2 className="font-medium text-stone-900 mb-2">Customer</h2>
-          <p>{order.customerName}</p>
-          <p>
-            <a href={`mailto:${order.email}`} className="text-blue-600 hover:underline">{order.email}</a>
-          </p>
-          {order.phone && (
+      <section className="bg-white rounded-xl shadow-sm p-6 text-sm">
+        <div className="grid md:grid-cols-2 gap-4">
+          <div>
+            <h2 className="font-medium text-stone-900 mb-2">Customer</h2>
+            <p>{order.customerName}</p>
             <p>
-              <a href={`tel:${order.phone}`} className="text-blue-600 hover:underline">{order.phone}</a>
+              <a href={`mailto:${order.email}`} className="text-blue-600 hover:underline">{order.email}</a>
             </p>
+            {order.phone && (
+              <p>
+                <a href={`tel:${order.phone}`} className="text-blue-600 hover:underline">{order.phone}</a>
+              </p>
+            )}
+          </div>
+          <div>
+            <h2 className="font-medium text-stone-900 mb-2">Delivery address</h2>
+            <p>{order.address ?? '—'}</p>
+            <p>{[order.postalCode, order.city].filter(Boolean).join(' ')}</p>
+          </div>
+          {order.message && (
+            <div className="md:col-span-2">
+              <h2 className="font-medium text-stone-900 mb-2">Customer message</h2>
+              <p className="whitespace-pre-wrap text-stone-600">{order.message}</p>
+            </div>
           )}
         </div>
-        <div>
-          <h2 className="font-medium text-stone-900 mb-2">Delivery address</h2>
-          <p>{order.address ?? '—'}</p>
-          <p>{[order.postalCode, order.city].filter(Boolean).join(' ')}</p>
-        </div>
-        {order.message && (
-          <div className="md:col-span-2">
-            <h2 className="font-medium text-stone-900 mb-2">Customer message</h2>
-            <p className="whitespace-pre-wrap text-stone-600">{order.message}</p>
-          </div>
-        )}
+        <details className="mt-4 border-t border-stone-100 pt-3">
+          <summary className="cursor-pointer text-stone-500 hover:text-stone-900 text-sm select-none">
+            ✎ Edit customer details
+          </summary>
+          <form action={updateOrderCustomer} className="grid sm:grid-cols-2 gap-3 mt-4">
+            <input type="hidden" name="id" value={order.id} />
+            <label className="text-xs text-stone-500">Name
+              <input name="customerName" defaultValue={order.customerName} required className="mt-1 w-full rounded border border-stone-300 px-3 py-2 text-sm" />
+            </label>
+            <label className="text-xs text-stone-500">Email
+              <input name="email" type="email" defaultValue={order.email} required className="mt-1 w-full rounded border border-stone-300 px-3 py-2 text-sm" />
+            </label>
+            <label className="text-xs text-stone-500">Phone
+              <input name="phone" defaultValue={order.phone ?? ''} className="mt-1 w-full rounded border border-stone-300 px-3 py-2 text-sm" />
+            </label>
+            <label className="text-xs text-stone-500">City
+              <input name="city" defaultValue={order.city ?? ''} className="mt-1 w-full rounded border border-stone-300 px-3 py-2 text-sm" />
+            </label>
+            <label className="text-xs text-stone-500">Address
+              <input name="address" defaultValue={order.address ?? ''} className="mt-1 w-full rounded border border-stone-300 px-3 py-2 text-sm" />
+            </label>
+            <label className="text-xs text-stone-500">Postal code
+              <input name="postalCode" defaultValue={order.postalCode ?? ''} className="mt-1 w-full rounded border border-stone-300 px-3 py-2 text-sm" />
+            </label>
+            <div className="sm:col-span-2">
+              <button className="rounded bg-stone-900 text-white px-5 py-2 text-sm font-medium hover:bg-stone-700">
+                Save customer details
+              </button>
+            </div>
+          </form>
+        </details>
       </section>
 
       {/* Items */}
@@ -91,7 +125,7 @@ export default async function OrderDetailPage({ params }: { params: { id: string
         </p>
       </section>
 
-      {/* Status + notes */}
+      {/* Status + note log */}
       <form action={updateOrder} className="bg-white rounded-xl shadow-sm p-6 space-y-4">
         <input type="hidden" name="id" value={order.id} />
         <div>
@@ -108,13 +142,34 @@ export default async function OrderDetailPage({ params }: { params: { id: string
             ))}
           </select>
         </div>
+
         <div>
-          <label className="block text-xs font-medium text-stone-500 mb-1">Internal notes</label>
+          <label className="block text-xs font-medium text-stone-500 mb-2">Note log</label>
+          {noteLines.length > 0 ? (
+            <ul className="space-y-1.5 mb-3 rounded-lg bg-stone-50 border border-stone-100 p-4">
+              {noteLines.map((line, i) => {
+                const m = line.match(/^\[(.+?)\]\s?(.*)$/);
+                return (
+                  <li key={i} className="text-sm text-stone-700">
+                    {m ? (
+                      <>
+                        <span className="text-xs text-stone-400 font-mono mr-2">{m[1]}</span>
+                        {m[2]}
+                      </>
+                    ) : (
+                      line
+                    )}
+                  </li>
+                );
+              })}
+            </ul>
+          ) : (
+            <p className="text-sm text-stone-400 mb-3">No notes yet.</p>
+          )}
           <textarea
-            name="adminNotes"
-            rows={4}
-            defaultValue={order.adminNotes ?? ''}
-            placeholder="Quote sent on…, delivery scheduled…, etc."
+            name="newNote"
+            rows={3}
+            placeholder="Add a note — it will be committed permanently with a timestamp on update."
             className="w-full rounded border border-stone-300 px-3 py-2 text-sm"
           />
         </div>
