@@ -30,11 +30,10 @@ export default async function OptionsPage() {
               <div key={opt.id} className="flex items-center gap-3">
                 <form
                   action={saveOption}
-                  className="grid grid-cols-[1fr_1fr_4rem_4.5rem] items-center gap-3 text-sm flex-1"
+                  className="grid grid-cols-[1fr_4rem_4.5rem] items-center gap-3 text-sm flex-1"
                 >
                   <input type="hidden" name="id" value={opt.id} />
-                  <input name="nameIt" defaultValue={opt.nameIt} className="rounded border border-stone-300 px-2 py-1.5" />
-                  <input name="nameEn" defaultValue={opt.nameEn} className="rounded border border-stone-300 px-2 py-1.5" />
+                  <input name="name" defaultValue={opt.nameEn} className="rounded border border-stone-300 px-2 py-1.5" />
                   <input name="sortOrder" type="number" defaultValue={opt.sortOrder} className="rounded border border-stone-300 px-2 py-1.5 text-right" />
                   <button className="rounded border border-stone-300 px-2 py-1.5 text-xs hover:bg-stone-50">Save</button>
                 </form>
@@ -56,8 +55,7 @@ export default async function OptionsPage() {
           </div>
           <form action={createOption} className="flex items-center gap-3 pt-3 border-t border-stone-100 text-sm">
             <input type="hidden" name="groupId" value={group.id} />
-            <input name="nameIt" placeholder="Name (Italian)" className="flex-1 rounded border border-stone-300 px-2 py-1.5" />
-            <input name="nameEn" placeholder="Name (English)" required className="flex-1 rounded border border-stone-300 px-2 py-1.5" />
+            <input name="name" placeholder="New option name" required className="flex-1 rounded border border-stone-300 px-2 py-1.5" />
             <button className="rounded bg-stone-900 text-white px-4 py-1.5 text-xs hover:bg-stone-700">+ Add option</button>
           </form>
         </section>

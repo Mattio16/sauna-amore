@@ -120,21 +120,15 @@ export default async function EditProductPage({
                   <div key={opt.id} className="flex items-center gap-2">
                     <form
                       action={setProductOption}
-                      className="flex-1 grid grid-cols-[1.2rem_1fr_1fr_6.5rem_4.5rem_3.5rem] items-center gap-2 rounded px-2 py-1.5 hover:bg-stone-50 text-sm"
+                      className="flex-1 grid grid-cols-[1.2rem_1fr_6.5rem_4.5rem_3.5rem] items-center gap-2 rounded px-2 py-1.5 hover:bg-stone-50 text-sm"
                     >
                       <input type="hidden" name="productId" value={product.id} />
                       <input type="hidden" name="optionId" value={opt.id} />
                       <input type="checkbox" name="enabled" defaultChecked={!!po} />
                       <input
-                        name="nameIt"
-                        defaultValue={opt.nameIt}
-                        title="Name (Italian) — renames this option everywhere"
-                        className={`rounded border border-stone-200 px-2 py-1 ${po ? 'text-stone-900' : 'text-stone-400'}`}
-                      />
-                      <input
-                        name="nameEn"
+                        name="name"
                         defaultValue={opt.nameEn}
-                        title="Name (English) — renames this option everywhere"
+                        title="Renames this option everywhere it is used"
                         className={`rounded border border-stone-200 px-2 py-1 ${po ? 'text-stone-900' : 'text-stone-400'}`}
                       />
                       <input
@@ -166,12 +160,11 @@ export default async function EditProductPage({
               })}
               <form
                 action={createOptionForProduct}
-                className="grid grid-cols-[1fr_1fr_6.5rem_auto] items-center gap-2 rounded border border-dashed border-stone-300 px-2 py-2 mt-1 text-sm"
+                className="grid grid-cols-[1fr_6.5rem_auto] items-center gap-2 rounded border border-dashed border-stone-300 px-2 py-2 mt-1 text-sm"
               >
                 <input type="hidden" name="productId" value={product.id} />
                 <input type="hidden" name="groupId" value={group.id} />
-                <input name="nameIt" placeholder="New option (Italian)" className="rounded border border-stone-200 px-2 py-1" />
-                <input name="nameEn" placeholder="New option (English)" required className="rounded border border-stone-200 px-2 py-1" />
+                <input name="name" placeholder="New option name" required className="rounded border border-stone-200 px-2 py-1" />
                 <input name="priceDelta" type="number" placeholder="+ €" className="rounded border border-stone-300 px-2 py-1 text-right" />
                 <button className="rounded bg-stone-900 text-white px-3 py-1 text-xs hover:bg-stone-700">
                   + Add option

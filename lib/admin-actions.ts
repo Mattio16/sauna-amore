@@ -25,19 +25,24 @@ function num(fd: FormData, key: string): number {
 export async function saveProduct(fd: FormData) {
   await requireAdmin();
   const id = str(fd, 'id');
+  // Single-language backend: English is the source of truth; the same value is
+  // written to both columns (frontend translation layer comes later).
+  const name = str(fd, 'name');
+  const description = str(fd, 'description') || null;
+  const specs = str(fd, 'specs') || null;
   const data = {
     sku: str(fd, 'sku').toUpperCase(),
-    nameIt: str(fd, 'nameIt'),
-    nameEn: str(fd, 'nameEn'),
+    nameIt: name,
+    nameEn: name,
     category: str(fd, 'category') as Category,
     subcategory: str(fd, 'subcategory') || null,
     basePrice: num(fd, 'basePrice'),
     capacity: num(fd, 'capacity') || null,
     dimensions: str(fd, 'dimensions') || null,
-    descriptionIt: str(fd, 'descriptionIt') || null,
-    descriptionEn: str(fd, 'descriptionEn') || null,
-    specsIt: str(fd, 'specsIt') || null,
-    specsEn: str(fd, 'specsEn') || null,
+    descriptionIt: description,
+    descriptionEn: description,
+    specsIt: specs,
+    specsEn: specs,
     sortOrder: num(fd, 'sortOrder'),
     isPublished: fd.get('isPublished') === 'on',
   };
@@ -122,13 +127,9 @@ export async function setProductOption(fd: FormData) {
   const isDefault = fd.get('isDefault') === 'on';
 
   // Inline rename (applies to this option everywhere it is used).
-  const nameIt = str(fd, 'nameIt');
-  const nameEn = str(fd, 'nameEn');
-  if (nameIt || nameEn) {
-    await prisma.option.update({
-      where: { id: optionId },
-      data: { ...(nameIt ? { nameIt } : {}), ...(nameEn ? { nameEn } : {}) },
-    });
+  const name = str(fd, 'name');
+  if (name) {
+    await prisma.option.update({ where: { id: optionId }, data: { nameIt: name, nameEn: name } });
   }
 
   const existing = await prisma.productOption.findUnique({
@@ -163,18 +164,17 @@ export async function createOptionForProduct(fd: FormData) {
   await requireAdmin();
   const productId = str(fd, 'productId');
   const groupId = str(fd, 'groupId');
-  const nameEn = str(fd, 'nameEn');
-  const nameIt = str(fd, 'nameIt') || nameEn;
+  const name = str(fd, 'name');
   const priceDelta = num(fd, 'priceDelta');
-  if (!nameEn) throw new Error('Name required');
+  if (!name) throw new Error('Name required');
 
-  let code = nameEn.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'option';
+  let code = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'option';
   const clash = await prisma.option.findUnique({ where: { groupId_code: { groupId, code } } });
   if (clash) code = `${code}-${Date.now().toString(36)}`;
 
   const count = await prisma.option.count({ where: { groupId } });
   const option = await prisma.option.create({
-    data: { groupId, code, nameIt, nameEn, sortOrder: count },
+    data: { groupId, code, nameIt: name, nameEn: name, sortOrder: count },
   });
   await prisma.productOption.create({
     data: { productId, optionId: option.id, priceDelta, isDefault: false },
@@ -196,24 +196,23 @@ export async function deleteOptionFromProduct(fd: FormData) {
 export async function saveOption(fd: FormData) {
   await requireAdmin();
   const id = str(fd, 'id');
-  const data = {
-    nameIt: str(fd, 'nameIt'),
-    nameEn: str(fd, 'nameEn'),
-    sortOrder: num(fd, 'sortOrder'),
-  };
-  await prisma.option.update({ where: { id }, data });
+  const name = str(fd, 'name');
+  await prisma.option.update({
+    where: { id },
+    data: { nameIt: name, nameEn: name, sortOrder: num(fd, 'sortOrder') },
+  });
   revalidatePath('/admin/options');
 }
 
 export async function createOption(fd: FormData) {
   await requireAdmin();
   const groupId = str(fd, 'groupId');
-  const nameEn = str(fd, 'nameEn');
-  const code = nameEn.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+  const name = str(fd, 'name');
+  const code = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
   if (!code) throw new Error('Name required');
   const count = await prisma.option.count({ where: { groupId } });
   await prisma.option.create({
-    data: { groupId, code, nameEn, nameIt: str(fd, 'nameIt') || nameEn, sortOrder: count },
+    data: { groupId, code, nameEn: name, nameIt: name, sortOrder: count },
   });
   revalidatePath('/admin/options');
 }

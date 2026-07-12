@@ -328,12 +328,16 @@ export function isLang(v: unknown): v is Lang {
   return v === 'it' || v === 'en' || v === 'nl' || v === 'de' || v === 'ru';
 }
 
-/** Localized product field: IT for Italian, EN fallback for all other languages. */
-export function pickName(item: { nameIt: string; nameEn: string }, lang: Lang): string {
-  return lang === 'it' ? item.nameIt : item.nameEn;
+/**
+ * Product content is single-language (English source of truth, managed in the
+ * admin). All site languages display it as-is for now — an automatic
+ * translation layer will localize it in a future step.
+ */
+export function pickName(item: { nameIt: string; nameEn: string }, _lang: Lang): string {
+  return item.nameEn;
 }
-export function pickText(itText: string | null, enText: string | null, lang: Lang): string | null {
-  return lang === 'it' ? itText ?? enText : enText ?? itText;
+export function pickText(itText: string | null, enText: string | null, _lang: Lang): string | null {
+  return enText ?? itText;
 }
 
 export function euro(n: number): string {

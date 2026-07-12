@@ -34,15 +34,9 @@ export default function ProductForm({ product }: { product?: Product }) {
         </div>
       </div>
 
-      <div className="grid md:grid-cols-2 gap-4">
-        <div>
-          <label className={label}>Name (Italian)</label>
-          <input name="nameIt" defaultValue={product?.nameIt} required className={input} />
-        </div>
-        <div>
-          <label className={label}>Name (English)</label>
-          <input name="nameEn" defaultValue={product?.nameEn} required className={input} />
-        </div>
+      <div>
+        <label className={label}>Name</label>
+        <input name="name" defaultValue={product?.nameEn} required className={input} />
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
@@ -60,26 +54,14 @@ export default function ProductForm({ product }: { product?: Product }) {
         </div>
       </div>
 
-      <div className="grid md:grid-cols-2 gap-4">
-        <div>
-          <label className={label}>Description (Italian)</label>
-          <textarea name="descriptionIt" rows={4} defaultValue={product?.descriptionIt ?? ''} className={input} />
-        </div>
-        <div>
-          <label className={label}>Description (English)</label>
-          <textarea name="descriptionEn" rows={4} defaultValue={product?.descriptionEn ?? ''} className={input} />
-        </div>
+      <div>
+        <label className={label}>Description</label>
+        <textarea name="description" rows={4} defaultValue={product?.descriptionEn ?? ''} className={input} />
       </div>
 
-      <div className="grid md:grid-cols-2 gap-4">
-        <div>
-          <label className={label}>Specs (Italian)</label>
-          <textarea name="specsIt" rows={2} defaultValue={product?.specsIt ?? ''} className={input} />
-        </div>
-        <div>
-          <label className={label}>Specs (English)</label>
-          <textarea name="specsEn" rows={2} defaultValue={product?.specsEn ?? ''} className={input} />
-        </div>
+      <div>
+        <label className={label}>Specs — format: Label: value | Label: value (rendered as a table)</label>
+        <textarea name="specs" rows={3} defaultValue={product?.specsEn ?? ''} className={input} />
       </div>
 
       <div className="flex items-center justify-between pt-2">
