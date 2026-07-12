@@ -5,7 +5,6 @@ import { useEffect, useRef, useState } from 'react';
 import { useT, euro } from '@/lib/i18n';
 import Reveal from './Reveal';
 import Parallax from './Parallax';
-import ProductCard, { ProductCardData } from './ProductCard';
 
 type Coll = { count: number; min: number };
 
@@ -73,10 +72,8 @@ function VideoBand() {
 
 export default function HomeView({
   collections,
-  featured,
 }: {
   collections: { saunas: Coll; tubs: Coll; ice: Coll };
-  featured: ProductCardData[];
 }) {
   const t = useT();
   const heroImg = useRef<HTMLImageElement>(null);
@@ -195,14 +192,14 @@ export default function HomeView({
       <VideoBand />
 
       {/* ---------- Full-bleed editorial (Composed for you) ---------- */}
-      <section className="relative min-h-[560px] flex items-center overflow-hidden bg-pine-dark my-10">
-        <Parallax speed={0.09} zoom={1.12} className="absolute inset-0">
+      <section className="relative min-h-[400px] flex items-center overflow-hidden bg-pine-dark my-10">
+        <Parallax speed={0.07} zoom={1.1} className="absolute inset-0">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/images/site/editorial.jpg" alt="" className="w-full h-full object-cover opacity-45" />
+          <img src="/images/site/editorial.jpg" alt="" className="w-full h-full object-cover object-left opacity-80" />
         </Parallax>
-        <div className="absolute inset-0 bg-gradient-to-r from-pine-night/85 via-pine-night/40 to-transparent" />
-        <div className="relative max-w-7xl mx-auto px-6 lg:px-8 w-full py-24">
-          <div className="max-w-xl">
+        <div className="absolute inset-0 bg-gradient-to-l from-pine-night/90 via-pine-night/55 to-transparent" />
+        <div className="relative max-w-7xl mx-auto px-6 lg:px-8 w-full py-14">
+          <div className="max-w-xl ml-auto">
             <Reveal>
               <span className="block text-xs font-medium tracking-[0.32em] uppercase text-moss-light mb-4">{t.home.edKicker}</span>
             </Reveal>
@@ -223,23 +220,6 @@ export default function HomeView({
               </Link>
             </Reveal>
           </div>
-        </div>
-      </section>
-
-      {/* ---------- Featured saunas ---------- */}
-      <section className="max-w-7xl mx-auto px-6 lg:px-8 py-20">
-        <Reveal className="flex items-end justify-between mb-10 flex-wrap gap-4">
-          <h2 className="font-display text-4xl text-pine-deep">{t.cat.saunasTitle}</h2>
-          <Link href="/saunas" className="text-sm text-inksoft hover:text-pine border-b border-line pb-0.5">
-            {t.common.viewAll} →
-          </Link>
-        </Reveal>
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-7">
-          {featured.map((p, i) => (
-            <Reveal key={p.id} delay={i * 130}>
-              <ProductCard product={p} index={i} />
-            </Reveal>
-          ))}
         </div>
       </section>
 

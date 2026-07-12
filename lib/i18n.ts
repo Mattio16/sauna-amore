@@ -39,7 +39,7 @@ const it = {
   },
   optionGroups: { wood: 'Legno', 'sauna-heater': 'Stufa', 'tub-filter': 'Filtrazione', 'tub-cover': 'Copertura', chiller: 'Raffreddamento', roof: 'Tetto', diameter: 'Diametro', 'front-windows': 'Finestre frontali', 'back-windows': 'Finestre posteriori' } as Record<string, string>,
   cat: {
-    saunasTitle: 'Saune a botte', saunasSub: 'Legno massiccio baltico, abete o thermowood. Da 2 a 6 persone.',
+    saunasTitle: 'Saune', saunasSub: 'Legno massiccio baltico, abete o thermowood. Da 2 a 6 persone.',
     tubsTitle: 'Vasche idromassaggio', tubsSub: 'Riscaldate a legna, in legno o vetroresina.',
     iceTitle: 'Bagni di ghiaccio', iceSub: "Il freddo che rigenera, tutto l'anno.",
     accTitle: 'Accessori', accSub: 'Tutto per completare il tuo rituale: secchielli, pietre, oli essenziali e cura del legno.',
@@ -103,7 +103,7 @@ const en: Dict = {
   },
   optionGroups: { wood: 'Wood', 'sauna-heater': 'Heater', 'tub-filter': 'Filtration', 'tub-cover': 'Cover', chiller: 'Chilling', roof: 'Roof', diameter: 'Diameter', 'front-windows': 'Front windows', 'back-windows': 'Back windows' } as Record<string, string>,
   cat: {
-    saunasTitle: 'Barrel saunas', saunasSub: 'Solid Baltic timber, spruce or thermowood. For 2 to 6 people.',
+    saunasTitle: 'Saunas', saunasSub: 'Solid Baltic timber, spruce or thermowood. For 2 to 6 people.',
     tubsTitle: 'Hot tubs', tubsSub: 'Wood-fired, in timber or fiberglass.',
     iceTitle: 'Ice baths', iceSub: 'The cold that regenerates, all year round.',
     accTitle: 'Accessories', accSub: 'Everything to complete your ritual: buckets, stones, essential oils and wood care.',
@@ -165,7 +165,7 @@ const nl: Dict = {
   },
   optionGroups: { wood: 'Hout', 'sauna-heater': 'Kachel', 'tub-filter': 'Filtratie', 'tub-cover': 'Afdekking', chiller: 'Koeling', roof: 'Dak', diameter: 'Diameter', 'front-windows': 'Ramen voorzijde', 'back-windows': 'Ramen achterzijde' } as Record<string, string>,
   cat: {
-    saunasTitle: "Barrelsauna's", saunasSub: 'Massief Baltisch hout, vuren of thermowood. Voor 2 tot 6 personen.',
+    saunasTitle: "Sauna's", saunasSub: 'Massief Baltisch hout, vuren of thermowood. Voor 2 tot 6 personen.',
     tubsTitle: 'Hottubs', tubsSub: 'Houtgestookt, in hout of glasvezel.',
     iceTitle: 'IJsbaden', iceSub: 'De kou die regenereert, het hele jaar door.',
     accTitle: 'Accessoires', accSub: 'Alles om uw ritueel compleet te maken: emmers, stenen, etherische oliën en houtverzorging.',
@@ -227,7 +227,7 @@ const de: Dict = {
   },
   optionGroups: { wood: 'Holz', 'sauna-heater': 'Ofen', 'tub-filter': 'Filtration', 'tub-cover': 'Abdeckung', chiller: 'Kühlung', roof: 'Dach', diameter: 'Durchmesser', 'front-windows': 'Fenster vorne', 'back-windows': 'Fenster hinten' } as Record<string, string>,
   cat: {
-    saunasTitle: 'Fasssaunen', saunasSub: 'Baltisches Massivholz, Fichte oder Thermoholz. Für 2 bis 6 Personen.',
+    saunasTitle: 'Saunen', saunasSub: 'Baltisches Massivholz, Fichte oder Thermoholz. Für 2 bis 6 Personen.',
     tubsTitle: 'Badefässer', tubsSub: 'Holzbefeuert, aus Holz oder Fiberglas.',
     iceTitle: 'Eisbäder', iceSub: 'Die Kälte, die regeneriert — das ganze Jahr.',
     accTitle: 'Zubehör', accSub: 'Alles für Ihr Ritual: Kübel, Steine, ätherische Öle und Holzpflege.',
@@ -289,7 +289,7 @@ const ru: Dict = {
   },
   optionGroups: { wood: 'Дерево', 'sauna-heater': 'Печь', 'tub-filter': 'Фильтрация', 'tub-cover': 'Крышка', chiller: 'Охлаждение', roof: 'Крыша', diameter: 'Диаметр', 'front-windows': 'Окна спереди', 'back-windows': 'Окна сзади' } as Record<string, string>,
   cat: {
-    saunasTitle: 'Бочковые сауны', saunasSub: 'Массив балтийской древесины, ель или термоясень. На 2–6 человек.',
+    saunasTitle: 'Сауны', saunasSub: 'Массив балтийской древесины, ель или термоясень. На 2–6 человек.',
     tubsTitle: 'Купели', tubsSub: 'На дровах, из дерева или стеклопластика.',
     iceTitle: 'Ледяные ванны', iceSub: 'Холод, который восстанавливает — круглый год.',
     accTitle: 'Аксессуары', accSub: 'Всё для вашего ритуала: ковши, камни, эфирные масла и уход за деревом.',
