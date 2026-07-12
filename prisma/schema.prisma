@@ -43,7 +43,8 @@ model Product {
   descriptionEn String?        @db.Text
   specsIt       String?        @db.Text
   specsEn       String?        @db.Text
-  basePrice     Int // starting price: cheapest configuration (spruce, flat-pack, no heater)
+  basePrice     Int // starting retail price: cheapest configuration (spruce, flat-pack, standard heater)
+  supplierItems Json? // dealer cost breakdown: [{ label: string, cost: number }]
   capacity      Int? // persons
   dimensions    String? // "160×200×210cm"
   isPublished   Boolean        @default(true)
@@ -99,11 +100,12 @@ model Option {
 // Which options a product offers, and the price delta for THIS product.
 // (Thermowood costs +€610 on an S16 but +€930 on an S3 — deltas live here.)
 model ProductOption {
-  id         String  @id @default(cuid())
-  productId  String
-  optionId   String
-  priceDelta Int     @default(0)
-  isDefault  Boolean @default(false)
+  id           String  @id @default(cuid())
+  productId    String
+  optionId     String
+  priceDelta   Int     @default(0)
+  supplierCost Int? // dealer/supplier price for this option (informational)
+  isDefault    Boolean @default(false)
 
   product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
   option  Option  @relation(fields: [optionId], references: [id], onDelete: Cascade)

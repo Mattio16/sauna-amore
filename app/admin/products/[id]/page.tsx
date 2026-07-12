@@ -120,7 +120,7 @@ export default async function EditProductPage({
                   <div key={opt.id} className="flex items-center gap-2">
                     <form
                       action={setProductOption}
-                      className="flex-1 grid grid-cols-[1.2rem_1fr_6.5rem_4.5rem_3.5rem] items-center gap-2 rounded px-2 py-1.5 hover:bg-stone-50 text-sm"
+                      className="flex-1 grid grid-cols-[1.2rem_1fr_6rem_6rem_4.5rem_3.5rem] items-center gap-2 rounded px-2 py-1.5 hover:bg-stone-50 text-sm"
                     >
                       <input type="hidden" name="productId" value={product.id} />
                       <input type="hidden" name="optionId" value={opt.id} />
@@ -135,7 +135,16 @@ export default async function EditProductPage({
                         name="priceDelta"
                         type="number"
                         defaultValue={po?.priceDelta ?? 0}
+                        title="Retail price difference (€)"
                         className="rounded border border-stone-300 px-2 py-1 text-right"
+                      />
+                      <input
+                        name="supplierCost"
+                        type="number"
+                        defaultValue={(po as unknown as { supplierCost?: number | null })?.supplierCost ?? ''}
+                        placeholder="supplier"
+                        title="Supplier / dealer price (€) — informational"
+                        className="rounded border border-dashed border-stone-300 px-2 py-1 text-right text-stone-600"
                       />
                       <label className="flex items-center gap-1 text-xs text-stone-500">
                         <input type="checkbox" name="isDefault" defaultChecked={po?.isDefault ?? false} />
@@ -160,12 +169,13 @@ export default async function EditProductPage({
               })}
               <form
                 action={createOptionForProduct}
-                className="grid grid-cols-[1fr_6.5rem_auto] items-center gap-2 rounded border border-dashed border-stone-300 px-2 py-2 mt-1 text-sm"
+                className="grid grid-cols-[1fr_6rem_6rem_auto] items-center gap-2 rounded border border-dashed border-stone-300 px-2 py-2 mt-1 text-sm"
               >
                 <input type="hidden" name="productId" value={product.id} />
                 <input type="hidden" name="groupId" value={group.id} />
                 <input name="name" placeholder="New option name" required className="rounded border border-stone-200 px-2 py-1" />
-                <input name="priceDelta" type="number" placeholder="+ €" className="rounded border border-stone-300 px-2 py-1 text-right" />
+                <input name="priceDelta" type="number" placeholder="+ € retail" className="rounded border border-stone-300 px-2 py-1 text-right" />
+                <input name="supplierCost" type="number" placeholder="supplier €" className="rounded border border-dashed border-stone-300 px-2 py-1 text-right" />
                 <button className="rounded bg-stone-900 text-white px-3 py-1 text-xs hover:bg-stone-700">
                   + Add option
                 </button>

@@ -30,7 +30,19 @@ export async function saveProduct(fd: FormData) {
   const name = str(fd, 'name');
   const description = str(fd, 'description') || null;
   const specs = str(fd, 'specs') || null;
+  // Supplier breakdown: one item per line, "Label: cost".
+  const supplierItems = str(fd, 'supplierItems')
+    .split('\n')
+    .map((l) => l.trim())
+    .filter(Boolean)
+    .map((l) => {
+      const i = l.lastIndexOf(':');
+      const label = (i === -1 ? l : l.slice(0, i)).trim();
+      const cost = i === -1 ? 0 : Number(l.slice(i + 1).replace(/[^\d]/g, '')) || 0;
+      return { label, cost };
+    });
   const data = {
+    supplierItems,
     sku: str(fd, 'sku').toUpperCase(),
     nameIt: name,
     nameEn: name,
@@ -50,13 +62,13 @@ export async function saveProduct(fd: FormData) {
 
   let productId = id;
   if (id) {
-    await prisma.product.update({ where: { id }, data });
+    await prisma.product.update({ where: { id }, data: data as never });
   } else {
     const slug = `${data.sku} ${data.nameIt}`
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, '-')
       .replace(/^-+|-+$/g, '');
-    const created = await prisma.product.create({ data: { ...data, slug } });
+    const created = await prisma.product.create({ data: { ...data, slug } as never });
     productId = created.id;
   }
   revalidatePath('/admin/products');
@@ -150,11 +162,13 @@ export async function setProductOption(fd: FormData) {
         data: { isDefault: false },
       });
     }
+    const supplierCostRaw = str(fd, 'supplierCost');
+    const supplierCost = supplierCostRaw === '' ? null : num(fd, 'supplierCost');
     await prisma.productOption.upsert({
       where: { productId_optionId: { productId, optionId } },
-      update: { priceDelta, isDefault },
-      create: { productId, optionId, priceDelta, isDefault },
-    });
+      update: { priceDelta, isDefault, supplierCost },
+      create: { productId, optionId, priceDelta, isDefault, supplierCost },
+    } as never);
   }
   revalidatePath(`/admin/products/${productId}`);
 }
@@ -176,8 +190,10 @@ export async function createOptionForProduct(fd: FormData) {
   const option = await prisma.option.create({
     data: { groupId, code, nameIt: name, nameEn: name, sortOrder: count },
   });
+  const supplierCostRaw = str(fd, 'supplierCost');
+  const supplierCost = supplierCostRaw === '' ? null : num(fd, 'supplierCost');
   await prisma.productOption.create({
-    data: { productId, optionId: option.id, priceDelta, isDefault: false },
+    data: { productId, optionId: option.id, priceDelta, supplierCost, isDefault: false } as never,
   });
   revalidatePath(`/admin/products/${productId}`);
 }

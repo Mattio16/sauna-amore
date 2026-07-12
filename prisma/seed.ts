@@ -76,13 +76,14 @@ type LineupProduct = {
   dimensions: string | null;
   sortOrder: number;
   images: string[];
-  options: { group: string; code: string; delta: number; isDefault?: boolean }[];
+  supplierItems?: { label: string; cost: number }[];
+  options: { group: string; code: string; delta: number; isDefault?: boolean; supplier?: number }[];
 };
 
-const heaterMenu = (woodFiredDelta: number) => [
-  { group: 'sauna-heater', code: 'electric-standard', delta: 0, isDefault: true },
-  { group: 'sauna-heater', code: 'electric-smart', delta: 990 },
-  { group: 'sauna-heater', code: 'wood-fired', delta: woodFiredDelta },
+const heaterMenu = (woodFiredDelta: number, stdCost: number, wfCost: number) => [
+  { group: 'sauna-heater', code: 'electric-standard', delta: 0, isDefault: true, supplier: stdCost },
+  { group: 'sauna-heater', code: 'electric-smart', delta: 990, supplier: 1210 },
+  { group: 'sauna-heater', code: 'wood-fired', delta: woodFiredDelta, supplier: wfCost },
 ];
 const woodToggle = (thermoDelta: number) => [
   { group: 'wood', code: 'spruce', delta: 0, isDefault: true },
@@ -116,14 +117,15 @@ const LINEUP: LineupProduct[] = [
     nameIt: 'S16 · Mini', nameEn: 'S16 · Mini',
     descriptionIt: "La porta d'ingresso alla vera sauna finlandese. Compatta, si monta in poche ore e vive bene anche nei giardini piccoli. Elettrica: si accende, si aspettano 40 minuti, si entra.",
     descriptionEn: 'The entry to true Finnish sauna. Compact, assembled in a few hours, at home even in small gardens. Electric: switch on, wait 40 minutes, step in.',
+    supplierItems: [{ label: 'Sauna S16 spruce flat-pack', cost: 1290 }, { label: 'Harvia M60 6kW electric', cost: 240 }],
     basePrice: 2590, capacity: 3, dimensions: '160×200×210 cm', sortOrder: 0,
     specsIt: 'Diametro: Ø2 m | Montata (LxPxA): 160×200×210 cm | Kit (LxPxA): 200×120×150 cm | Volume cabina: 4,2 m³ | Lunghezza cabina: 145 cm | Peso: ~500 kg | Capienza cabina: 2–3 persone | Spessore legno: 40 mm | Larghezza panche: 49 cm | Riscaldamento: ~1 h',
     specsEn: 'Diameter: Ø2 m | Assembled (LxWxH): 160×200×210 cm | Flat-pack (LxWxH): 200×120×150 cm | Steam room volume: 4.2 m³ | Steam room length: 145 cm | Weight: ~500 kg | Steam room capacity: 2–3 persons | Wood thickness: 40 mm | Bench width: 49 cm | Heating time: ~1 h',
     images: img('s16', 5),
     options: [
       ...woodToggle(400),
-      { group: 'sauna-heater', code: 'electric-standard', delta: 0, isDefault: true },
-      { group: 'sauna-heater', code: 'electric-smart', delta: 990 },
+      { group: 'sauna-heater', code: 'electric-standard', delta: 0, isDefault: true, supplier: 240 },
+      { group: 'sauna-heater', code: 'electric-smart', delta: 990, supplier: 1210 },
       ...frontWindows(), ...backWindows(),
     ],
   },
@@ -132,33 +134,36 @@ const LINEUP: LineupProduct[] = [
     nameIt: 'S2V · 2.4m', nameEn: 'S2V · 2.4m',
     descriptionIt: "La nostra raccomandazione. Appena più lunga della 2 metri ma sensibilmente più comoda: quattro persone sedute bene, tre cerchi d'acciaio, proporzioni perfette. Se non sai quale scegliere, è questa.",
     descriptionEn: "Our recommendation. Barely longer than the 2-metre but noticeably roomier: four people seated well, three steel hoops, perfect proportions. If you don't know which to choose, it's this one.",
+    supplierItems: [{ label: 'Sauna S2V spruce flat-pack', cost: 1470 }, { label: 'Harvia M80 8kW electric', cost: 270 }],
     basePrice: 2990, capacity: 4, dimensions: '240×200×210 cm', sortOrder: 1,
     specsIt: 'Diametro: Ø2 m | Montata (LxPxA): 240×200×210 cm | Kit (LxPxA): 240×120×150 cm | Volume cabina: 5,3 m³ | Lunghezza cabina: 185 cm | Peso: ~670 kg | Capienza cabina: ~4 persone | Spessore legno: 40 mm | Larghezza panche: 49 cm | Riscaldamento: ~1 h',
     specsEn: 'Diameter: Ø2 m | Assembled (LxWxH): 240×200×210 cm | Flat-pack (LxWxH): 240×120×150 cm | Steam room volume: 5.3 m³ | Steam room length: 185 cm | Weight: ~670 kg | Steam room capacity: ~4 persons | Wood thickness: 40 mm | Bench width: 49 cm | Heating time: ~1 h',
     images: img('s2v', 6),
-    options: [...woodToggle(450), ...heaterMenu(690), ...diameterChoice(), ...frontWindows(), ...backWindows()],
+    options: [...woodToggle(450), ...heaterMenu(690, 270, 730), ...diameterChoice(), ...frontWindows(), ...backWindows()],
   },
   {
     sku: 'S3', slug: 's3-3m', category: 'SAUNA', subcategory: '3m',
     nameIt: 'S3 · 3m', nameEn: 'S3 · 3m',
     descriptionIt: 'Per famiglie e gruppi: sei persone, panche comode, il classico dei classici. Il passo su misura per chi chiede "e quella più grande?".',
     descriptionEn: 'For families and groups: six people, comfortable benches, the classic of classics. The right step up for anyone asking "and the bigger one?".',
+    supplierItems: [{ label: 'Sauna S3 spruce flat-pack', cost: 1740 }, { label: 'Harvia PC90 9kW electric', cost: 420 }],
     basePrice: 3590, capacity: 6, dimensions: '300×200×210 cm', sortOrder: 2,
     specsIt: 'Diametro: Ø2 m | Montata (LxPxA): 300×200×210 cm | Kit (LxPxA): 300×80×150 cm | Volume cabina: 6,0 m³ | Lunghezza cabina: 280 cm | Peso: ~650 kg | Capienza cabina: ~6 persone | Spessore legno: 40 mm | Larghezza panche: 49 cm | Riscaldamento: ~1 h',
     specsEn: 'Diameter: Ø2 m | Assembled (LxWxH): 300×200×210 cm | Flat-pack (LxWxH): 300×80×150 cm | Steam room volume: 6.0 m³ | Steam room length: 280 cm | Weight: ~650 kg | Steam room capacity: ~6 persons | Wood thickness: 40 mm | Bench width: 49 cm | Heating time: ~1 h',
     images: img('s3', 4),
-    options: [...woodToggle(500), ...heaterMenu(990), ...diameterChoice(), ...frontWindows(), ...backWindows()],
+    options: [...woodToggle(500), ...heaterMenu(990, 420, 1120), ...diameterChoice(), ...frontWindows(), ...backWindows()],
   },
   {
     sku: 'S4P', slug: 's4p-4m-spogliatoio', category: 'SAUNA', subcategory: '4m',
     nameIt: 'S4P · 4m con spogliatoio', nameEn: 'S4P · 4m with changing room',
     descriptionIt: "La macchina da ospitalità. Spogliatoio interno con porta richiudibile: gli ospiti si cambiano dentro, la struttura si chiude tra un noleggio e l'altro. Il cuore del Wellness Corner per agriturismi e B&B.",
     descriptionEn: 'The hospitality machine. Interior changing room with lockable door: guests change inside, and it locks between rentals. The heart of the Wellness Corner for agriturismi and B&Bs.',
+    supplierItems: [{ label: 'Sauna S4P spruce flat-pack', cost: 2230 }, { label: 'Harvia PC90 9kW electric', cost: 420 }],
     basePrice: 4490, capacity: 8, dimensions: '400×200×210 cm', sortOrder: 3,
     specsIt: 'Diametro: Ø2 m | Montata (LxPxA): 400×200×210 cm | Kit (LxPxA): 400×80×150 cm | Volume cabina: 8 m³ | Cabina sauna: 280 cm + spogliatoio | Peso: ~720 kg | Capienza: ~4 in cabina, 8 totale | Spessore legno: 40 mm | Larghezza panche: 49 cm | Riscaldamento: ~1 h',
     specsEn: 'Diameter: Ø2 m | Assembled (LxWxH): 400×200×210 cm | Flat-pack (LxWxH): 400×80×150 cm | Steam room volume: 8 m³ | Steam room: 280 cm + changing room | Weight: ~720 kg | Capacity: ~4 in steam room, 8 total | Wood thickness: 40 mm | Bench width: 49 cm | Heating time: ~1 h',
     images: img('s4p', 5),
-    options: [...woodToggle(550), ...heaterMenu(990), ...diameterChoice(), ...frontWindows(), ...backWindows()],
+    options: [...woodToggle(550), ...heaterMenu(990, 420, 1120), ...diameterChoice(), ...frontWindows(), ...backWindows()],
   },
   {
     sku: 'SQR2V', slug: 'cube-vetro-panoramico', category: 'SAUNA', subcategory: '2m',
@@ -169,18 +174,19 @@ const LINEUP: LineupProduct[] = [
     specsIt: 'Montata (LxPxA): 200×220×230 cm | Kit (LxPxA): 200×120×150 cm | Volume cabina: 6,7 m³ | Lunghezza cabina: 185 cm | Peso: ~640 kg | Capienza cabina: ~4 persone | Larghezza panche: 49 cm | Riscaldamento: ~1 h',
     specsEn: 'Assembled (LxWxH): 200×220×230 cm | Flat-pack (LxWxH): 200×120×150 cm | Steam room volume: 6.7 m³ | Steam room length: 185 cm | Weight: ~640 kg | Steam room capacity: ~4 persons | Bench width: 49 cm | Heating time: ~1 h',
     images: img('sqr2v', 5),
-    options: [...woodToggle(500), ...heaterMenu(690)],
+    options: [...woodToggle(500), ...heaterMenu(690, 270, 730)],
   },
   {
     sku: 'S5P', slug: 's5p-panorama', category: 'SAUNA', subcategory: '5m',
     nameIt: 'S5P · 5m Panorama', nameEn: 'S5P · 5m Panorama',
     descriptionIt: "L'ammiraglia. Cinque metri con salotto interno e finestra panoramica: la sauna che si guarda il tramonto. Prodotta su ordinazione.",
     descriptionEn: 'The flagship. Five metres with interior sitting room and panoramic window: the sauna that watches the sunset. Built to order.',
+    supplierItems: [{ label: 'Sauna S5P spruce flat-pack', cost: 3790 }, { label: 'Harvia PC90 9kW electric', cost: 420 }],
     basePrice: 6490, capacity: 6, dimensions: '500×220×230 cm', sortOrder: 5,
     specsIt: 'Diametro: Ø2,2 m | Montata (LxPxA): 500×220×230 cm | Kit (LxPxA): 500×120×150 cm | Volume cabina: 8,2 m³ | Cabina sauna: 200 cm + salotto (letto 210×180 cm) | Peso: ~1500 kg | Capienza cabina: ~6 persone | Spessore legno: 40 mm | Larghezza panche: 49 cm | Riscaldamento: ~1 h',
     specsEn: 'Diameter: Ø2.2 m | Assembled (LxWxH): 500×220×230 cm | Flat-pack (LxWxH): 500×120×150 cm | Steam room volume: 8.2 m³ | Steam room: 200 cm + lounge (bed 210×180 cm) | Weight: ~1500 kg | Steam room capacity: ~6 persons | Wood thickness: 40 mm | Bench width: 49 cm | Heating time: ~1 h',
     images: img('s5p', 4),
-    options: [...woodToggle(600), ...heaterMenu(990), ...frontWindows(), ...backWindows()],
+    options: [...woodToggle(600), ...heaterMenu(990, 420, 1120), ...frontWindows(), ...backWindows()],
   },
 
   // ---------- Hot tubs (3) ----------
@@ -189,15 +195,16 @@ const LINEUP: LineupProduct[] = [
     nameIt: 'LT18 · Thermowood Ø1.8m', nameEn: 'LT18 · Thermowood Ø1.8m',
     descriptionIt: 'La tinozza romantica in thermowood scuro, riscaldata dalla stufa a legna esterna da 27kW. Acqua a 38° in poche ore, anche a gennaio.',
     descriptionEn: 'The romantic tub in dark thermowood, heated by the 27kW external wood stove. Water at 38° in a few hours, even in January.',
+    supplierItems: [{ label: 'Wooden tub Ø1.8 thermowood', cost: 950 }, { label: 'NA27 wood stove 27kW', cost: 530 }],
     basePrice: 2390, capacity: 7, dimensions: 'Ø180 cm', sortOrder: 0,
     specsIt: 'Diametro: Ø1,8 m | Capienza: 7–8 persone | Volume: 1.900 l | Peso: 250 kg | Altezza: 112 cm | Profondità: 98 cm | Sedute: 32 × 35 cm | Spessore legno: 41 mm | Stufa: esterna a legna 27 kW',
     specsEn: 'Diameter: Ø1.8 m | Capacity: 7–8 persons | Volume: 1,900 l | Weight: 250 kg | Height: 112 cm | Depth: 98 cm | Seats: 32 × 35 cm | Wood thickness: 41 mm | Stove: external wood-fired 27 kW',
     images: img('lt18', 3),
     options: [
       { group: 'tub-filter', code: 'no-filter', delta: 0, isDefault: true },
-      { group: 'tub-filter', code: 'filter-set', delta: 390 },
+      { group: 'tub-filter', code: 'filter-set', delta: 390, supplier: 280 },
       { group: 'tub-cover', code: 'no-cover', delta: 0, isDefault: true },
-      { group: 'tub-cover', code: 'insulated-cover', delta: 340 },
+      { group: 'tub-cover', code: 'insulated-cover', delta: 340, supplier: 240 },
     ],
   },
   {
@@ -205,15 +212,16 @@ const LINEUP: LineupProduct[] = [
     nameIt: 'TP8 · Ottagonale 1.8×1.8m', nameEn: 'TP8 · Octagonal 1.8×1.8m',
     descriptionIt: "La scelta giusta per agriturismi e famiglie: interno in vetroresina facile da pulire, sedute stampate, quattro poggiatesta, stufa esterna inox. Pronta per l'inverno.",
     descriptionEn: 'The right answer for agriturismi and families: easy-clean fiberglass interior, moulded seats, four headrests, stainless external stove. Winter-proof.',
+    supplierItems: [{ label: 'TP8 octagonal fiberglass', cost: 950 }, { label: 'NN inox external stove', cost: 650 }],
     basePrice: 2790, capacity: 6, dimensions: '180×180 cm', sortOrder: 1,
     specsIt: 'Dimensioni: 180×180 cm | Capienza: 6 persone | Volume: 1.200 l | Peso: 180 kg | Altezza: 110 cm | Profondità: 96 cm | Interno: vetroresina 5 mm | Esterno: thermowood 18 mm | Stufa: esterna inox',
     specsEn: 'Size: 180×180 cm | Capacity: 6 persons | Volume: 1,200 l | Weight: 180 kg | Height: 110 cm | Depth: 96 cm | Interior: 5 mm fiberglass | Exterior: 18 mm thermowood | Stove: external stainless',
     images: img('tp8', 3),
     options: [
       { group: 'tub-filter', code: 'no-filter', delta: 0, isDefault: true },
-      { group: 'tub-filter', code: 'filter-set', delta: 390 },
+      { group: 'tub-filter', code: 'filter-set', delta: 390, supplier: 280 },
       { group: 'tub-cover', code: 'no-cover', delta: 0, isDefault: true },
-      { group: 'tub-cover', code: 'insulated-cover', delta: 340 },
+      { group: 'tub-cover', code: 'insulated-cover', delta: 340, supplier: 240 },
     ],
   },
   {
@@ -221,6 +229,7 @@ const LINEUP: LineupProduct[] = [
     nameIt: 'TP2V · Rotonda Ø2m stufa integrata', nameEn: 'TP2V · Round Ø2m integrated stove',
     descriptionIt: 'Un prezzo, niente da aggiungere: stufa inox integrata e canna fumaria incluse. La risposta per chi dice "dammi quella completa".',
     descriptionEn: 'One price, nothing to add: built-in stainless stove and chimney included. For those who say "just give me the complete one".',
+    supplierItems: [{ label: 'TP2V integrated stove, all-in', cost: 1490 }],
     basePrice: 2490, capacity: 6, dimensions: 'Ø200 cm', sortOrder: 2,
     specsIt: 'Diametro: Ø2 m | Capienza: 4–6 persone | Volume: 1.100 l | Peso: 265 kg | Altezza: 110 cm | Profondità: 83 cm | Stufa: integrata inox AISI304 30 kW | Interno: vetroresina 5 mm | Esterno: thermowood 18 mm | Canna fumaria: inclusa',
     specsEn: 'Diameter: Ø2 m | Capacity: 4–6 persons | Volume: 1,100 l | Weight: 265 kg | Height: 110 cm | Depth: 83 cm | Stove: integrated stainless AISI304 30 kW | Interior: 5 mm fiberglass | Exterior: 18 mm thermowood | Chimney: included',
@@ -234,13 +243,14 @@ const LINEUP: LineupProduct[] = [
     nameIt: 'TP10 · Fiberglass Ø1m', nameEn: 'TP10 · Fiberglass Ø1m',
     descriptionIt: "Il tuffo che rigenera, con copertura isolata inclusa. D'estate all'ombra, d'inverno sotto le stelle. Aggiungi il chiller e l'acqua resta sempre a 4°.",
     descriptionEn: 'The regenerating plunge, insulated cover included. In summer shade or under winter stars. Add the chiller and the water stays at 4° all year.',
+    supplierItems: [{ label: 'TP10 fiberglass tub', cost: 590 }, { label: 'Insulated cover', cost: 130 }],
     basePrice: 1190, capacity: 1, dimensions: 'Ø106 cm', sortOrder: 0,
     specsIt: 'Diametro: Ø106 cm | Capienza: 1 persona | Volume: 400 l | Peso: 65 kg | Altezza: 103 cm | Profondità: 93,5 cm | Esterno: thermowood | Copertura isolata: inclusa',
     specsEn: 'Diameter: Ø106 cm | Capacity: 1 person | Volume: 400 l | Weight: 65 kg | Height: 103 cm | Depth: 93.5 cm | Exterior: thermowood | Insulated cover: included',
     images: img('tp10', 4),
     options: [
       { group: 'chiller', code: 'no-chiller', delta: 0, isDefault: true },
-      { group: 'chiller', code: 'chiller-pro', delta: 2490 },
+      { group: 'chiller', code: 'chiller-pro', delta: 2490, supplier: 1600 },
     ],
   },
   {
@@ -248,13 +258,14 @@ const LINEUP: LineupProduct[] = [
     nameIt: 'LN9 · Acciaio inox e legno Ø0.86m', nameEn: 'LN9 · Stainless steel & wood Ø0.86m',
     descriptionIt: 'Il bagno di ghiaccio bello da vedere: acciaio inox e legno, per giardini di design e spa. Si abbina naturalmente alla sauna Cube.',
     descriptionEn: 'The ice bath that looks beautiful: stainless steel and wood, for design gardens and spas. Pairs naturally with the Cube sauna.',
+    supplierItems: [{ label: 'LN9 stainless + wood', cost: 960 }],
     basePrice: 1690, capacity: 1, dimensions: 'Ø86 cm', sortOrder: 1,
     specsIt: 'Diametro: Ø86 cm | Capienza: 1 persona | Volume: 400 l | Peso: 120 kg | Altezza: 105 cm | Profondità: 96 cm | Vasca: acciaio inox | Esterno: thermowood 41 mm | Set base: cerchi inox, panca, scarico, bordo decorativo',
     specsEn: 'Diameter: Ø86 cm | Capacity: 1 person | Volume: 400 l | Weight: 120 kg | Height: 105 cm | Depth: 96 cm | Tub: stainless steel | Exterior: 41 mm thermowood | Basic set: stainless hoops, bench, drain, decorative rim',
     images: img('ln9', 3),
     options: [
       { group: 'chiller', code: 'no-chiller', delta: 0, isDefault: true },
-      { group: 'chiller', code: 'chiller-pro', delta: 2490 },
+      { group: 'chiller', code: 'chiller-pro', delta: 2490, supplier: 1600 },
     ],
   },
 
@@ -264,9 +275,10 @@ const LINEUP: LineupProduct[] = [
     nameIt: 'Doccia da giardino', nameEn: 'Garden shower',
     descriptionIt: 'Il risciacquo freddo che completa il rituale caldo-freddo. In abete o thermowood, si collega al tubo da giardino.',
     descriptionEn: 'The cold rinse that completes the hot-cold ritual. In spruce or thermowood, connects to a garden hose.',
+    supplierItems: [{ label: 'Garden shower spruce', cost: 900 }],
     basePrice: 1390, capacity: null, dimensions: null, sortOrder: 0,
     images: img('shower', 3),
-    options: [...woodToggle(430)],
+    options: [{ group: 'wood', code: 'spruce', delta: 0, isDefault: true }, { group: 'wood', code: 'thermowood', delta: 430, supplier: 310 }],
   },
 ];
 
@@ -298,6 +310,7 @@ async function seedLineup(optionIds: Map<string, string>) {
       nameIt: p.nameIt, nameEn: p.nameEn,
       descriptionIt: p.descriptionIt, descriptionEn: p.descriptionEn,
       specsIt: p.specsIt ?? null, specsEn: p.specsEn ?? null,
+      supplierItems: p.supplierItems ?? [],
       basePrice: p.basePrice, capacity: p.capacity, dimensions: p.dimensions,
       sortOrder: p.sortOrder, isPublished: true,
     };
@@ -315,6 +328,7 @@ async function seedLineup(optionIds: Map<string, string>) {
         productId: product.id,
         optionId: optionIds.get(`${o.group}:${o.code}`)!,
         priceDelta: o.delta,
+        supplierCost: o.supplier ?? null,
         isDefault: o.isDefault ?? false,
       })),
     });
