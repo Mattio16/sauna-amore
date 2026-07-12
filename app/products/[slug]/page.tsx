@@ -59,6 +59,7 @@ export default async function ProductPage({ params }: { params: { slug: string }
     dimensions: product.dimensions,
     category: product.category,
     images: product.images.map((i) => i.url),
+    videoUrl: (product as unknown as { videoUrl?: string | null }).videoUrl ?? null,
     optionGroups,
   };
 

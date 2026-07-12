@@ -39,6 +39,7 @@ export type ProductData = {
   dimensions: string | null;
   category: string;
   images: string[];
+  videoUrl?: string | null;
   optionGroups: OptionGroupData[];
 };
 
@@ -46,6 +47,11 @@ const SWATCHES: Record<string, string> = {
   'roof-brown': '#4d3b33',
   'roof-black': '#33383b',
   'roof-green': '#55604d',
+  'liner-blue': '#1c4fa1',
+  'liner-grey': '#383e42',
+  'liner-turquoise': '#7fb0b2',
+  'liner-beige': '#eae6ca',
+  'liner-black': '#0a0a0d',
 };
 
 export default function ProductView({ product, related }: { product: ProductData; related: ProductCardData[] }) {
@@ -138,6 +144,20 @@ export default function ProductView({ product, related }: { product: ProductData
                       <img src={url} alt="" loading="lazy" className="w-full h-full object-cover" />
                     </button>
                   ))}
+                </div>
+              )}
+              {product.videoUrl && (
+                <div className="mt-6 rounded-3xl overflow-hidden bg-line/40">
+                  <video
+                    autoPlay
+                    muted
+                    loop
+                    playsInline
+                    preload="metadata"
+                    className="w-full h-auto block"
+                  >
+                    <source src={product.videoUrl} type="video/mp4" />
+                  </video>
                 </div>
               )}
             </Reveal>

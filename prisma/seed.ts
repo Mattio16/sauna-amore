@@ -33,6 +33,9 @@ const GROUPS = [
   { code: 'front-windows', nameIt: 'Finestre frontali', nameEn: 'Front windows', sortOrder: 7 },
   { code: 'back-windows', nameIt: 'Finestre posteriori', nameEn: 'Back windows', sortOrder: 8 },
   { code: 'stairs', nameIt: 'Scaletta', nameEn: 'Stairs', sortOrder: 9 },
+  { code: 'liner-color', nameIt: 'Colore interno', nameEn: 'Liner colour', sortOrder: 10 },
+  { code: 'jacuzzi', nameIt: 'Jacuzzi', nameEn: 'Jacuzzi', sortOrder: 11 },
+  { code: 'led', nameIt: 'Illuminazione LED', nameEn: 'LED lighting', sortOrder: 12 },
 ];
 
 const OPTIONS = [
@@ -55,6 +58,20 @@ const OPTIONS = [
   { group: 'stairs', code: 'no-stairs', description: 'No steps — fine when the tub sits against a deck or terrace edge.', nameIt: 'Senza scaletta', nameEn: 'No stairs', sortOrder: 0 },
   { group: 'stairs', code: 'stairs-classic', description: 'Solid wooden three-step ladder — the safe, easy way in and out.', nameIt: 'Scaletta classica', nameEn: 'Classic stairs', sortOrder: 1 },
   { group: 'stairs', code: 'stairs-lux', description: 'Curved two-tier LUX platform that hugs the tub — doubles as a seat and looks built-in.', nameIt: 'Scaletta LUX', nameEn: 'Stairs LUX', sortOrder: 2 },
+  { group: 'tub-cover', code: 'wooden-lid', description: 'Solid spruce lid — keeps leaves, rain and curious animals out of the water. Please note it is not insulated, so the tub will cool down overnight.', nameIt: 'Coperchio in legno (non isolato)', nameEn: 'Wooden lid (uninsulated)', sortOrder: 2 },
+  { group: 'liner-color', code: 'liner-blue', description: 'Classic Mediterranean blue (RAL 5010).', nameIt: 'Blu', nameEn: 'Blue', sortOrder: 0 },
+  { group: 'liner-color', code: 'liner-grey', description: 'Anthracite grey (RAL 7016) — the discreet, modern choice.', nameIt: 'Grigio', nameEn: 'Grey', sortOrder: 1 },
+  { group: 'liner-color', code: 'liner-turquoise', description: 'Soft turquoise (RAL 6034) — bright, spa-like water colour.', nameIt: 'Turchese', nameEn: 'Turquoise', sortOrder: 2 },
+  { group: 'liner-color', code: 'liner-beige', description: 'Warm beige (RAL 1013) — natural against wood cladding.', nameIt: 'Beige', nameEn: 'Beige', sortOrder: 3 },
+  { group: 'liner-color', code: 'liner-black', description: 'Deep black (RAL 9005) — dramatic, holds the heat look of dark water.', nameIt: 'Nero', nameEn: 'Black', sortOrder: 4 },
+  { group: 'jacuzzi', code: 'no-jacuzzi', description: 'Pure wood-fired soaking, no pumps and no power needed.', nameIt: 'Senza jacuzzi', nameEn: 'No jacuzzi', sortOrder: 0 },
+  { group: 'jacuzzi', code: 'bubble-system', description: 'Air bubble system: thousands of soft bubbles from the seats — gentle, playful massage.', nameIt: 'Sistema bolle', nameEn: 'Bubble system', sortOrder: 1 },
+  { group: 'jacuzzi', code: 'hydromassage', description: 'Hydromassage jets: directed water streams for a real massage on back and shoulders.', nameIt: 'Idromassaggio', nameEn: 'Hydromassage', sortOrder: 2 },
+  { group: 'jacuzzi', code: 'bubble-hydro', description: 'The full set: bubbles plus hydromassage jets — the complete spa experience.', nameIt: 'Bolle + idromassaggio', nameEn: 'Bubble + hydromassage set', sortOrder: 3 },
+  { group: 'led', code: 'no-led', description: 'No underwater lighting.', nameIt: 'Senza LED', nameEn: 'No LED light', sortOrder: 0 },
+  { group: 'led', code: 'led-1', description: 'One underwater LED — a warm glow for evening soaks.', nameIt: '1 luce LED', nameEn: '1 LED light', sortOrder: 1 },
+  { group: 'led', code: 'led-2', description: 'Two underwater LEDs for even lighting across the tub.', nameIt: '2 luci LED', nameEn: '2 LED lights', sortOrder: 2 },
+  { group: 'led', code: 'led-8', description: 'Eight LEDs around the rim — the tub becomes a glowing centrepiece at night.', nameIt: '8 luci LED', nameEn: '8 LED lights', sortOrder: 3 },
   { group: 'front-windows', code: 'fw-none', description: 'Solid wood front — maximum heat retention and privacy.', nameIt: 'Senza finestre', nameEn: 'No windows', sortOrder: 0 },
   { group: 'front-windows', code: 'fw-2-fixed', description: 'Two fixed windows either side of the door bring daylight into the cabin.', nameIt: '2 finestre fisse', nameEn: '2 non-openable windows', sortOrder: 1 },
   { group: 'front-windows', code: 'fw-2-open', description: 'Two opening windows for daylight plus quick airing between sessions.', nameIt: '2 finestre apribili', nameEn: '2 openable windows', sortOrder: 2 },
@@ -84,6 +101,7 @@ type LineupProduct = {
   dimensions: string | null;
   sortOrder: number;
   images: string[];
+  videoUrl?: string;
   supplierItems?: { label: string; cost: number }[];
   options: { group: string; code: string; delta: number; isDefault?: boolean; supplier?: number }[];
 };
@@ -119,6 +137,26 @@ const roofChoice = () => [
   { group: 'roof', code: 'roof-brown', delta: 0, isDefault: true },
   { group: 'roof', code: 'roof-black', delta: 0 },
   { group: 'roof', code: 'roof-green', delta: 0 },
+];
+const linerColors = () => [
+  { group: 'liner-color', code: 'liner-blue', delta: 0, isDefault: true },
+  { group: 'liner-color', code: 'liner-grey', delta: 0 },
+  { group: 'liner-color', code: 'liner-turquoise', delta: 0 },
+  { group: 'liner-color', code: 'liner-beige', delta: 0 },
+  { group: 'liner-color', code: 'liner-black', delta: 0 },
+];
+// Jacuzzi & LED deltas = Baltresto public price + ~30% margin, rounded.
+const jacuzziChoice = () => [
+  { group: 'jacuzzi', code: 'no-jacuzzi', delta: 0, isDefault: true },
+  { group: 'jacuzzi', code: 'bubble-system', delta: 510 },
+  { group: 'jacuzzi', code: 'hydromassage', delta: 750 },
+  { group: 'jacuzzi', code: 'bubble-hydro', delta: 1120 },
+];
+const ledChoice = () => [
+  { group: 'led', code: 'no-led', delta: 0, isDefault: true },
+  { group: 'led', code: 'led-1', delta: 250 },
+  { group: 'led', code: 'led-2', delta: 340 },
+  { group: 'led', code: 'led-8', delta: 440 },
 ];
 const stairsChoice = () => [
   { group: 'stairs', code: 'no-stairs', delta: 0, isDefault: true },
@@ -222,17 +260,18 @@ const LINEUP: LineupProduct[] = [
       { group: 'tub-filter', code: 'no-filter', delta: 0, isDefault: true },
       { group: 'tub-filter', code: 'filter-set', delta: 390, supplier: 280 },
       { group: 'tub-cover', code: 'no-cover', delta: 0, isDefault: true },
-      { group: 'tub-cover', code: 'insulated-cover', delta: 340, supplier: 240 },
+      { group: 'tub-cover', code: 'wooden-lid', delta: 270 },
       ...stairsChoice(),
     ],
   },
   {
     sku: 'TP8', slug: 'tp8-ottagonale', category: 'HOT_TUB', subcategory: 'vetroresina',
     nameIt: 'TP8 · Ottagonale 1.8×1.8m', nameEn: 'TP8 · Octagonal 1.8×1.8m',
-    descriptionIt: "La scelta giusta per agriturismi e famiglie: interno in vetroresina facile da pulire, sedute stampate, quattro poggiatesta, stufa esterna inox. Pronta per l'inverno.",
-    descriptionEn: 'The right answer for agriturismi and families: easy-clean fiberglass interior, moulded seats, four headrests, stainless external stove. Winter-proof.',
+    descriptionIt: "La scelta giusta per agriturismi e famiglie: interno in vetroresina facile da pulire, sedute stampate, quattro poggiatesta. Stufa a legna esterna in acciaio inox da 30 kW inclusa nel prezzo. Pronta per l'inverno.",
+    descriptionEn: 'The right answer for agriturismi and families: easy-clean fiberglass interior, moulded seats, four headrests. 30 kW stainless steel wood-fired external stove included in the price. Winter-proof.',
     supplierItems: [{ label: 'TP8 octagonal fiberglass', cost: 950 }, { label: 'NN inox external stove', cost: 650 }],
     basePrice: 2790, capacity: 6, dimensions: '180×180 cm', sortOrder: 1,
+    videoUrl: '/videos/products/tp8.mp4',
     specsIt: 'Dimensioni: 180×180 cm | Capienza: 6 persone | Volume: 1.200 l | Peso: 180 kg | Altezza: 110 cm | Profondità: 96 cm | Interno: vetroresina 5 mm | Esterno: thermowood 18 mm | Stufa: esterna inox',
     specsEn: 'Size: 180×180 cm | Capacity: 6 persons | Volume: 1,200 l | Weight: 180 kg | Height: 110 cm | Depth: 96 cm | Interior: 5 mm fiberglass | Exterior: 18 mm thermowood | Stove: external stainless',
     images: img('tp8', 3),
@@ -241,7 +280,7 @@ const LINEUP: LineupProduct[] = [
       { group: 'tub-filter', code: 'filter-set', delta: 390, supplier: 280 },
       { group: 'tub-cover', code: 'no-cover', delta: 0, isDefault: true },
       { group: 'tub-cover', code: 'insulated-cover', delta: 340, supplier: 240 },
-      ...stairsChoice(),
+      ...linerColors(), ...jacuzziChoice(), ...ledChoice(), ...stairsChoice(),
     ],
   },
   {
@@ -254,7 +293,7 @@ const LINEUP: LineupProduct[] = [
     specsIt: 'Diametro: Ø2 m | Capienza: 4–6 persone | Volume: 1.100 l | Peso: 265 kg | Altezza: 110 cm | Profondità: 83 cm | Stufa: integrata inox AISI304 30 kW | Interno: vetroresina 5 mm | Esterno: thermowood 18 mm | Canna fumaria: inclusa',
     specsEn: 'Diameter: Ø2 m | Capacity: 4–6 persons | Volume: 1,100 l | Weight: 265 kg | Height: 110 cm | Depth: 83 cm | Stove: integrated stainless AISI304 30 kW | Interior: 5 mm fiberglass | Exterior: 18 mm thermowood | Chimney: included',
     images: img('tp2v', 2),
-    options: [...stairsChoice()],
+    options: [...linerColors(), ...jacuzziChoice(), ...ledChoice(), ...stairsChoice()],
   },
 
   // ---------- Ice baths (2) ----------
@@ -334,6 +373,7 @@ async function seedLineup(optionIds: Map<string, string>) {
       descriptionIt: p.descriptionIt, descriptionEn: p.descriptionEn,
       specsIt: p.specsIt ?? null, specsEn: p.specsEn ?? null,
       supplierItems: p.supplierItems ?? [],
+      videoUrl: p.videoUrl ?? null,
       basePrice: p.basePrice, capacity: p.capacity, dimensions: p.dimensions,
       sortOrder: p.sortOrder, isPublished: true,
     };

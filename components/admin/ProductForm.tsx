@@ -92,6 +92,11 @@ export default function ProductForm({ product }: { product?: Product }) {
       </div>
 
       <div>
+        <label className={label}>Video URL (optional — shown under the gallery, e.g. /videos/products/tp8.mp4)</label>
+        <input name="videoUrl" defaultValue={(product as unknown as { videoUrl?: string | null } | undefined)?.videoUrl ?? ''} className={input} />
+      </div>
+
+      <div>
         <label className={label}>Description</label>
         <textarea name="description" rows={4} defaultValue={product?.descriptionEn ?? ''} className={input} />
       </div>

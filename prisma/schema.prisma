@@ -46,6 +46,7 @@ model Product {
   basePrice     Int // starting retail price: cheapest configuration (spruce, flat-pack, standard heater)
   supplierItems Json? // dealer cost breakdown: [{ label: string, cost: number }]
   translations  Json? // { it|nl|de|ru: { name, description, specs } } — auto-generated
+  videoUrl      String? // optional product video shown under the gallery
   capacity      Int? // persons
   dimensions    String? // "160×200×210cm"
   isPublished   Boolean        @default(true)

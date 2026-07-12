@@ -44,6 +44,7 @@ export async function saveProduct(fd: FormData) {
     });
   const data = {
     supplierItems,
+    videoUrl: str(fd, 'videoUrl') || null,
     sku: str(fd, 'sku').toUpperCase(),
     nameIt: name,
     nameEn: name,
