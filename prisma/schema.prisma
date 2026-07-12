@@ -45,6 +45,7 @@ model Product {
   specsEn       String?        @db.Text
   basePrice     Int // starting retail price: cheapest configuration (spruce, flat-pack, standard heater)
   supplierItems Json? // dealer cost breakdown: [{ label: string, cost: number }]
+  translations  Json? // { it|nl|de|ru: { name, description, specs } } — auto-generated
   capacity      Int? // persons
   dimensions    String? // "160×200×210cm"
   isPublished   Boolean        @default(true)
@@ -89,8 +90,9 @@ model Option {
   code        String // "spruce" | "thermowood" | heater sku...
   nameIt      String
   nameEn      String
-  description String? @db.Text // short customer-facing blurb shown when selected
-  sortOrder   Int     @default(0)
+  description  String? @db.Text // short customer-facing blurb shown when selected
+  translations Json? // { it|nl|de|ru: { name, description } } — auto-generated
+  sortOrder    Int     @default(0)
 
   group    OptionGroup     @relation(fields: [groupId], references: [id], onDelete: Cascade)
   products ProductOption[]

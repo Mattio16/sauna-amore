@@ -28,6 +28,7 @@ export default async function HomePage() {
         slug: p.slug,
         nameIt: p.nameIt,
         nameEn: p.nameEn,
+        translations: (p as unknown as { translations?: unknown }).translations ?? null,
         basePrice: p.basePrice,
         capacity: p.capacity,
         dimensions: p.dimensions,

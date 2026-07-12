@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useMemo, FormEvent } from 'react';
-import { useT, useLang, pickName, pickText, euro } from '@/lib/i18n';
+import { useT, useLang, pickName, pickField, euro } from '@/lib/i18n';
 import Reveal from './Reveal';
 import ProductCard, { ProductCardData } from './ProductCard';
 
@@ -16,6 +16,7 @@ export type OptionGroupData = {
     nameIt: string;
     nameEn: string;
     description: string | null;
+    translations?: unknown;
     priceDelta: number;
     isDefault: boolean;
     sortOrder: number;
@@ -27,6 +28,7 @@ export type ProductData = {
   slug: string;
   nameIt: string;
   nameEn: string;
+  translations?: unknown;
   descriptionIt: string | null;
   descriptionEn: string | null;
   specsIt: string | null;
@@ -65,8 +67,8 @@ export default function ProductView({ product, related }: { product: ProductData
     return p;
   }, [product, selected]);
 
-  const description = pickText(product.descriptionIt, product.descriptionEn, lang);
-  const specs = pickText(product.specsIt, product.specsEn, lang);
+  const description = pickField(product, lang, 'description', product.descriptionEn ?? product.descriptionIt);
+  const specs = pickField(product, lang, 'specs', product.specsEn ?? product.specsIt);
   const specRows = useMemo(() => {
     if (!specs) return [] as [string, string][];
     return specs
@@ -172,7 +174,7 @@ export default function ProductView({ product, related }: { product: ProductData
                     const selectedOpt = g.options.find((o) => o.optionId === selected[g.id]);
                     return (
                       <div key={g.id}>
-                        <h3 className="text-xs font-semibold tracking-[0.2em] uppercase text-pine mb-3">{pickName(g, lang)}</h3>
+                        <h3 className="text-xs font-semibold tracking-[0.2em] uppercase text-pine mb-3">{t.optionGroups[g.code] ?? pickName(g, lang)}</h3>
                         <div className="flex flex-wrap gap-2.5">
                           {g.options.map((o) => {
                             const active = selected[g.id] === o.optionId;
@@ -192,9 +194,9 @@ export default function ProductView({ product, related }: { product: ProductData
                             );
                           })}
                         </div>
-                        {selectedOpt?.description && (
+                        {selectedOpt && (pickField(selectedOpt, lang, 'description', selectedOpt.description)) && (
                           <p key={selectedOpt.optionId} className="mt-3 text-sm text-inksoft leading-relaxed border-l-2 border-moss-light pl-3">
-                            {selectedOpt.description}
+                            {pickField(selectedOpt, lang, 'description', selectedOpt.description)}
                           </p>
                         )}
                       </div>

@@ -8,6 +8,7 @@ export type ProductCardData = {
   slug: string;
   nameIt: string;
   nameEn: string;
+  translations?: unknown;
   basePrice: number;
   capacity: number | null;
   dimensions: string | null;

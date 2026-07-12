@@ -5,6 +5,7 @@ import { redirect } from 'next/navigation';
 import { getServerSession } from 'next-auth/next';
 import { Category, OrderStatus } from '@prisma/client';
 import { prisma } from './db';
+import { buildTranslations } from './translate';
 import { authOptions } from './auth';
 
 async function requireAdmin() {
@@ -71,6 +72,12 @@ export async function saveProduct(fd: FormData) {
     const created = await prisma.product.create({ data: { ...data, slug } as never });
     productId = created.id;
   }
+  // Auto-translate product content (no-op without DEEPL_API_KEY).
+  const translations = await buildTranslations({ name, description, specs });
+  if (translations) {
+    await prisma.product.update({ where: { id: productId }, data: { translations } as never });
+  }
+
   revalidatePath('/admin/products');
   redirect(`/admin/products/${productId}?saved=1`);
 }
@@ -142,9 +149,10 @@ export async function setProductOption(fd: FormData) {
   const name = str(fd, 'name');
   if (name) {
     const description = str(fd, 'description') || null;
+    const translations = await buildTranslations({ name, description });
     await prisma.option.update({
       where: { id: optionId },
-      data: { nameIt: name, nameEn: name, description } as never,
+      data: { nameIt: name, nameEn: name, description, ...(translations ? { translations } : {}) } as never,
     });
   }
 
@@ -191,8 +199,9 @@ export async function createOptionForProduct(fd: FormData) {
   if (clash) code = `${code}-${Date.now().toString(36)}`;
 
   const count = await prisma.option.count({ where: { groupId } });
+  const translations = await buildTranslations({ name });
   const option = await prisma.option.create({
-    data: { groupId, code, nameIt: name, nameEn: name, sortOrder: count },
+    data: { groupId, code, nameIt: name, nameEn: name, sortOrder: count, ...(translations ? { translations } : {}) } as never,
   });
   const supplierCostRaw = str(fd, 'supplierCost');
   const supplierCost = supplierCostRaw === '' ? null : num(fd, 'supplierCost');

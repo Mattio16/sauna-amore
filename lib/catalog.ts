@@ -17,6 +17,7 @@ export async function getCategoryProducts(category: Category): Promise<CategoryP
     capacity: p.capacity,
     dimensions: p.dimensions,
     subcategory: p.subcategory,
+    translations: (p as unknown as { translations?: unknown }).translations ?? null,
     imageUrl: p.images[0]?.url ?? null,
   }));
 }
