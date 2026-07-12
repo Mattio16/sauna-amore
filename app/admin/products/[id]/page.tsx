@@ -43,7 +43,7 @@ export default async function EditProductPage({
           <Link href="/admin/products" className="text-sm text-stone-500 hover:text-stone-900">
             ← Products
           </Link>
-          <h1 className="text-2xl font-semibold text-stone-900">{product.nameIt}</h1>
+          <h1 className="text-2xl font-semibold text-stone-900">{product.nameEn}</h1>
         </div>
         <DeleteProductButton id={product.id} />
       </div>

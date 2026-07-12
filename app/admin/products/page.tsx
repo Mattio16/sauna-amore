@@ -76,7 +76,7 @@ export default async function ProductsPage({
                     ) : (
                       <span className="h-10 w-14 rounded bg-stone-100" />
                     )}
-                    {p.nameIt}
+                    {p.nameEn}
                   </Link>
                 </td>
                 <td className="px-3 py-3 text-stone-500">{p.sku}</td>
