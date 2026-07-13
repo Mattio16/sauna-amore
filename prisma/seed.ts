@@ -372,9 +372,16 @@ async function seedOptions() {
       nameIt: o.nameIt, nameEn: o.nameEn,
       description: (o as { description?: string }).description ?? null, sortOrder: o.sortOrder,
     };
+    // If the English source changed, clear stale translations so db:translate refreshes them.
+    const where = { groupId_code: { groupId: groupIds.get(o.group)!, code: o.code } };
+    const existing = (await prisma.option.findUnique({ where })) as
+      | { nameEn: string; description?: string | null }
+      | null;
+    const stale =
+      existing && (existing.nameEn !== data.nameEn || (existing.description ?? null) !== data.description);
     const rec = await prisma.option.upsert({
-      where: { groupId_code: { groupId: groupIds.get(o.group)!, code: o.code } },
-      update: data as never,
+      where,
+      update: { ...data, ...(stale ? { translations: null } : {}) } as never,
       create: { groupId: groupIds.get(o.group)!, code: o.code, ...data } as never,
     });
     optionIds.set(`${o.group}:${o.code}`, rec.id);
@@ -394,15 +401,27 @@ async function seedLineup(optionIds: Map<string, string>) {
       basePrice: p.basePrice, capacity: p.capacity, dimensions: p.dimensions,
       sortOrder: p.sortOrder, isPublished: true,
     };
+    // If the English source changed, clear stale translations so db:translate refreshes them.
+    const existing = await prisma.product.findUnique({
+      where: { sku: p.sku },
+      select: { nameEn: true, descriptionEn: true, specsEn: true },
+    });
+    const stale =
+      existing &&
+      (existing.nameEn !== data.nameEn ||
+        existing.descriptionEn !== data.descriptionEn ||
+        existing.specsEn !== data.specsEn);
     const product = await prisma.product.upsert({
       where: { sku: p.sku },
-      update: data,
+      update: { ...data, ...(stale ? { translations: null } : {}) } as never,
       create: { sku: p.sku, ...data },
     });
     await prisma.productImage.deleteMany({ where: { productId: product.id } });
     await prisma.productImage.createMany({
       data: p.images.map((url, i) => ({ productId: product.id, url, sortOrder: i })),
     });
+    // Groups/options are upserted (not wiped) now, so clear this product's rows first.
+    await prisma.productOption.deleteMany({ where: { productId: product.id } });
     await prisma.productOption.createMany({
       data: p.options.map((o) => ({
         productId: product.id,
