@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
+import { sendOrderNotification } from '@/lib/notify';
 
 /**
  * Public endpoint: customers submit a quote request from a product page.
@@ -42,8 +43,8 @@ export async function POST(req: NextRequest) {
   const optionIds = Array.isArray(body.optionIds) ? body.optionIds : [];
   const selected = product.options.filter((po) => optionIds.includes(po.optionId));
   const optionsSnapshot = selected.map((po) => ({
-    group: po.option.group.nameIt,
-    option: po.option.nameIt,
+    group: po.option.group.nameEn,
+    option: po.option.nameEn,
     priceDelta: po.priceDelta,
   }));
   const unitPrice = product.basePrice + selected.reduce((sum, po) => sum + po.priceDelta, 0);
@@ -72,7 +73,7 @@ export async function POST(req: NextRequest) {
         create: [
           {
             productId: product.id,
-            productName: product.nameIt,
+            productName: product.nameEn,
             optionsSnapshot,
             unitPrice,
             quantity,
@@ -80,6 +81,23 @@ export async function POST(req: NextRequest) {
         ],
       },
     },
+  });
+
+  // Notify the shop — never blocks or fails the order (no-op without RESEND_API_KEY).
+  await sendOrderNotification({
+    orderId: order.id,
+    orderNumber: order.orderNumber,
+    productName: product.nameEn,
+    options: optionsSnapshot,
+    quantity,
+    totalEstimate: unitPrice * quantity,
+    customerName: order.customerName,
+    email: order.email,
+    phone: order.phone,
+    address: order.address,
+    city: order.city,
+    postalCode: order.postalCode,
+    message: order.message,
   });
 
   return NextResponse.json({ ok: true, orderNumber: order.orderNumber });
