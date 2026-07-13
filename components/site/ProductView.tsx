@@ -11,6 +11,7 @@ export type OptionGroupData = {
   nameIt: string;
   nameEn: string;
   translations?: unknown;
+  displayType?: string;
   sortOrder: number;
   options: {
     optionId: string;
@@ -60,14 +61,33 @@ export default function ProductView({ product, related }: { product: ProductData
   const t = useT();
   const lang = useLang();
   const [imgIdx, setImgIdx] = useState(0);
-  const [selected, setSelected] = useState<Record<string, string>>(() => {
-    const init: Record<string, string> = {};
+  // Each group holds an array of selected option ids (radio groups: exactly one;
+  // multi groups: zero or more).
+  const [selected, setSelected] = useState<Record<string, string[]>>(() => {
+    const init: Record<string, string[]> = {};
     for (const g of product.optionGroups) {
-      const def = g.options.find((o) => o.isDefault) ?? g.options[0];
-      if (def) init[g.id] = def.optionId;
+      if (g.displayType === 'MULTI') {
+        init[g.id] = g.options.filter((o) => o.isDefault).map((o) => o.optionId);
+      } else {
+        const def = g.options.find((o) => o.isDefault) ?? g.options[0];
+        init[g.id] = def ? [def.optionId] : [];
+      }
     }
     return init;
   });
+
+  const toggleOption = (g: OptionGroupData, optionId: string) => {
+    setSelected((prev) => {
+      const cur = prev[g.id] ?? [];
+      if (g.displayType === 'MULTI') {
+        return {
+          ...prev,
+          [g.id]: cur.includes(optionId) ? cur.filter((x) => x !== optionId) : [...cur, optionId],
+        };
+      }
+      return { ...prev, [g.id]: [optionId] };
+    });
+  };
   const [qty, setQty] = useState(1);
   const [form, setForm] = useState({ customerName: '', email: '', phone: '', address: '', city: '', postalCode: '', message: '' });
   const [status, setStatus] = useState<'idle' | 'sending' | 'ok' | 'error'>('idle');
@@ -76,8 +96,9 @@ export default function ProductView({ product, related }: { product: ProductData
   const unitPrice = useMemo(() => {
     let p = product.basePrice;
     for (const g of product.optionGroups) {
-      const opt = g.options.find((o) => o.optionId === selected[g.id]);
-      if (opt) p += opt.priceDelta;
+      for (const opt of g.options) {
+        if (selected[g.id]?.includes(opt.optionId)) p += opt.priceDelta;
+      }
     }
     return p;
   }, [product, selected]);
@@ -104,7 +125,7 @@ export default function ProductView({ product, related }: { product: ProductData
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           productId: product.id,
-          optionIds: Object.values(selected),
+          optionIds: Object.values(selected).flat(),
           quantity: qty,
           locale: lang === 'it' ? 'it' : 'en',
           ...form,
@@ -200,17 +221,18 @@ export default function ProductView({ product, related }: { product: ProductData
               <Reveal delay={120}>
                 <div className="space-y-7 mb-8">
                   {product.optionGroups.map((g) => {
-                    const selectedOpt = g.options.find((o) => o.optionId === selected[g.id]);
+                    const selectedIds = selected[g.id] ?? [];
+                    const selectedOpt = g.options.filter((o) => selectedIds.includes(o.optionId)).pop();
                     return (
                       <div key={g.id}>
                         <h3 className="text-xs font-semibold tracking-[0.2em] uppercase text-pine mb-3">{t.optionGroups[g.code] ?? pickName(g, lang)}</h3>
                         <div className="flex flex-wrap gap-2.5">
                           {g.options.map((o) => {
-                            const active = selected[g.id] === o.optionId;
+                            const active = selectedIds.includes(o.optionId);
                             return (
                               <button
                                 key={o.optionId}
-                                onClick={() => setSelected({ ...selected, [g.id]: o.optionId })}
+                                onClick={() => toggleOption(g, o.optionId)}
                                 className={`rounded-2xl border px-3.5 py-2.5 text-left text-sm transition-all flex items-center gap-3 ${
                                   active ? 'border-pine bg-pine text-mist' : 'border-line bg-mist-card text-pine hover:border-moss'
                                 }`}

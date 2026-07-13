@@ -126,6 +126,13 @@ export default async function EditProductPage({
                   title="Renames this option group everywhere it is used (all products, all languages)"
                   className="w-56 rounded border border-stone-200 px-2 py-1 text-sm font-medium text-stone-700"
                 />
+                <label
+                  className="flex items-center gap-1 text-xs text-stone-500"
+                  title="Allow customers to pick several options from this group (e.g. accessories) instead of just one"
+                >
+                  <input type="checkbox" name="multi" defaultChecked={(group.displayType as string) === 'MULTI'} />
+                  multi
+                </label>
                 <button className="rounded border border-stone-300 px-2 py-1 text-xs hover:bg-stone-50">Save</button>
               </form>
               <span className="text-xs text-stone-400">({group.code})</span>

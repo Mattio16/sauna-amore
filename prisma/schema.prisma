@@ -29,6 +29,7 @@ enum OrderStatus {
 enum DisplayType {
   RADIO
   DROPDOWN
+  MULTI // multiple selections allowed (accessories etc.)
 }
 
 model Product {

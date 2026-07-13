@@ -276,9 +276,10 @@ export async function renameOptionGroup(fd: FormData) {
   const name = str(fd, 'name');
   if (!name) throw new Error('Name required');
   const translations = await buildTranslations({ name });
+  const displayType = fd.get('multi') === 'on' ? 'MULTI' : 'RADIO';
   await prisma.optionGroup.update({
     where: { id: str(fd, 'groupId') },
-    data: { nameIt: name, nameEn: name, ...(translations ? { translations } : {}) } as never,
+    data: { nameIt: name, nameEn: name, displayType, ...(translations ? { translations } : {}) } as never,
   });
   revalidatePath(`/admin/products/${productId}`);
 }

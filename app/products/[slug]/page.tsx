@@ -25,6 +25,7 @@ export default async function ProductPage({ params }: { params: { slug: string }
         nameIt: g.nameIt,
         nameEn: g.nameEn,
         translations: (g as unknown as { translations?: unknown }).translations ?? null,
+        displayType: String(g.displayType),
         sortOrder: g.sortOrder,
         options: [],
       });
