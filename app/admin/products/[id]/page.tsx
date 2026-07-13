@@ -10,6 +10,9 @@ import {
   setProductOption,
   createOptionForProduct,
   deleteOptionFromProduct,
+  createOptionGroup,
+  renameOptionGroup,
+  deleteOptionGroup,
 } from '@/lib/admin-actions';
 
 export const dynamic = 'force-dynamic';
@@ -110,9 +113,30 @@ export default async function EditProductPage({
         </div>
         {groups.map((group) => (
           <div key={group.id}>
-            <h3 className="text-sm font-medium text-stone-700 mb-2">
-              {group.nameEn} <span className="text-stone-400">({group.code})</span>
-            </h3>
+            <div className="flex items-center gap-2 mb-2">
+              <form action={renameOptionGroup} className="flex items-center gap-2">
+                <input type="hidden" name="productId" value={product.id} />
+                <input type="hidden" name="groupId" value={group.id} />
+                <input
+                  name="name"
+                  defaultValue={group.nameEn}
+                  title="Renames this option group everywhere it is used (all products, all languages)"
+                  className="w-56 rounded border border-stone-200 px-2 py-1 text-sm font-medium text-stone-700"
+                />
+                <button className="rounded border border-stone-300 px-2 py-1 text-xs hover:bg-stone-50">Save</button>
+              </form>
+              <span className="text-xs text-stone-400">({group.code})</span>
+              <form action={deleteOptionGroup} className="ml-auto">
+                <input type="hidden" name="productId" value={product.id} />
+                <input type="hidden" name="groupId" value={group.id} />
+                <button
+                  className="text-red-400 hover:text-red-600 px-1 text-sm"
+                  title="Delete this whole group and all its options — from every product"
+                >
+                  ✕ group
+                </button>
+              </form>
+            </div>
             <div className="space-y-1">
               {group.options.map((opt) => {
                 const po = byOptionId.get(opt.id);
@@ -190,6 +214,21 @@ export default async function EditProductPage({
             </div>
           </div>
         ))}
+        <form
+          action={createOptionGroup}
+          className="flex items-center gap-2 rounded border-2 border-dashed border-stone-300 px-3 py-3 text-sm"
+        >
+          <input type="hidden" name="productId" value={product.id} />
+          <input
+            name="name"
+            placeholder="New option group (e.g. Lighting, Aromatherapy…)"
+            required
+            className="flex-1 rounded border border-stone-200 px-2 py-1"
+          />
+          <button className="rounded bg-stone-900 text-white px-3 py-1 text-xs hover:bg-stone-700">
+            + Add option group
+          </button>
+        </form>
       </section>
     </div>
   );

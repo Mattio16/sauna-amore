@@ -10,6 +10,7 @@ export type OptionGroupData = {
   code: string;
   nameIt: string;
   nameEn: string;
+  translations?: unknown;
   sortOrder: number;
   options: {
     optionId: string;

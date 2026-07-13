@@ -355,19 +355,27 @@ const LINEUP_SKUS = LINEUP.map((p) => p.sku);
 // ---------------- seeding ----------------
 
 async function seedOptions() {
-  await prisma.optionGroup.deleteMany({});
+  // Upserts only — groups/options created in the admin survive reseeding.
+  // (Seed-managed entries are reset to the values in this file.)
   const groupIds = new Map<string, string>();
   for (const g of GROUPS) {
-    const rec = await prisma.optionGroup.create({ data: { ...g, displayType: DisplayType.RADIO } });
+    const rec = await prisma.optionGroup.upsert({
+      where: { code: g.code },
+      update: { nameIt: g.nameIt, nameEn: g.nameEn, sortOrder: g.sortOrder },
+      create: { ...g, displayType: DisplayType.RADIO },
+    });
     groupIds.set(g.code, rec.id);
   }
   const optionIds = new Map<string, string>();
   for (const o of OPTIONS) {
-    const rec = await prisma.option.create({
-      data: {
-        groupId: groupIds.get(o.group)!, code: o.code, nameIt: o.nameIt, nameEn: o.nameEn,
-        description: (o as { description?: string }).description ?? null, sortOrder: o.sortOrder,
-      } as never,
+    const data = {
+      nameIt: o.nameIt, nameEn: o.nameEn,
+      description: (o as { description?: string }).description ?? null, sortOrder: o.sortOrder,
+    };
+    const rec = await prisma.option.upsert({
+      where: { groupId_code: { groupId: groupIds.get(o.group)!, code: o.code } },
+      update: data as never,
+      create: { groupId: groupIds.get(o.group)!, code: o.code, ...data } as never,
     });
     optionIds.set(`${o.group}:${o.code}`, rec.id);
   }

@@ -75,12 +75,13 @@ model ProductImage {
 
 // e.g. "wood" (Spruce/Thermowood), "assembly" (Flat-pack/Assembled), "heater"
 model OptionGroup {
-  id          String      @id @default(cuid())
-  code        String      @unique // "wood" | "assembly" | "sauna-heater" | "hottub-heater"
-  nameIt      String
-  nameEn      String
-  displayType DisplayType @default(RADIO)
-  sortOrder   Int         @default(0)
+  id           String      @id @default(cuid())
+  code         String      @unique // "wood" | "assembly" | "sauna-heater" | "hottub-heater"
+  nameIt       String
+  nameEn       String
+  translations Json? // { it|nl|de|ru: { name } } — auto-generated for admin-created groups
+  displayType  DisplayType @default(RADIO)
+  sortOrder    Int         @default(0)
 
   options Option[]
 }

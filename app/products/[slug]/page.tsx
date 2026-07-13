@@ -19,7 +19,15 @@ export default async function ProductPage({ params }: { params: { slug: string }
   for (const po of product.options) {
     const g = po.option.group;
     if (!groupsMap.has(g.id)) {
-      groupsMap.set(g.id, { id: g.id, code: g.code, nameIt: g.nameIt, nameEn: g.nameEn, sortOrder: g.sortOrder, options: [] });
+      groupsMap.set(g.id, {
+        id: g.id,
+        code: g.code,
+        nameIt: g.nameIt,
+        nameEn: g.nameEn,
+        translations: (g as unknown as { translations?: unknown }).translations ?? null,
+        sortOrder: g.sortOrder,
+        options: [],
+      });
     }
     groupsMap.get(g.id)!.options.push({
       optionId: po.optionId,

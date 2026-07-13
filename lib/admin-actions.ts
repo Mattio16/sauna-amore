@@ -221,6 +221,47 @@ export async function deleteOptionFromProduct(fd: FormData) {
   revalidatePath('/admin/options');
 }
 
+// ---------- option groups ----------
+
+export async function createOptionGroup(fd: FormData) {
+  await requireAdmin();
+  const productId = str(fd, 'productId');
+  const name = str(fd, 'name');
+  if (!name) throw new Error('Name required');
+  let code = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'group';
+  const clash = await prisma.optionGroup.findUnique({ where: { code } });
+  if (clash) code = `${code}-${Date.now().toString(36)}`;
+  const count = await prisma.optionGroup.count();
+  const translations = await buildTranslations({ name });
+  await prisma.optionGroup.create({
+    data: { code, nameIt: name, nameEn: name, sortOrder: count, ...(translations ? { translations } : {}) } as never,
+  });
+  revalidatePath(`/admin/products/${productId}`);
+}
+
+/** Renames a group everywhere it appears (all products; translated via DeepL). */
+export async function renameOptionGroup(fd: FormData) {
+  await requireAdmin();
+  const productId = str(fd, 'productId');
+  const name = str(fd, 'name');
+  if (!name) throw new Error('Name required');
+  const translations = await buildTranslations({ name });
+  await prisma.optionGroup.update({
+    where: { id: str(fd, 'groupId') },
+    data: { nameIt: name, nameEn: name, ...(translations ? { translations } : {}) } as never,
+  });
+  revalidatePath(`/admin/products/${productId}`);
+}
+
+/** Deletes a group AND all its options, from every product that uses them. */
+export async function deleteOptionGroup(fd: FormData) {
+  await requireAdmin();
+  const productId = str(fd, 'productId');
+  await prisma.optionGroup.delete({ where: { id: str(fd, 'groupId') } });
+  revalidatePath(`/admin/products/${productId}`);
+  revalidatePath('/admin/options');
+}
+
 // ---------- global options ----------
 
 export async function saveOption(fd: FormData) {
