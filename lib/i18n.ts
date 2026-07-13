@@ -76,7 +76,7 @@ const it = {
       { h: "Ordine e pagamento", items: [
         ["Come si ordina?", "Configura il prodotto, scegli le opzioni e invia la richiesta di preventivo — online non si paga nulla. Ti rispondiamo entro 24 ore con un preventivo completo di consegna e confermiamo l’ordine insieme."],
         ["Quali sono le condizioni di pagamento?", "Accettiamo pagamenti con carta. Si versa il 50% di acconto prima dell’inizio della produzione e il restante 50% alla consegna."],
-        ["Che garanzia ho?", "Ogni prodotto ha 2 anni di garanzia su materiali e lavorazione. Sono esclusi i materiali di consumo come guarnizioni e filtri."],
+        ["Che garanzia ho?", "Ogni prodotto ha 2 anni di garanzia su materiali e lavorazione per uso privato (6 mesi per uso commerciale: agriturismi, hotel, noleggio). La garanzia è valida con la normale cura descritta in questa pagina — in particolare il trattamento protettivo del legno esterno subito dopo il montaggio. Esclusi i materiali di consumo e i comportamenti naturali del legno."],
       ] },
       { h: "Spedizione e consegna", items: [
         ["Quali sono i tempi di consegna?", "Se la configurazione è disponibile a magazzino, circa 2 settimane. Se va prodotta su misura, circa 8 settimane. La data esatta viene confermata con il preventivo."],
@@ -175,7 +175,7 @@ const en: Dict = {
       { h: "Ordering & payment", items: [
         ["How do I order?", "Configure your product, choose your options and send a quote request — nothing is paid online. We reply within 24 hours with a complete quote including delivery, and confirm the order together with you."],
         ["What are the payment terms?", "We accept card payments. You pay a 50% deposit before production starts and the remaining 50% at delivery."],
-        ["What warranty do I get?", "Every product comes with a 2-year warranty on materials and workmanship. Wear items such as gaskets and filters are excluded."],
+        ["What warranty do I get?", "Every product comes with a 2-year warranty on materials and workmanship for private use (6 months for commercial use: agriturismi, hotels, rental). The warranty holds with the normal care described on this page — in particular treating exterior wood with a preservative right after assembly. Wear items and natural wood behaviour are excluded."],
       ] },
       { h: "Shipping & delivery", items: [
         ["What is the lead time?", "If your configuration is in stock, about 2 weeks. If it needs to be custom made, about 8 weeks. We confirm the exact date with your quote."],
@@ -272,7 +272,7 @@ const nl: Dict = {
       { h: "Bestellen & betalen", items: [
         ["Hoe bestel ik?", "Stel je product samen, kies je opties en stuur een offerteaanvraag — online betaal je niets. Binnen 24 uur ontvang je een complete offerte inclusief levering en bevestigen we de bestelling samen."],
         ["Wat zijn de betalingsvoorwaarden?", "We accepteren kaartbetalingen. Je betaalt 50% aan vóór de start van de productie en de resterende 50% bij levering."],
-        ["Welke garantie krijg ik?", "Elk product heeft 2 jaar garantie op materiaal en vakmanschap. Slijtageonderdelen zoals pakkingen en filters vallen erbuiten."],
+        ["Welke garantie krijg ik?", "Elk product heeft 2 jaar garantie op materiaal en vakmanschap bij particulier gebruik (6 maanden bij commercieel gebruik: agriturismi, hotels, verhuur). De garantie geldt bij normaal onderhoud zoals op deze pagina beschreven — met name het direct na montage behandelen van het buitenhout. Slijtageonderdelen en natuurlijk houtgedrag vallen erbuiten."],
       ] },
       { h: "Verzending & levering", items: [
         ["Wat is de levertijd?", "Op voorraad: circa 2 weken. Maatwerk: circa 8 weken. De exacte datum bevestigen we bij de offerte."],
@@ -369,7 +369,7 @@ const de: Dict = {
       { h: "Bestellung & Zahlung", items: [
         ["Wie bestelle ich?", "Konfigurieren Sie Ihr Produkt, wählen Sie die Optionen und senden Sie eine Angebotsanfrage — online wird nichts bezahlt. Innerhalb von 24 Stunden erhalten Sie ein komplettes Angebot inklusive Lieferung, und wir bestätigen die Bestellung gemeinsam."],
         ["Wie sind die Zahlungsbedingungen?", "Wir akzeptieren Kartenzahlung. 50% Anzahlung vor Produktionsbeginn, die restlichen 50% bei Lieferung."],
-        ["Welche Garantie erhalte ich?", "Jedes Produkt hat 2 Jahre Garantie auf Material und Verarbeitung. Verschleißteile wie Dichtungen und Filter sind ausgenommen."],
+        ["Welche Garantie erhalte ich?", "Jedes Produkt hat 2 Jahre Garantie auf Material und Verarbeitung bei privater Nutzung (6 Monate bei gewerblicher Nutzung: Agriturismi, Hotels, Vermietung). Die Garantie gilt bei normaler Pflege wie auf dieser Seite beschrieben — insbesondere der Schutzbehandlung des Außenholzes direkt nach der Montage. Verschleißteile und natürliches Holzverhalten sind ausgenommen."],
       ] },
       { h: "Versand & Lieferung", items: [
         ["Wie lang ist die Lieferzeit?", "Ab Lager: etwa 2 Wochen. Maßanfertigung: etwa 8 Wochen. Den genauen Termin bestätigen wir mit dem Angebot."],
@@ -466,7 +466,7 @@ const ru: Dict = {
       { h: "Заказ и оплата", items: [
         ["Как оформить заказ?", "Соберите конфигурацию, выберите опции и отправьте запрос — онлайн ничего платить не нужно. В течение 24 часов мы пришлём полное предложение с доставкой и вместе подтвердим заказ."],
         ["Каковы условия оплаты?", "Принимаем оплату картой. 50% предоплата до начала производства, оставшиеся 50% — при доставке."],
-        ["Какая гарантия?", "На каждое изделие — гарантия 2 года на материалы и качество изготовления. Расходные детали (уплотнители, фильтры) не входят."],
+        ["Какая гарантия?", "На каждое изделие — гарантия 2 года на материалы и качество изготовления при частном использовании (6 месяцев при коммерческом: агротуризм, отели, аренда). Гарантия действует при обычном уходе, описанном на этой странице, — прежде всего обработке наружного дерева защитным составом сразу после сборки. Расходные детали и естественное поведение дерева не входят."],
       ] },
       { h: "Доставка", items: [
         ["Каковы сроки поставки?", "Если конфигурация есть на складе — около 2 недель. Если изготавливается на заказ — около 8 недель. Точную дату подтверждаем вместе с предложением."],
