@@ -150,11 +150,11 @@ export async function setProductOption(fd: FormData) {
   const name = str(fd, 'name');
   if (name) {
     const description = str(fd, 'description') || null;
-    const imageUrl = str(fd, 'imageUrl') || null;
     const translations = await buildTranslations({ name, description });
+    // imageUrl is managed by the upload/remove control, not by this form.
     await prisma.option.update({
       where: { id: optionId },
-      data: { nameIt: name, nameEn: name, description, imageUrl, ...(translations ? { translations } : {}) } as never,
+      data: { nameIt: name, nameEn: name, description, ...(translations ? { translations } : {}) } as never,
     });
   }
 

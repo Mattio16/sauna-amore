@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import { prisma } from '@/lib/db';
 import ProductForm, { DeleteProductButton } from '@/components/admin/ProductForm';
 import ImageUploader from '@/components/admin/ImageUploader';
+import OptionImageControl from '@/components/admin/OptionImageControl';
 import {
   addImageUrl,
   deleteImage,
@@ -184,12 +185,9 @@ export default async function EditProductPage({
                         placeholder="Short customer-facing description (shown when this option is selected)…"
                         className="col-span-4 rounded border border-stone-200 px-2 py-1 text-xs text-stone-600 mt-0.5"
                       />
-                      <input
-                        name="imageUrl"
-                        defaultValue={(opt as unknown as { imageUrl?: string | null }).imageUrl ?? ''}
-                        placeholder="Image URL (option photo)"
-                        title="Small photo shown on this option in the configurator"
-                        className="col-span-2 rounded border border-dashed border-stone-200 px-2 py-1 text-xs text-stone-600 mt-0.5"
+                      <OptionImageControl
+                        optionId={opt.id}
+                        imageUrl={(opt as unknown as { imageUrl?: string | null }).imageUrl ?? null}
                       />
                     </form>
                     <form action={deleteOptionFromProduct}>
