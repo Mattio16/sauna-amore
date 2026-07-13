@@ -215,6 +215,12 @@ export default async function EditProductPage({
                 <button className="rounded bg-stone-900 text-white px-3 py-1 text-xs hover:bg-stone-700">
                   + Add option
                 </button>
+                <textarea
+                  name="description"
+                  rows={1}
+                  placeholder="Short customer-facing description (optional — can also be added later)…"
+                  className="col-span-4 rounded border border-stone-200 px-2 py-1 text-xs text-stone-600"
+                />
               </form>
             </div>
           </div>

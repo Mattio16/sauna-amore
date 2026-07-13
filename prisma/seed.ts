@@ -422,8 +422,11 @@ async function seedLineup(optionIds: Map<string, string>) {
     await prisma.productImage.createMany({
       data: p.images.map((url, i) => ({ productId: product.id, url, sortOrder: i })),
     });
-    // Groups/options are upserted (not wiped) now, so clear this product's rows first.
-    await prisma.productOption.deleteMany({ where: { productId: product.id } });
+    // Reset only the seed-managed assignments — options added in the admin stay attached.
+    const seedOptionIds = p.options.map((o) => optionIds.get(`${o.group}:${o.code}`)!);
+    await prisma.productOption.deleteMany({
+      where: { productId: product.id, optionId: { in: seedOptionIds } },
+    });
     await prisma.productOption.createMany({
       data: p.options.map((o) => ({
         productId: product.id,

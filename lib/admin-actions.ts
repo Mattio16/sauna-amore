@@ -205,9 +205,10 @@ export async function createOptionForProduct(fd: FormData) {
   if (clash) code = `${code}-${Date.now().toString(36)}`;
 
   const count = await prisma.option.count({ where: { groupId } });
-  const translations = await buildTranslations({ name });
+  const description = str(fd, 'description') || null;
+  const translations = await buildTranslations({ name, description });
   const option = await prisma.option.create({
-    data: { groupId, code, nameIt: name, nameEn: name, sortOrder: count, ...(translations ? { translations } : {}) } as never,
+    data: { groupId, code, nameIt: name, nameEn: name, description, sortOrder: count, ...(translations ? { translations } : {}) } as never,
   });
   const supplierCostRaw = str(fd, 'supplierCost');
   const supplierCost = supplierCostRaw === '' ? null : num(fd, 'supplierCost');

@@ -136,7 +136,7 @@ export default function ProductView({ product, related }: { product: ProductData
               </div>
               {product.images.length > 1 && (
                 <div className="grid grid-cols-5 gap-3">
-                  {product.images.slice(0, 5).map((url, i) => (
+                  {product.images.map((url, i) => (
                     <button
                       key={i}
                       onClick={() => setImgIdx(i)}
