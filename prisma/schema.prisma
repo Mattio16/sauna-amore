@@ -93,6 +93,7 @@ model Option {
   nameIt      String
   nameEn      String
   description  String? @db.Text // short customer-facing blurb shown when selected
+  imageUrl     String? // small option thumbnail shown in the configurator
   translations Json? // { it|nl|de|ru: { name, description } } — auto-generated
   sortOrder    Int     @default(0)
 

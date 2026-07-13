@@ -182,7 +182,14 @@ export default async function EditProductPage({
                         rows={1}
                         defaultValue={(opt as unknown as { description?: string | null }).description ?? ''}
                         placeholder="Short customer-facing description (shown when this option is selected)…"
-                        className="col-span-6 rounded border border-stone-200 px-2 py-1 text-xs text-stone-600 mt-0.5"
+                        className="col-span-4 rounded border border-stone-200 px-2 py-1 text-xs text-stone-600 mt-0.5"
+                      />
+                      <input
+                        name="imageUrl"
+                        defaultValue={(opt as unknown as { imageUrl?: string | null }).imageUrl ?? ''}
+                        placeholder="Image URL (option photo)"
+                        title="Small photo shown on this option in the configurator"
+                        className="col-span-2 rounded border border-dashed border-stone-200 px-2 py-1 text-xs text-stone-600 mt-0.5"
                       />
                     </form>
                     <form action={deleteOptionFromProduct}>

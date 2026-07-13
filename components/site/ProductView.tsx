@@ -18,6 +18,7 @@ export type OptionGroupData = {
     nameIt: string;
     nameEn: string;
     description: string | null;
+    imageUrl?: string | null;
     translations?: unknown;
     priceDelta: number;
     isDefault: boolean;
@@ -210,21 +211,32 @@ export default function ProductView({ product, related }: { product: ProductData
                               <button
                                 key={o.optionId}
                                 onClick={() => setSelected({ ...selected, [g.id]: o.optionId })}
-                                className={`rounded-2xl border px-4 py-3 text-left text-sm transition-all ${
+                                className={`rounded-2xl border px-3.5 py-2.5 text-left text-sm transition-all flex items-center gap-3 ${
                                   active ? 'border-pine bg-pine text-mist' : 'border-line bg-mist-card text-pine hover:border-moss'
                                 }`}
                               >
-                                <span className="block font-medium">
-                                  {SWATCHES[o.code] && (
-                                    <span
-                                      className="inline-block w-3.5 h-3.5 rounded-full mr-2 align-[-2px] border border-white/40"
-                                      style={{ backgroundColor: SWATCHES[o.code] }}
-                                    />
-                                  )}
-                                  {pickName(o, lang)}
-                                </span>
-                                <span className={`block text-xs mt-0.5 ${active ? 'text-moss-light' : 'text-moss'}`}>
-                                  {o.priceDelta > 0 ? `+ ${euro(o.priceDelta)}` : '—'}
+                                {o.imageUrl && (
+                                  // eslint-disable-next-line @next/next/no-img-element
+                                  <img
+                                    src={o.imageUrl}
+                                    alt=""
+                                    loading="lazy"
+                                    className="h-12 w-12 rounded-xl object-cover shrink-0 bg-white"
+                                  />
+                                )}
+                                <span>
+                                  <span className="block font-medium">
+                                    {SWATCHES[o.code] && (
+                                      <span
+                                        className="inline-block w-3.5 h-3.5 rounded-full mr-2 align-[-2px] border border-white/40"
+                                        style={{ backgroundColor: SWATCHES[o.code] }}
+                                      />
+                                    )}
+                                    {pickName(o, lang)}
+                                  </span>
+                                  <span className={`block text-xs mt-0.5 ${active ? 'text-moss-light' : 'text-moss'}`}>
+                                    {o.priceDelta > 0 ? `+ ${euro(o.priceDelta)}` : '—'}
+                                  </span>
                                 </span>
                               </button>
                             );
