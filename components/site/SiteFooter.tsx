@@ -30,6 +30,7 @@ export default function SiteFooter() {
           <h4 className="text-xs font-medium tracking-[0.24em] uppercase text-moss-light mb-5">{t.footer.company}</h4>
           <ul className="space-y-2.5 text-sm text-mist/80">
             <li><Link href="/about" className="hover:text-white">{t.nav.about}</Link></li>
+            <li><Link href="/faq" className="hover:text-white">{t.faq.linkLabel}</Link></li>
             <li><Link href="/contact" className="hover:text-white">{t.nav.contact}</Link></li>
             <li><Link href="/privacy" className="hover:text-white">{t.footer.privacy}</Link></li>
           </ul>
