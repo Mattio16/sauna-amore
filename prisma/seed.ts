@@ -169,8 +169,8 @@ const img = (sku: string, n: number) =>
 const LINEUP: LineupProduct[] = [
   // ---------- Saunas (6) ----------
   {
-    sku: 'S16', slug: 's16-mini', category: 'SAUNA', subcategory: '1.6m',
-    nameIt: 'S16 · Mini', nameEn: 'S16 · Mini',
+    sku: 'S16', slug: 'nido-1-6m', category: 'SAUNA', subcategory: '1.6m',
+    nameIt: 'Nido · 1.6 m', nameEn: 'Nido · 1.6 m',
     descriptionIt: "La porta d'ingresso alla vera sauna finlandese. Compatta, si monta in poche ore e vive bene anche nei giardini piccoli. Elettrica: si accende, si aspettano 40 minuti, si entra.",
     descriptionEn: 'The entry to true Finnish sauna. Compact, assembled in a few hours, at home even in small gardens. Electric: switch on, wait 40 minutes, step in.',
     supplierItems: [{ label: 'Sauna S16 spruce flat-pack', cost: 1290 }, { label: 'Harvia M60 6kW electric', cost: 240 }],
@@ -186,8 +186,8 @@ const LINEUP: LineupProduct[] = [
     ],
   },
   {
-    sku: 'S2V', slug: 's2v-2-4m', category: 'SAUNA', subcategory: '2.4m',
-    nameIt: 'S2V · 2.4m', nameEn: 'S2V · 2.4m',
+    sku: 'S2V', slug: 'brezza-2-4m', category: 'SAUNA', subcategory: '2.4m',
+    nameIt: 'Brezza · 2.4 m', nameEn: 'Brezza · 2.4 m',
     descriptionIt: "La nostra raccomandazione. Appena più lunga della 2 metri ma sensibilmente più comoda: quattro persone sedute bene, tre cerchi d'acciaio, proporzioni perfette. Se non sai quale scegliere, è questa.",
     descriptionEn: "Our recommendation. Barely longer than the 2-metre but noticeably roomier: four people seated well, three steel hoops, perfect proportions. If you don't know which to choose, it's this one.",
     supplierItems: [{ label: 'Sauna S2V spruce flat-pack', cost: 1470 }, { label: 'Harvia M80 8kW electric', cost: 270 }],
@@ -198,8 +198,8 @@ const LINEUP: LineupProduct[] = [
     options: [...woodToggle(450), ...heaterMenu(690, 270, 730), ...diameterChoice(), ...roofChoice(), ...frontWindows(), ...backWindows()],
   },
   {
-    sku: 'S3', slug: 's3-3m', category: 'SAUNA', subcategory: '3m',
-    nameIt: 'S3 · 3m', nameEn: 'S3 · 3m',
+    sku: 'S3', slug: 'bosco-3m', category: 'SAUNA', subcategory: '3m',
+    nameIt: 'Bosco · 3 m', nameEn: 'Bosco · 3 m',
     descriptionIt: 'Per famiglie e gruppi: sei persone, panche comode, il classico dei classici. Il passo su misura per chi chiede "e quella più grande?".',
     descriptionEn: 'For families and groups: six people, comfortable benches, the classic of classics. The right step up for anyone asking "and the bigger one?".',
     supplierItems: [{ label: 'Sauna S3 spruce flat-pack', cost: 1740 }, { label: 'Harvia PC90 9kW electric', cost: 420 }],
@@ -210,8 +210,8 @@ const LINEUP: LineupProduct[] = [
     options: [...woodToggle(500), ...heaterMenu(990, 420, 1120), ...diameterChoice(), ...roofChoice(), ...frontWindows(), ...backWindows()],
   },
   {
-    sku: 'S4P', slug: 's4p-4m-spogliatoio', category: 'SAUNA', subcategory: '4m',
-    nameIt: 'S4P · 4m con spogliatoio', nameEn: 'S4P · 4m with changing room',
+    sku: 'S4P', slug: 'rifugio-4m', category: 'SAUNA', subcategory: '4m',
+    nameIt: 'Rifugio · 4 m con spogliatoio', nameEn: 'Rifugio · 4 m with changing room',
     descriptionIt: "La macchina da ospitalità. Spogliatoio interno con porta richiudibile: gli ospiti si cambiano dentro, la struttura si chiude tra un noleggio e l'altro. Il cuore del Wellness Corner per agriturismi e B&B.",
     descriptionEn: 'The hospitality machine. Interior changing room with lockable door: guests change inside, and it locks between rentals. The heart of the Wellness Corner for agriturismi and B&Bs.',
     supplierItems: [{ label: 'Sauna S4P spruce flat-pack', cost: 2230 }, { label: 'Harvia PC90 9kW electric', cost: 420 }],
@@ -222,8 +222,8 @@ const LINEUP: LineupProduct[] = [
     options: [...woodToggle(550), ...heaterMenu(990, 420, 1120), ...diameterChoice(), ...roofChoice(), ...frontWindows(), ...backWindows()],
   },
   {
-    sku: 'SQR2V', slug: 'cube-vetro-panoramico', category: 'SAUNA', subcategory: '2m',
-    nameIt: 'Cube · Vetro panoramico 2m', nameEn: 'Cube · Panoramic glass 2m',
+    sku: 'SQR2V', slug: 'cristallo-cubo', category: 'SAUNA', subcategory: '2m',
+    nameIt: 'Cristallo · Cubo vetro panoramico', nameEn: 'Cristallo · Panoramic glass cube',
     descriptionIt: "Il design che si dissolve nel paesaggio: cube nero con pareti in vetro panoramico davanti e dietro. Dentro, il legno caldo e la stufa a colonna; fuori, il tuo giardino che diventa parte della sauna. Per ville e giardini contemporanei.",
     descriptionEn: 'Design that dissolves into the landscape: a black cube with panoramic glass walls front and back. Warm wood and a column heater inside; outside, your garden becomes part of the sauna. For contemporary villas and gardens.',
     basePrice: 4990, capacity: 4, dimensions: '200×220×230 cm', sortOrder: 4,
@@ -233,8 +233,8 @@ const LINEUP: LineupProduct[] = [
     options: [...woodToggle(500), ...heaterMenu(690, 270, 730), ...roofChoice()],
   },
   {
-    sku: 'S5P', slug: 's5p-panorama', category: 'SAUNA', subcategory: '5m',
-    nameIt: 'S5P · 5m Panorama', nameEn: 'S5P · 5m Panorama',
+    sku: 'S5P', slug: 'panorama-5m', category: 'SAUNA', subcategory: '5m',
+    nameIt: 'Panorama · 5 m', nameEn: 'Panorama · 5 m',
     descriptionIt: "L'ammiraglia. Cinque metri con salotto interno e finestra panoramica: la sauna che si guarda il tramonto. Prodotta su ordinazione.",
     descriptionEn: 'The flagship. Five metres with interior sitting room and panoramic window: the sauna that watches the sunset. Built to order.',
     supplierItems: [{ label: 'Sauna S5P spruce flat-pack', cost: 3790 }, { label: 'Harvia PC90 9kW electric', cost: 420 }],
@@ -247,8 +247,8 @@ const LINEUP: LineupProduct[] = [
 
   // ---------- Hot tubs (3) ----------
   {
-    sku: 'LT18', slug: 'lt18-thermowood', category: 'HOT_TUB', subcategory: 'legno',
-    nameIt: 'LT18 · Thermowood Ø1.8m', nameEn: 'LT18 · Thermowood Ø1.8m',
+    sku: 'LT18', slug: 'fonte-legno', category: 'HOT_TUB', subcategory: 'legno',
+    nameIt: 'Fonte · Legno Ø1.8 m', nameEn: 'Fonte · Wood Ø1.8 m',
     descriptionIt: 'La tinozza romantica in thermowood scuro, riscaldata dalla stufa a legna esterna da 27kW. Acqua a 38° in poche ore, anche a gennaio.',
     descriptionEn: 'The romantic tub in dark thermowood, heated by the 27kW external wood stove. Water at 38° in a few hours, even in January.',
     supplierItems: [{ label: 'Wooden tub Ø1.8 thermowood', cost: 950 }, { label: 'NA27 wood stove 27kW', cost: 530 }],
@@ -265,8 +265,8 @@ const LINEUP: LineupProduct[] = [
     ],
   },
   {
-    sku: 'TP8', slug: 'tp8-ottagonale', category: 'HOT_TUB', subcategory: 'vetroresina',
-    nameIt: 'TP8 · Ottagonale 1.8×1.8m', nameEn: 'TP8 · Octagonal 1.8×1.8m',
+    sku: 'TP8', slug: 'laguna-ottagonale', category: 'HOT_TUB', subcategory: 'vetroresina',
+    nameIt: 'Laguna · Ottagonale 1.8×1.8 m', nameEn: 'Laguna · Octagonal 1.8×1.8 m',
     descriptionIt: "La scelta giusta per agriturismi e famiglie: interno in vetroresina facile da pulire, sedute stampate, quattro poggiatesta. Stufa a legna esterna in acciaio inox da 30 kW inclusa nel prezzo. Pronta per l'inverno.",
     descriptionEn: 'The right answer for agriturismi and families: easy-clean fiberglass interior, moulded seats, four headrests. 30 kW stainless steel wood-fired external stove included in the price. Winter-proof.',
     supplierItems: [{ label: 'TP8 octagonal fiberglass', cost: 950 }, { label: 'NN inox external stove', cost: 650 }],
@@ -284,8 +284,8 @@ const LINEUP: LineupProduct[] = [
     ],
   },
   {
-    sku: 'TP2V', slug: 'tp2v-rotonda', category: 'HOT_TUB', subcategory: 'vetroresina',
-    nameIt: 'TP2V · Rotonda Ø2m stufa integrata', nameEn: 'TP2V · Round Ø2m integrated stove',
+    sku: 'TP2V', slug: 'vulcano-rotonda', category: 'HOT_TUB', subcategory: 'vetroresina',
+    nameIt: 'Vulcano · Ø2 m stufa integrata', nameEn: 'Vulcano · Ø2 m integrated stove',
     descriptionIt: 'Un prezzo, niente da aggiungere: stufa inox integrata e canna fumaria incluse. La risposta per chi dice "dammi quella completa".',
     descriptionEn: 'One price, nothing to add: built-in stainless stove and chimney included. For those who say "just give me the complete one".',
     supplierItems: [{ label: 'TP2V integrated stove, all-in', cost: 1490 }],
@@ -298,8 +298,8 @@ const LINEUP: LineupProduct[] = [
 
   // ---------- Ice baths (2) ----------
   {
-    sku: 'TP10', slug: 'tp10-fiberglass', category: 'ICE_BATH', subcategory: null,
-    nameIt: 'TP10 · Fiberglass Ø1m', nameEn: 'TP10 · Fiberglass Ø1m',
+    sku: 'TP10', slug: 'artico-plunge', category: 'ICE_BATH', subcategory: null,
+    nameIt: 'Artico · Ø1 m', nameEn: 'Artico · Ø1 m',
     descriptionIt: "Il tuffo che rigenera, con copertura isolata inclusa. D'estate all'ombra, d'inverno sotto le stelle. Aggiungi il chiller e l'acqua resta sempre a 4°.",
     descriptionEn: 'The regenerating plunge, insulated cover included. In summer shade or under winter stars. Add the chiller and the water stays at 4° all year.',
     supplierItems: [{ label: 'TP10 fiberglass tub', cost: 590 }, { label: 'Insulated cover', cost: 130 }],
@@ -316,8 +316,8 @@ const LINEUP: LineupProduct[] = [
     ],
   },
   {
-    sku: 'CP2', slug: 'cp2-vasca-ghiaccio-ovale', category: 'ICE_BATH', subcategory: null,
-    nameIt: 'CP2 · Vasca ghiaccio ovale 2 posti', nameEn: 'CP2 · Oval cold plunge for 2',
+    sku: 'CP2', slug: 'boreale-ovale', category: 'ICE_BATH', subcategory: null,
+    nameIt: 'Boreale · Ovale 2 posti', nameEn: 'Boreale · Oval for 2',
     descriptionIt: "Il bagno di ghiaccio da condividere: vasca ovale in vetroresina da 800 litri per due persone, rivestita in thermowood 18 mm, con due poggiatesta e scarico. Con il chiller opzionale l'acqua resta a 3° tutto l'anno — o si scalda fino a 42°.",
     descriptionEn: 'The cold plunge to share: 800-litre oval fiberglass tub for two, clad in 18 mm thermowood, with two headrests and a drain. Add the optional chiller and the water stays at 3° all year round — or warms up to 42°.',
     supplierItems: [],
@@ -339,8 +339,8 @@ const LINEUP: LineupProduct[] = [
 
   // ---------- Garden shower (universal upsell) ----------
   {
-    sku: 'SHOWER', slug: 'doccia-giardino', category: 'ACCESSORY', subcategory: 'garden',
-    nameIt: 'Doccia da giardino', nameEn: 'Garden shower',
+    sku: 'SHOWER', slug: 'cascata-doccia', category: 'ACCESSORY', subcategory: 'garden',
+    nameIt: 'Cascata · Doccia da giardino', nameEn: 'Cascata · Garden shower',
     descriptionIt: 'Il risciacquo freddo che completa il rituale caldo-freddo. In abete o thermowood, si collega al tubo da giardino.',
     descriptionEn: 'The cold rinse that completes the hot-cold ritual. In spruce or thermowood, connects to a garden hose.',
     supplierItems: [{ label: 'Garden shower spruce', cost: 900 }],
