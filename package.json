@@ -11,7 +11,8 @@
     "db:seed": "prisma db seed",
     "db:translate": "tsx scripts/translate-catalog.ts",
     "db:studio": "prisma studio",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate",
+    "admin:password": "node --env-file=.env scripts/set-admin.mjs"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"

@@ -361,18 +361,20 @@ async function seedOptions() {
   for (const g of GROUPS) {
     const rec = await prisma.optionGroup.upsert({
       where: { code: g.code },
-      update: { nameIt: g.nameIt, nameEn: g.nameEn, sortOrder: g.sortOrder },
+      // sortOrder only on create — group reordering done in the admin sticks.
+      update: { nameIt: g.nameIt, nameEn: g.nameEn },
       create: { ...g, displayType: DisplayType.RADIO },
     });
     groupIds.set(g.code, rec.id);
   }
   const optionIds = new Map<string, string>();
   for (const o of OPTIONS) {
+    // sortOrder is set only on create — reordering done in the admin sticks
+    // through reseeds.
     const data = {
       nameIt: o.nameIt, nameEn: o.nameEn,
       description: (o as { description?: string }).description ?? null,
       imageUrl: (o as { image?: string }).image ?? null,
-      sortOrder: o.sortOrder,
     };
     // If the English source changed, clear stale translations so db:translate refreshes them.
     const where = { groupId_code: { groupId: groupIds.get(o.group)!, code: o.code } };
@@ -384,7 +386,7 @@ async function seedOptions() {
     const rec = await prisma.option.upsert({
       where,
       update: { ...data, ...(stale ? { translations: null } : {}) } as never,
-      create: { groupId: groupIds.get(o.group)!, code: o.code, ...data } as never,
+      create: { groupId: groupIds.get(o.group)!, code: o.code, sortOrder: o.sortOrder, ...data } as never,
     });
     optionIds.set(`${o.group}:${o.code}`, rec.id);
   }

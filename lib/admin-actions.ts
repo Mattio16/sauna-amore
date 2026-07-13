@@ -218,6 +218,30 @@ export async function createOptionForProduct(fd: FormData) {
   revalidatePath(`/admin/products/${productId}`);
 }
 
+/** Move an option up/down within its group (affects display order everywhere). */
+export async function moveOption(fd: FormData) {
+  await requireAdmin();
+  const productId = str(fd, 'productId');
+  const optionId = str(fd, 'optionId');
+  const dir = str(fd, 'dir') === 'up' ? -1 : 1;
+
+  const option = await prisma.option.findUniqueOrThrow({ where: { id: optionId } });
+  const siblings = await prisma.option.findMany({
+    where: { groupId: option.groupId },
+    orderBy: { sortOrder: 'asc' },
+  });
+  const idx = siblings.findIndex((o) => o.id === optionId);
+  const target = idx + dir;
+  if (target >= 0 && target < siblings.length) {
+    [siblings[idx], siblings[target]] = [siblings[target], siblings[idx]];
+    // Rewrite sequential sortOrders — also normalizes any duplicates.
+    await prisma.$transaction(
+      siblings.map((o, i) => prisma.option.update({ where: { id: o.id }, data: { sortOrder: i } })),
+    );
+  }
+  revalidatePath(`/admin/products/${productId}`);
+}
+
 /** Delete an option globally (removes it from every product that offers it). */
 export async function deleteOptionFromProduct(fd: FormData) {
   await requireAdmin();
@@ -256,6 +280,25 @@ export async function renameOptionGroup(fd: FormData) {
     where: { id: str(fd, 'groupId') },
     data: { nameIt: name, nameEn: name, ...(translations ? { translations } : {}) } as never,
   });
+  revalidatePath(`/admin/products/${productId}`);
+}
+
+/** Move a whole option group up/down (display order everywhere). */
+export async function moveOptionGroup(fd: FormData) {
+  await requireAdmin();
+  const productId = str(fd, 'productId');
+  const groupId = str(fd, 'groupId');
+  const dir = str(fd, 'dir') === 'up' ? -1 : 1;
+
+  const groups = await prisma.optionGroup.findMany({ orderBy: { sortOrder: 'asc' } });
+  const idx = groups.findIndex((g) => g.id === groupId);
+  const target = idx + dir;
+  if (idx !== -1 && target >= 0 && target < groups.length) {
+    [groups[idx], groups[target]] = [groups[target], groups[idx]];
+    await prisma.$transaction(
+      groups.map((g, i) => prisma.optionGroup.update({ where: { id: g.id }, data: { sortOrder: i } })),
+    );
+  }
   revalidatePath(`/admin/products/${productId}`);
 }
 

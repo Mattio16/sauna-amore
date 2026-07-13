@@ -14,6 +14,8 @@ import {
   createOptionGroup,
   renameOptionGroup,
   deleteOptionGroup,
+  moveOption,
+  moveOptionGroup,
 } from '@/lib/admin-actions';
 
 export const dynamic = 'force-dynamic';
@@ -127,6 +129,18 @@ export default async function EditProductPage({
                 <button className="rounded border border-stone-300 px-2 py-1 text-xs hover:bg-stone-50">Save</button>
               </form>
               <span className="text-xs text-stone-400">({group.code})</span>
+              <form action={moveOptionGroup}>
+                <input type="hidden" name="productId" value={product.id} />
+                <input type="hidden" name="groupId" value={group.id} />
+                <input type="hidden" name="dir" value="up" />
+                <button className="text-stone-400 hover:text-stone-800 px-1 text-xs" title="Move group up">▲</button>
+              </form>
+              <form action={moveOptionGroup}>
+                <input type="hidden" name="productId" value={product.id} />
+                <input type="hidden" name="groupId" value={group.id} />
+                <input type="hidden" name="dir" value="down" />
+                <button className="text-stone-400 hover:text-stone-800 px-1 text-xs" title="Move group down">▼</button>
+              </form>
               <form action={deleteOptionGroup} className="ml-auto">
                 <input type="hidden" name="productId" value={product.id} />
                 <input type="hidden" name="groupId" value={group.id} />
@@ -190,6 +204,24 @@ export default async function EditProductPage({
                         imageUrl={(opt as unknown as { imageUrl?: string | null }).imageUrl ?? null}
                       />
                     </form>
+                    <span className="flex flex-col">
+                      <form action={moveOption}>
+                        <input type="hidden" name="productId" value={product.id} />
+                        <input type="hidden" name="optionId" value={opt.id} />
+                        <input type="hidden" name="dir" value="up" />
+                        <button className="text-stone-400 hover:text-stone-800 px-1 text-xs leading-tight" title="Move up">
+                          ▲
+                        </button>
+                      </form>
+                      <form action={moveOption}>
+                        <input type="hidden" name="productId" value={product.id} />
+                        <input type="hidden" name="optionId" value={opt.id} />
+                        <input type="hidden" name="dir" value="down" />
+                        <button className="text-stone-400 hover:text-stone-800 px-1 text-xs leading-tight" title="Move down">
+                          ▼
+                        </button>
+                      </form>
+                    </span>
                     <form action={deleteOptionFromProduct}>
                       <input type="hidden" name="productId" value={product.id} />
                       <input type="hidden" name="optionId" value={opt.id} />
