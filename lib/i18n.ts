@@ -90,7 +90,7 @@ const it = {
       ] },
       { h: "Permessi e requisiti tecnici", items: [
         ["Serve un permesso edilizio?", "Nella maggior parte dei comuni italiani una sauna o vasca da giardino autoportante e amovibile rientra nell’edilizia libera: nessun permesso. La chiave è mantenerla amovibile: appoggiata su traversine, senza fondazioni in muratura né allacci permanenti. Le regole variano da comune a comune e possono esserci vincoli paesaggistici: verifica con il tuo comune o un geometra — noi ti supportiamo con disegni e schede tecniche."],
-        ["Cosa serve per una sauna elettrica?", "Una stufa da 6–9 kW richiede in genere una linea dedicata trifase 400 V con protezione differenziale, installata da un elettricista qualificato. Prima della consegna confermiamo le specifiche elettriche esatte del tuo modello."],
+        ["Cosa serve per una sauna elettrica?", "Non serve necessariamente il trifase. Le stufe fino a 6 kW si collegano in monofase 230 V: in Italia di solito basta aumentare il contatore dai 3 kW standard a 6 kW, un semplice adeguamento contrattuale. Dai 9 kW in su la soluzione giusta è una linea trifase 400 V. In ogni caso serve una linea dedicata con protezione differenziale, installata da un elettricista qualificato. Dicci che fornitura hai e ti consigliamo la stufa adatta — le specifiche esatte le confermiamo prima della consegna."],
         ["Cosa serve per una sauna o vasca a legna?", "Nessun allaccio elettrico. Il kit canna fumaria è incluso; mantieni la canna lontana da materiali infiammabili e rispetta le regole del comune sui fumi. Regola d’oro per le vasche a legna: mai accendere la stufa prima che la vasca sia piena d’acqua."],
       ] },
       { h: "Uso e cura", items: [
@@ -187,7 +187,7 @@ const en: Dict = {
       ] },
       { h: "Permits & technical", items: [
         ["Do I need planning permission?", "In most Italian comuni a freestanding, movable garden sauna or tub falls under “edilizia libera” — no permit needed. The key is keeping it movable: resting on bearers rather than masonry foundations, with no permanent connections. Rules vary by comune and landscape restrictions may apply, so check with your comune or a geometra — we support you with drawings and specifications."],
-        ["What does an electric sauna need?", "A 6–9 kW heater generally requires a dedicated 400 V three-phase line with RCD protection, installed by a qualified electrician. We confirm the exact electrical spec for your model before delivery."],
+        ["What does an electric sauna need?", "You don’t necessarily need three-phase. Heaters up to 6 kW can be wired single-phase 230 V — in Italy this usually just means upgrading your meter contract from the standard 3 kW to 6 kW, a routine request to your provider. From 9 kW up, a dedicated 400 V three-phase line is the right solution. Either way the heater needs its own dedicated line with RCD protection, installed by a qualified electrician. Tell us what supply you have and we will recommend the right heater — we confirm the exact spec before delivery."],
         ["What does a wood-fired sauna or tub need?", "No electricity at all. The chimney kit is included; keep the flue clear of combustible materials and respect your comune’s rules on smoke. One golden rule for wood-fired tubs: never light the stove before the tub is full of water."],
       ] },
       { h: "Use & care", items: [
@@ -282,7 +282,7 @@ const nl: Dict = {
       ] },
       { h: "Vergunningen & techniek", items: [
         ["Heb ik een vergunning nodig?", "In de meeste Italiaanse gemeenten valt een vrijstaande, verplaatsbare tuinsauna of tub onder “edilizia libera” — geen vergunning nodig. De sleutel is verplaatsbaar houden: op balken in plaats van een gemetselde fundering, zonder vaste aansluitingen. Regels verschillen per gemeente en er kunnen landschapsbeperkingen gelden; check bij je gemeente of een geometra — wij ondersteunen met tekeningen en specificaties."],
-        ["Wat heeft een elektrische sauna nodig?", "Een kachel van 6–9 kW vraagt doorgaans een aparte 400V-krachtstroomlijn met aardlekbeveiliging, aangelegd door een erkend elektricien. Vóór levering bevestigen we de exacte elektrische specificaties van je model."],
+        ["Wat heeft een elektrische sauna nodig?", "Krachtstroom is niet per se nodig. Kachels tot 6 kW kunnen op eenfase 230 V — in Italië betekent dat meestal alleen het metercontract verhogen van de standaard 3 kW naar 6 kW, een routineverzoek aan de leverancier. Vanaf 9 kW is een aparte 400V-krachtstroomlijn de juiste oplossing. In beide gevallen heeft de kachel een eigen lijn met aardlekbeveiliging nodig, aangelegd door een erkend elektricien. Vertel ons welke aansluiting je hebt en we adviseren de juiste kachel — de exacte specificaties bevestigen we vóór levering."],
         ["Wat heeft een houtgestookte sauna of tub nodig?", "Helemaal geen stroom. De schoorsteenset is inbegrepen; houd het rookkanaal vrij van brandbaar materiaal en volg de lokale regels voor rook. Gouden regel voor houtgestookte tubs: nooit de kachel aansteken voordat de tub vol water zit."],
       ] },
       { h: "Gebruik & onderhoud", items: [
@@ -377,7 +377,7 @@ const de: Dict = {
       ] },
       { h: "Genehmigungen & Technik", items: [
         ["Brauche ich eine Baugenehmigung?", "In den meisten italienischen Gemeinden fällt eine freistehende, versetzbare Gartensauna oder Tub unter die „edilizia libera“ — keine Genehmigung nötig. Entscheidend ist die Versetzbarkeit: auf Trägern statt gemauertem Fundament, ohne feste Anschlüsse. Die Regeln variieren je nach Gemeinde, und Landschaftsschutz kann greifen; klären Sie es mit Ihrer Gemeinde oder einem Geometra — wir unterstützen mit Zeichnungen und Datenblättern."],
-        ["Was braucht eine Elektrosauna?", "Ein 6–9-kW-Ofen benötigt in der Regel eine eigene 400-V-Drehstromleitung mit FI-Schutz, installiert von einem qualifizierten Elektriker. Vor der Lieferung bestätigen wir die genauen elektrischen Anforderungen Ihres Modells."],
+        ["Was braucht eine Elektrosauna?", "Drehstrom ist nicht zwingend nötig. Öfen bis 6 kW lassen sich einphasig mit 230 V anschließen — in Italien heißt das meist nur, den Zählervertrag von den üblichen 3 kW auf 6 kW zu erhöhen, ein Routineantrag beim Versorger. Ab 9 kW ist eine eigene 400-V-Drehstromleitung die richtige Lösung. In jedem Fall braucht der Ofen eine eigene Leitung mit FI-Schutz, installiert von einem qualifizierten Elektriker. Sagen Sie uns, welchen Anschluss Sie haben, und wir empfehlen den passenden Ofen — die genauen Anforderungen bestätigen wir vor der Lieferung."],
         ["Was braucht eine holzbefeuerte Sauna oder Tub?", "Gar keinen Strom. Das Schornstein-Set ist inklusive; halten Sie das Rauchrohr von brennbaren Materialien fern und beachten Sie die lokalen Regeln. Goldene Regel bei Holz-Tubs: Den Ofen nie anfeuern, bevor die Tub voll Wasser ist."],
       ] },
       { h: "Nutzung & Pflege", items: [
@@ -472,7 +472,7 @@ const ru: Dict = {
       ] },
       { h: "Разрешения и техника", items: [
         ["Нужно ли разрешение на строительство?", "В большинстве итальянских коммун отдельно стоящая переставная садовая сауна или купель относится к «edilizia libera» — разрешение не требуется. Главное — сохранить переставной характер: опоры вместо каменного фундамента, без постоянных подключений. Правила зависят от коммуны, возможны ландшафтные ограничения; уточните в коммуне или у geometra — мы поможем чертежами и спецификациями."],
-        ["Что нужно для электрической сауны?", "Печи 6–9 кВт обычно требуют отдельной трёхфазной линии 400 В с УЗО, установленной квалифицированным электриком. Точные требования для вашей модели подтверждаем до доставки."],
+        ["Что нужно для электрической сауны?", "Три фазы нужны не всегда. Печи до 6 кВт подключаются к однофазной сети 230 В — в Италии обычно достаточно повысить лимит счётчика со стандартных 3 кВт до 6 кВт, это обычный запрос поставщику. От 9 кВт правильное решение — отдельная трёхфазная линия 400 В. В любом случае печи нужна выделенная линия с УЗО, установленная квалифицированным электриком. Скажите, какая у вас сеть, — подберём подходящую печь; точные требования подтверждаем до доставки."],
         ["Что нужно для дровяной сауны или купели?", "Электричество не нужно вовсе. Дымоход в комплекте; держите трубу вдали от горючих материалов и соблюдайте местные правила. Золотое правило дровяных купелей: не разжигайте печь, пока купель не заполнена водой."],
       ] },
       { h: "Использование и уход", items: [
