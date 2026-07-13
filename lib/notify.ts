@@ -36,7 +36,11 @@ export async function sendOrderNotification(o: OrderEmailData): Promise<void> {
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) return;
 
-  const to = process.env.ORDER_EMAIL_TO || 'info@saunaamore.it';
+  // Comma-separated list supported, e.g. "info@saunaamore.it, mkirk1066@gmail.com"
+  const to = (process.env.ORDER_EMAIL_TO || 'info@saunaamore.it')
+    .split(',')
+    .map((s) => s.trim())
+    .filter(Boolean);
   const from = process.env.ORDER_EMAIL_FROM || 'Sauna Amore <onboarding@resend.dev>';
 
   const optionRows = o.options
@@ -77,7 +81,7 @@ export async function sendOrderNotification(o: OrderEmailData): Promise<void> {
       headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({
         from,
-        to: [to],
+        to,
         reply_to: o.email,
         subject: `🛁 ${o.orderNumber} · ${o.productName} · ${euro(o.totalEstimate)}`,
         html,
