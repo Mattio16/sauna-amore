@@ -42,8 +42,12 @@ export async function saveProduct(fd: FormData) {
       const cost = i === -1 ? 0 : Number(l.slice(i + 1).replace(/[^\d]/g, '')) || 0;
       return { label, cost };
     });
+  // Manual total override: stored only when it differs from the breakdown sum.
+  const lineSum = supplierItems.reduce((s, i) => s + (Number(i.cost) || 0), 0);
+  const supplierTotalRaw = num(fd, 'supplierTotal');
   const data = {
     supplierItems,
+    supplierTotal: supplierTotalRaw && supplierTotalRaw !== lineSum ? supplierTotalRaw : null,
     videoUrl: str(fd, 'videoUrl') || null,
     sku: str(fd, 'sku').toUpperCase(),
     nameIt: name,

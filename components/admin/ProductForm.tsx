@@ -1,3 +1,6 @@
+'use client';
+
+import { useMemo, useState } from 'react';
 import { Product } from '@prisma/client';
 import { saveProduct, deleteProduct } from '@/lib/admin-actions';
 
@@ -15,13 +18,37 @@ function getSupplierItems(product?: Product): SupplierItem[] {
   );
 }
 
+function parseLines(text: string): number {
+  return text
+    .split('\n')
+    .map((l) => l.trim())
+    .filter(Boolean)
+    .reduce((sum, l) => {
+      const i = l.lastIndexOf(':');
+      const cost = i === -1 ? 0 : Number(l.slice(i + 1).replace(/[^\d]/g, '')) || 0;
+      return sum + cost;
+    }, 0);
+}
+
 export default function ProductForm({ product }: { product?: Product }) {
   const supplierItems = getSupplierItems(product);
-  const supplierTotal = supplierItems.reduce((s, i) => s + (Number(i.cost) || 0), 0);
+  const initialText = supplierItems.map((i) => `${i.label}: ${i.cost}`).join('\n');
+  const storedTotal = (product as (Product & { supplierTotal?: number | null }) | undefined)
+    ?.supplierTotal;
+
+  const [linesText, setLinesText] = useState(initialText);
+  const [basePrice, setBasePrice] = useState(product?.basePrice ?? 0);
+  // Total follows the line sum until the user types their own number.
+  const [manualTotal, setManualTotal] = useState<number | null>(storedTotal ?? null);
+
+  const lineSum = useMemo(() => parseLines(linesText), [linesText]);
+  const total = manualTotal ?? lineSum;
+
   const marginPct =
-    product && supplierTotal > 0
-      ? Math.round(((product.basePrice / 1.22 - supplierTotal) / (product.basePrice / 1.22)) * 100)
+    basePrice > 0 && total > 0
+      ? Math.round(((basePrice / 1.22 - total) / (basePrice / 1.22)) * 100)
       : null;
+
   return (
     <form action={saveProduct} className="bg-white rounded-xl shadow-sm p-6 space-y-5">
       {product && <input type="hidden" name="id" value={product.id} />}
@@ -42,7 +69,14 @@ export default function ProductForm({ product }: { product?: Product }) {
         </div>
         <div>
           <label className={label}>Base price (€)</label>
-          <input name="basePrice" type="number" defaultValue={product?.basePrice} required className={input} />
+          <input
+            name="basePrice"
+            type="number"
+            defaultValue={product?.basePrice}
+            required
+            className={input}
+            onChange={(e) => setBasePrice(Number(e.target.value) || 0)}
+          />
         </div>
         <div>
           <label className={label}>Sort order</label>
@@ -71,12 +105,30 @@ export default function ProductForm({ product }: { product?: Product }) {
       </div>
 
       <div className="rounded-lg border border-stone-200 bg-stone-50 p-4">
-        <div className="flex items-center justify-between mb-2">
+        <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
           <label className={label + ' mb-0'}>Supplier list price — one item per line: Item: cost</label>
-          <span className="text-sm text-stone-700">
-            Total <strong>€{supplierTotal.toLocaleString('it-IT')}</strong>
+          <span className="flex items-center gap-2 text-sm text-stone-700">
+            Total €
+            <input
+              name="supplierTotal"
+              type="number"
+              value={total || ''}
+              onChange={(e) => setManualTotal(e.target.value === '' ? null : Number(e.target.value) || 0)}
+              title="Auto-sums from the lines; type your own number to override"
+              className="w-24 rounded border border-stone-300 px-2 py-1 text-right text-sm"
+            />
+            {manualTotal !== null && manualTotal !== lineSum && (
+              <button
+                type="button"
+                onClick={() => setManualTotal(null)}
+                title={`Reset to the sum of the lines (€${lineSum.toLocaleString('it-IT')})`}
+                className="text-xs text-stone-400 hover:text-stone-700"
+              >
+                ↻ auto
+              </button>
+            )}
             {marginPct !== null && (
-              <span className={`ml-3 text-xs ${marginPct < 15 ? 'text-red-600' : 'text-green-700'}`}>
+              <span className={`text-xs ${marginPct < 15 ? 'text-red-600' : 'text-green-700'}`}>
                 margin ~{marginPct}% (ex-VAT)
               </span>
             )}
@@ -84,8 +136,9 @@ export default function ProductForm({ product }: { product?: Product }) {
         </div>
         <textarea
           name="supplierItems"
-          rows={Math.max(2, supplierItems.length + 1)}
-          defaultValue={supplierItems.map((i) => `${i.label}: ${i.cost}`).join('\n')}
+          rows={Math.max(2, linesText.split('\n').length + 1)}
+          defaultValue={initialText}
+          onChange={(e) => setLinesText(e.target.value)}
           placeholder={'Sauna body spruce flat-pack: 1470\nHarvia M80 8kW electric: 270'}
           className={input + ' font-mono text-xs'}
         />
