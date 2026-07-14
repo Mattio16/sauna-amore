@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { OrderStatus } from '@prisma/client';
 import { prisma } from '@/lib/db';
 import { euro, formatDate } from '@/lib/format';
+import DeleteOrderButton from '@/components/admin/DeleteOrderButton';
 
 export const dynamic = 'force-dynamic';
 
@@ -61,6 +62,7 @@ export default async function OrdersPage({
                 <th className="px-3 py-3 font-medium">Estimate</th>
                 <th className="px-3 py-3 font-medium">Status</th>
                 <th className="px-5 py-3 font-medium">Received</th>
+                <th className="px-3 py-3" />
               </tr>
             </thead>
             <tbody>
@@ -83,6 +85,9 @@ export default async function OrdersPage({
                     </span>
                   </td>
                   <td className="px-5 py-3 text-stone-400">{formatDate(o.createdAt)}</td>
+                  <td className="px-3 py-3">
+                    <DeleteOrderButton orderId={o.id} orderNumber={o.orderNumber} />
+                  </td>
                 </tr>
               ))}
             </tbody>

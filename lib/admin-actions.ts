@@ -398,6 +398,14 @@ export async function updateOrder(fd: FormData) {
   revalidatePath(`/admin/orders/${id}`);
 }
 
+/** Permanently deletes an order (and its line items). Confirmed client-side. */
+export async function deleteOrder(fd: FormData) {
+  await requireAdmin();
+  await prisma.order.delete({ where: { id: str(fd, 'id') } });
+  revalidatePath('/admin');
+  revalidatePath('/admin/orders');
+}
+
 export async function updateOrderCustomer(fd: FormData) {
   await requireAdmin();
   const id = str(fd, 'id');
