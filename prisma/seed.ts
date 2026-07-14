@@ -11,8 +11,10 @@
  *  - Cut models are deleted from the site (available to order, invisible).
  *
  * Accessories (secchielli, pietre, oli…) still seed from lib/products.ts.
- * Idempotent: upserts by SKU, replaces images/options, deletes non-lineup products.
- * Run: npx prisma db seed
+ *
+ * BOOTSTRAP ONLY: refuses to run against a non-empty database so the admin
+ * remains the source of truth (use --force to rebuild from scratch).
+ * Run: npm run db:seed   (or: npm run db:seed -- --force)
  */
 import { PrismaClient, Category, DisplayType } from '@prisma/client';
 import bcrypt from 'bcryptjs';
@@ -487,6 +489,21 @@ async function seedAdmin() {
 }
 
 async function main() {
+  // The admin (/admin) is the source of truth for a live catalog. To protect
+  // admin edits and deletions, this seed only runs against an EMPTY database —
+  // it exists to bootstrap fresh environments or rebuild after disaster.
+  // Run with --force to override (this resets seed-managed content and
+  // restores anything deleted in the admin).
+  const existing = await prisma.product.count();
+  if (existing > 0 && !process.argv.includes('--force')) {
+    console.log(
+      `Database already has ${existing} products — skipping seed to protect admin edits.\n` +
+        'The back office is the source of truth. To rebuild from the seed file anyway, run:\n' +
+        '  npm run db:seed -- --force',
+    );
+    return;
+  }
+
   const optionIds = await seedOptions();
   console.log('✔ Option groups (wood, heater menu, tub & ice options)');
   await seedLineup(optionIds);

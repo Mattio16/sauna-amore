@@ -2,13 +2,19 @@
 
 ## Critical routine
 
-- **Every `npm run db:seed` must be followed by `npm run db:translate`.** The seed
-  writes English directly to the DB and (since July 2026) clears stale translations
-  when English text changed — the translate run is what refills them. When telling
-  Matt to reseed, ALWAYS give both commands together:
-  `npm run db:seed && npm run db:translate`
+- **THE ADMIN (/admin) IS THE SOURCE OF TRUTH for the live catalog.** The seed is
+  bootstrap/disaster-recovery only: it refuses to run against a non-empty database
+  (override: `npm run db:seed -- --force`, which RESETS seed-managed content and
+  resurrects admin deletions — never suggest it casually).
+- Catalog changes (prices, options, products, texts) are made through the admin UI,
+  not by editing seed.ts + reseeding. If Claude needs to change catalog data in bulk,
+  write a one-off script against the DB (or walk Matt through the admin), and update
+  seed.ts too only so fresh environments match.
+- **If a forced/bootstrap seed ever runs, follow it with `npm run db:translate`**
+  (`npm run db:seed -- --force && npm run db:translate`).
 - Admin edits need no translate run — server actions auto-translate on save via DeepL.
-- After schema changes, `npm run db:push` comes first.
+- After schema changes, `npm run db:push` comes first (before or immediately after
+  `git push`, never forgotten — new code + old DB = site-wide 500s).
 - Env var changes in Vercel require a redeploy to take effect.
 
 ## Conventions
