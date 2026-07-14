@@ -21,8 +21,8 @@ if (password.length < 8) {
 const prisma = new PrismaClient();
 const passwordHash = await bcrypt.hash(password, 12);
 
-// Replace whatever admin user(s) exist with this one.
-await prisma.adminUser.deleteMany({ where: { email: { not: email } } });
+// Upserts this admin; other admin users are left untouched
+// (manage the team at /admin/users).
 await prisma.adminUser.upsert({
   where: { email },
   update: { passwordHash },

@@ -1,6 +1,7 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
+import bcrypt from 'bcryptjs';
 import { redirect } from 'next/navigation';
 import { getServerSession } from 'next-auth/next';
 import { Category, OrderStatus } from '@prisma/client';
@@ -424,4 +425,42 @@ export async function updateOrderCustomer(fd: FormData) {
   });
   revalidatePath('/admin/orders');
   revalidatePath(`/admin/orders/${id}`);
+}
+
+
+// ---------- admin users ----------
+
+export async function createAdminUser(fd: FormData) {
+  await requireAdmin();
+  const email = str(fd, 'email').toLowerCase();
+  const name = str(fd, 'name') || null;
+  const password = str(fd, 'password');
+  if (!email.includes('@')) throw new Error('Valid email required');
+  if (password.length < 8) throw new Error('Password must be at least 8 characters');
+  const passwordHash = await bcrypt.hash(password, 12);
+  await prisma.adminUser.upsert({
+    where: { email },
+    update: { name, passwordHash },
+    create: { email, name, passwordHash },
+  });
+  revalidatePath('/admin/users');
+}
+
+export async function resetAdminPassword(fd: FormData) {
+  await requireAdmin();
+  const id = str(fd, 'id');
+  const password = str(fd, 'password');
+  if (password.length < 8) throw new Error('Password must be at least 8 characters');
+  const passwordHash = await bcrypt.hash(password, 12);
+  await prisma.adminUser.update({ where: { id }, data: { passwordHash } });
+  revalidatePath('/admin/users');
+}
+
+export async function deleteAdminUser(fd: FormData) {
+  await requireAdmin();
+  const id = str(fd, 'id');
+  const count = await prisma.adminUser.count();
+  if (count <= 1) throw new Error('Cannot delete the last admin user');
+  await prisma.adminUser.delete({ where: { id } });
+  revalidatePath('/admin/users');
 }
