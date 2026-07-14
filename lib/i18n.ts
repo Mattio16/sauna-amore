@@ -16,7 +16,7 @@ const it = {
   nav: { saunas: 'Saune', tubs: 'Vasche', ice: 'Bagni di Ghiaccio', accessories: 'Accessori', rental: 'Noleggio', about: 'Chi Siamo', contact: 'Contatti' },
   common: {
     from: 'a partire da', discover: 'Scopri', requestQuote: 'Richiedi preventivo', configure: 'Componi la tua',
-    persons: 'persone', viewAll: 'Vedi tutti', back: 'Indietro', models: 'modelli', loading: 'Caricamento…',
+    persons: 'persone', viewAll: 'Vedi tutti', back: 'Indietro', models: 'modelli', loading: 'Caricamento…', vatIncl: 'IVA inclusa',
   },
   home: {
     kicker: 'Benessere nordico · Le Marche',
@@ -116,7 +116,7 @@ export type Dict = typeof it;
 
 const en: Dict = {
   nav: { saunas: 'Saunas', tubs: 'Hot Tubs', ice: 'Ice Baths', accessories: 'Accessories', rental: 'Rental', about: 'About', contact: 'Contact' },
-  common: { from: 'from', discover: 'Discover', requestQuote: 'Request a quote', configure: 'Compose yours', persons: 'persons', viewAll: 'View all', back: 'Back', models: 'models', loading: 'Loading…' },
+  common: { from: 'from', discover: 'Discover', requestQuote: 'Request a quote', configure: 'Compose yours', persons: 'persons', viewAll: 'View all', back: 'Back', models: 'models', loading: 'Loading…', vatIncl: 'VAT included' },
   home: {
     kicker: 'Nordic wellness · Le Marche',
     h1a: 'The quiet luxury', h1b: 'of nature',
@@ -213,7 +213,7 @@ const en: Dict = {
 
 const nl: Dict = {
   nav: { saunas: "Sauna's", tubs: 'Hottubs', ice: 'IJsbaden', accessories: 'Accessoires', rental: 'Verhuur', about: 'Over ons', contact: 'Contact' },
-  common: { from: 'vanaf', discover: 'Ontdek', requestQuote: 'Offerte aanvragen', configure: 'Stel de jouwe samen', persons: 'personen', viewAll: 'Bekijk alles', back: 'Terug', models: 'modellen', loading: 'Laden…' },
+  common: { from: 'vanaf', discover: 'Ontdek', requestQuote: 'Offerte aanvragen', configure: 'Stel de jouwe samen', persons: 'personen', viewAll: 'Bekijk alles', back: 'Terug', models: 'modellen', loading: 'Laden…', vatIncl: 'incl. btw' },
   home: {
     kicker: 'Noords welzijn · Le Marche',
     h1a: 'De stille luxe', h1b: 'van de natuur',
@@ -310,7 +310,7 @@ const nl: Dict = {
 
 const de: Dict = {
   nav: { saunas: 'Saunen', tubs: 'Badefässer', ice: 'Eisbäder', accessories: 'Zubehör', rental: 'Vermietung', about: 'Über uns', contact: 'Kontakt' },
-  common: { from: 'ab', discover: 'Entdecken', requestQuote: 'Angebot anfordern', configure: 'Ihre zusammenstellen', persons: 'Personen', viewAll: 'Alle ansehen', back: 'Zurück', models: 'Modelle', loading: 'Laden…' },
+  common: { from: 'ab', discover: 'Entdecken', requestQuote: 'Angebot anfordern', configure: 'Ihre zusammenstellen', persons: 'Personen', viewAll: 'Alle ansehen', back: 'Zurück', models: 'Modelle', loading: 'Laden…', vatIncl: 'inkl. MwSt.' },
   home: {
     kicker: 'Nordisches Wohlbefinden · Le Marche',
     h1a: 'Der stille Luxus', h1b: 'der Natur',
@@ -407,7 +407,7 @@ const de: Dict = {
 
 const ru: Dict = {
   nav: { saunas: 'Сауны', tubs: 'Купели', ice: 'Ледяные ванны', accessories: 'Аксессуары', rental: 'Аренда', about: 'О нас', contact: 'Контакты' },
-  common: { from: 'от', discover: 'Подробнее', requestQuote: 'Запросить расчёт', configure: 'Собрать свою', persons: 'человек', viewAll: 'Смотреть все', back: 'Назад', models: 'моделей', loading: 'Загрузка…' },
+  common: { from: 'от', discover: 'Подробнее', requestQuote: 'Запросить расчёт', configure: 'Собрать свою', persons: 'человек', viewAll: 'Смотреть все', back: 'Назад', models: 'моделей', loading: 'Загрузка…', vatIncl: 'НДС включён' },
   home: {
     kicker: 'Северное благополучие · Ле Марке',
     h1a: 'Тихая роскошь', h1b: 'природы',

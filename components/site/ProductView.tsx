@@ -287,6 +287,7 @@ export default function ProductView({ product, related }: { product: ProductData
                   </div>
                 </div>
                 <p className="font-display text-4xl text-pine-deep">{euro(unitPrice * qty)}</p>
+                <p className="text-xs text-moss mt-1">{t.common.vatIncl}</p>
               </div>
             </Reveal>
 

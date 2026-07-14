@@ -44,6 +44,7 @@ export default function ProductCard({ product, index = 0 }: { product: ProductCa
         <p className="text-pine font-medium">
           <span className="text-inksoft font-normal text-sm mr-1.5">{t.common.from}</span>
           {euro(product.basePrice)}
+          <span className="text-inksoft font-normal text-[11px] ml-1.5">{t.common.vatIncl}</span>
         </p>
       </div>
     </Link>
