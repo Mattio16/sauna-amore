@@ -13,6 +13,11 @@ async function requireAdmin() {
   if (!session) throw new Error('Unauthorized');
 }
 
+/** Purge the public site cache so admin changes (and deletions) show immediately. */
+function revalidateShop() {
+  revalidatePath('/', 'layout');
+}
+
 function str(fd: FormData, key: string): string {
   return String(fd.get(key) ?? '').trim();
 }
@@ -83,6 +88,7 @@ export async function saveProduct(fd: FormData) {
     await prisma.product.update({ where: { id: productId }, data: { translations } as never });
   }
 
+  revalidateShop();
   revalidatePath('/admin/products');
   redirect(`/admin/products/${productId}?saved=1`);
 }
@@ -90,6 +96,7 @@ export async function saveProduct(fd: FormData) {
 export async function deleteProduct(fd: FormData) {
   await requireAdmin();
   await prisma.product.delete({ where: { id: str(fd, 'id') } });
+  revalidateShop();
   revalidatePath('/admin/products');
   redirect('/admin/products');
 }
@@ -99,6 +106,7 @@ export async function togglePublish(fd: FormData) {
   const id = str(fd, 'id');
   const current = await prisma.product.findUniqueOrThrow({ where: { id }, select: { isPublished: true } });
   await prisma.product.update({ where: { id }, data: { isPublished: !current.isPublished } });
+  revalidateShop();
   revalidatePath('/admin/products');
 }
 
@@ -111,12 +119,14 @@ export async function addImageUrl(fd: FormData) {
   if (!url.startsWith('http')) throw new Error('Invalid URL');
   const count = await prisma.productImage.count({ where: { productId } });
   await prisma.productImage.create({ data: { productId, url, sortOrder: count } });
+  revalidateShop();
   revalidatePath(`/admin/products/${productId}`);
 }
 
 export async function deleteImage(fd: FormData) {
   await requireAdmin();
   const image = await prisma.productImage.delete({ where: { id: str(fd, 'id') } });
+  revalidateShop();
   revalidatePath(`/admin/products/${image.productId}`);
 }
 
@@ -137,6 +147,7 @@ export async function moveImage(fd: FormData) {
       prisma.productImage.update({ where: { id: swapWith.id }, data: { sortOrder: img.sortOrder } }),
     ]);
   }
+  revalidateShop();
   revalidatePath(`/admin/products/${img.productId}`);
 }
 
@@ -188,6 +199,7 @@ export async function setProductOption(fd: FormData) {
       create: { productId, optionId, priceDelta, isDefault, supplierCost },
     } as never);
   }
+  revalidateShop();
   revalidatePath(`/admin/products/${productId}`);
 }
 
@@ -215,6 +227,7 @@ export async function createOptionForProduct(fd: FormData) {
   await prisma.productOption.create({
     data: { productId, optionId: option.id, priceDelta, supplierCost, isDefault: false } as never,
   });
+  revalidateShop();
   revalidatePath(`/admin/products/${productId}`);
 }
 
@@ -239,6 +252,7 @@ export async function moveOption(fd: FormData) {
       siblings.map((o, i) => prisma.option.update({ where: { id: o.id }, data: { sortOrder: i } })),
     );
   }
+  revalidateShop();
   revalidatePath(`/admin/products/${productId}`);
 }
 
@@ -247,7 +261,9 @@ export async function deleteOptionFromProduct(fd: FormData) {
   await requireAdmin();
   const productId = str(fd, 'productId');
   await prisma.option.delete({ where: { id: str(fd, 'optionId') } });
+  revalidateShop();
   revalidatePath(`/admin/products/${productId}`);
+  revalidateShop();
   revalidatePath('/admin/options');
 }
 
@@ -266,6 +282,7 @@ export async function createOptionGroup(fd: FormData) {
   await prisma.optionGroup.create({
     data: { code, nameIt: name, nameEn: name, sortOrder: count, ...(translations ? { translations } : {}) } as never,
   });
+  revalidateShop();
   revalidatePath(`/admin/products/${productId}`);
 }
 
@@ -281,6 +298,7 @@ export async function renameOptionGroup(fd: FormData) {
     where: { id: str(fd, 'groupId') },
     data: { nameIt: name, nameEn: name, displayType, ...(translations ? { translations } : {}) } as never,
   });
+  revalidateShop();
   revalidatePath(`/admin/products/${productId}`);
 }
 
@@ -300,6 +318,7 @@ export async function moveOptionGroup(fd: FormData) {
       groups.map((g, i) => prisma.optionGroup.update({ where: { id: g.id }, data: { sortOrder: i } })),
     );
   }
+  revalidateShop();
   revalidatePath(`/admin/products/${productId}`);
 }
 
@@ -308,7 +327,9 @@ export async function deleteOptionGroup(fd: FormData) {
   await requireAdmin();
   const productId = str(fd, 'productId');
   await prisma.optionGroup.delete({ where: { id: str(fd, 'groupId') } });
+  revalidateShop();
   revalidatePath(`/admin/products/${productId}`);
+  revalidateShop();
   revalidatePath('/admin/options');
 }
 
@@ -322,6 +343,7 @@ export async function saveOption(fd: FormData) {
     where: { id },
     data: { nameIt: name, nameEn: name, sortOrder: num(fd, 'sortOrder') },
   });
+  revalidateShop();
   revalidatePath('/admin/options');
 }
 
@@ -335,12 +357,14 @@ export async function createOption(fd: FormData) {
   await prisma.option.create({
     data: { groupId, code, nameEn: name, nameIt: name, sortOrder: count },
   });
+  revalidateShop();
   revalidatePath('/admin/options');
 }
 
 export async function deleteOption(fd: FormData) {
   await requireAdmin();
   await prisma.option.delete({ where: { id: str(fd, 'id') } });
+  revalidateShop();
   revalidatePath('/admin/options');
 }
 

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { revalidatePath } from 'next/cache';
 import { getServerSession } from 'next-auth/next';
 import { put } from '@vercel/blob';
 import { authOptions } from '@/lib/auth';
@@ -27,6 +28,7 @@ export async function POST(req: NextRequest) {
       access: 'public',
     });
     await prisma.option.update({ where: { id: optionId }, data: { imageUrl: blob.url } as never });
+    revalidatePath('/', 'layout');
     return NextResponse.json({ url: blob.url });
   }
 
@@ -51,5 +53,6 @@ export async function DELETE(req: NextRequest) {
   if (!optionId) return NextResponse.json({ error: 'Missing optionId' }, { status: 400 });
 
   await prisma.option.update({ where: { id: optionId }, data: { imageUrl: null } as never });
+  revalidatePath('/', 'layout');
   return NextResponse.json({ ok: true });
 }
