@@ -106,7 +106,7 @@ const it = {
     ] as { h: string; items: [string, string][] }[],
   },
   footer: {
-    tagline: 'Benessere nordico nel cuore delle Marche. Saune finlandesi premium, bagni di ghiaccio ed esperienze wellness autentiche.',
+    tagline: 'Benessere nordico nel cuore delle Marche. Saune premium, bagni di ghiaccio ed esperienze wellness autentiche.',
     products: 'Prodotti', company: 'Azienda', contacts: 'Contatti', privacy: 'Privacy Policy',
     rights: 'Tutti i diritti riservati.',
   },
@@ -205,7 +205,7 @@ const en: Dict = {
     ] as { h: string; items: [string, string][] }[],
   },
   footer: {
-    tagline: 'Nordic wellness in the heart of the Marche. Premium Finnish saunas, ice baths and authentic wellness experiences.',
+    tagline: 'Nordic wellness in the heart of the Marche. Premium saunas, ice baths and authentic wellness experiences.',
     products: 'Products', company: 'Company', contacts: 'Contacts', privacy: 'Privacy Policy',
     rights: 'All rights reserved.',
   },
@@ -302,7 +302,7 @@ const nl: Dict = {
     ] as { h: string; items: [string, string][] }[],
   },
   footer: {
-    tagline: "Noords welzijn in het hart van de Marche. Premium Finse sauna's, ijsbaden en authentieke wellnesservaringen.",
+    tagline: "Noords welzijn in het hart van de Marche. Premium sauna's, ijsbaden en authentieke wellnesservaringen.",
     products: 'Producten', company: 'Bedrijf', contacts: 'Contact', privacy: 'Privacybeleid',
     rights: 'Alle rechten voorbehouden.',
   },
@@ -399,7 +399,7 @@ const de: Dict = {
     ] as { h: string; items: [string, string][] }[],
   },
   footer: {
-    tagline: 'Nordisches Wohlbefinden im Herzen der Marken. Premium-Saunen aus Finnland, Eisbäder und authentische Wellness-Erlebnisse.',
+    tagline: 'Nordisches Wohlbefinden im Herzen der Marken. Premium-Saunen, Eisbäder und authentische Wellness-Erlebnisse.',
     products: 'Produkte', company: 'Unternehmen', contacts: 'Kontakt', privacy: 'Datenschutz',
     rights: 'Alle Rechte vorbehalten.',
   },
@@ -496,7 +496,7 @@ const ru: Dict = {
     ] as { h: string; items: [string, string][] }[],
   },
   footer: {
-    tagline: 'Северное благополучие в сердце Ле Марке. Премиальные финские сауны, ледяные ванны и подлинный wellness-опыт.',
+    tagline: 'Северное благополучие в сердце Ле Марке. Премиальные сауны, ледяные ванны и подлинный wellness-опыт.',
     products: 'Продукция', company: 'Компания', contacts: 'Контакты', privacy: 'Конфиденциальность',
     rights: 'Все права защищены.',
   },
