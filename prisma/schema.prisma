@@ -166,3 +166,21 @@ model AdminUser {
   name         String?
   createdAt    DateTime @default(now())
 }
+
+// One row per QR code scan. Written by the /<code> redirect routes (lib/qr.ts).
+// Deliberately stores no IP address and no cookie/visitor id — country comes
+// from Vercel's edge header, which is enough to see where a campaign lands
+// without holding personal data.
+model QrScan {
+  id        String   @id @default(cuid())
+  code      String // campaign code, e.g. "ca1"
+  createdAt DateTime @default(now())
+  userAgent String?  @db.Text
+  referer   String?  @db.Text
+  country   String? // ISO-2 from x-vercel-ip-country
+  city      String?
+  isBot     Boolean  @default(false) // link previewers / crawlers, excluded from headline counts
+
+  @@index([code, createdAt])
+  @@index([createdAt])
+}

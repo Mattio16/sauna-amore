@@ -14,11 +14,12 @@ const statusColors: Record<string, string> = {
 };
 
 export default async function AdminDashboard() {
-  const [newOrders, totalOrders, products, unpublished, recent] = await Promise.all([
+  const [newOrders, totalOrders, products, unpublished, qrScans, recent] = await Promise.all([
     prisma.order.count({ where: { status: 'NEW' } }),
     prisma.order.count(),
     prisma.product.count(),
     prisma.product.count({ where: { isPublished: false } }),
+    prisma.qrScan.count({ where: { isBot: false } }),
     prisma.order.findMany({
       orderBy: { createdAt: 'desc' },
       take: 8,
@@ -31,13 +32,14 @@ export default async function AdminDashboard() {
     { label: 'Total orders', value: totalOrders, href: '/admin/orders' },
     { label: 'Products', value: products, href: '/admin/products' },
     { label: 'Unpublished', value: unpublished, href: '/admin/products' },
+    { label: 'QR scans', value: qrScans, href: '/admin/qr' },
   ];
 
   return (
     <div className="space-y-8 max-w-5xl">
       <h1 className="text-2xl font-semibold text-stone-900">Dashboard</h1>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
         {stats.map((s) => (
           <Link key={s.label} href={s.href} className="bg-white rounded-xl shadow-sm p-5 hover:shadow transition-shadow">
             <p className="text-3xl font-semibold text-stone-900">{s.value}</p>
